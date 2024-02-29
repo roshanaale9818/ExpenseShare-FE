@@ -19,9 +19,6 @@ import { PAGES, SETTINGS_MENU } from 'src/utils/menu/pages';
 
 import { authActions } from 'src/store';
 
-
-
-
 // import AdbIcon from '@mui/icons-material/Adb';
 
 export default function Navbar() {
@@ -44,21 +41,27 @@ export default function Navbar() {
   const handleCloseUserMenu = (menu) => {
     setAnchorElUser(null);
     console.log('CLOSING');
+    console.log("sadas",menu.title)
     try {
       switch (menu.title) {
-        case 'logout':
-          logoutHandler();
+        case 'Logout':
+            
+          if (window.confirm('Are you sure you want to logout?')) {
+            logoutHandler();
+          }
+
           break;
 
         default:
           break;
       }
     } catch {
-      console.log('errror has occured');
+      console.error('errror has occured');
     }
   };
-  const logoutHandler = () => {
-    dispatch(authActions.logout());
+  const logoutHandler = async () => {
+    await dispatch(authActions.logout());
+    navigate('/home');
   };
   const onNavbarMainHandler = () => {
     console.log('This should route to main home');
@@ -193,5 +196,3 @@ export default function Navbar() {
     </AppBar>
   );
 }
-
-
