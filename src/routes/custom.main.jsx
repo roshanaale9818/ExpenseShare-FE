@@ -13,7 +13,7 @@ export default function CustomMain() {
         <div className="main-content" id="main">
           {outlet}
         </div>
-    <Footer />
+        <Footer />
       </div>
     </div>
   );

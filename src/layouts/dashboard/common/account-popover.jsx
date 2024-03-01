@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -9,7 +11,13 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
+import { authActions } from 'src/store';
 import { account } from 'src/_mock/account';
+
+import ConfirmDialog from 'src/components/confirm/confirm-dialog';
+
+
+// import ConfirmDialog from 'src/components/confirm/confirm-dialog';
 
 // ----------------------------------------------------------------------
 
@@ -32,14 +40,20 @@ const MENU_OPTIONS = [
 
 export default function AccountPopover() {
   const [open, setOpen] = useState(null);
-
+  const dispatch = useDispatch();
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
   };
+  const navigate = useNavigate();
 
   const handleClose = () => {
     setOpen(null);
   };
+  const onConfirmedHandler = () => {
+    dispatch(authActions.logout());
+    navigate('/home')
+  };
+  const onCancelHandler = ()=>{}
 
   return (
     <>
@@ -102,14 +116,21 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
 
-        <MenuItem
+        {/* <MenuItem
           disableRipple
           disableTouchRipple
-          onClick={handleClose}
+          onClick={onLogoutHandler}
           sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
         >
           Logout
-        </MenuItem>
+        </MenuItem> */}
+        <ConfirmDialog
+          title="Are you sure you want to Logout ?"
+          description="You have to sign in again."
+          onConfirmed={onConfirmedHandler}
+          onCanceled={onCancelHandler}
+          sx={{ typography: 'body2', color: 'error.main', py: 1.5,width:'100%'}}
+        />
       </Popover>
     </>
   );

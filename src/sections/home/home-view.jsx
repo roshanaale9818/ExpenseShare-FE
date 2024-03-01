@@ -20,7 +20,7 @@ export default function HomeView() {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            height: 'calc(100vw * 0.5625)', // For a 16:9 aspect ratio
+            height: '600px', // For a 16:9 aspect ratio
             padding: 0, // Set padding
           }}
         >

@@ -1,15 +1,22 @@
+import { useNavigate } from 'react-router-dom';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
-import { RouterLink } from 'src/routes/components';
+// import { RouterLink } from 'src/routes/components';
 
 // import Logo from 'src/components/logo';
 
 // ----------------------------------------------------------------------
 
 export default function NotFoundView() {
+  const navigate = useNavigate();
+  const onNavHandler = ()=>{
+    console.log("NAV HANDLER")
+    navigate('/home');
+  }
   // const renderHeader = (
   //   <Box
   //     component="header"
@@ -63,7 +70,7 @@ export default function NotFoundView() {
             }}
           />
 
-          <Button href="/" size="large" variant="contained" component={RouterLink}>
+          <Button onClick={onNavHandler} size="large" variant="contained">
             Go to Home
           </Button>
         </Box>

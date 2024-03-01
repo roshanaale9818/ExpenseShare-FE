@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 // import { useLoaderData } from 'react-router-dom';
@@ -15,15 +15,13 @@ import { authActions } from 'src/store';
 // import Checkbox from '@mui/material/Checkbox';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
 // import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
-
-
 import CopyRight from 'src/components/copyright/CopyRight';
+// import ConfirmDialog from 'src/components/confirm/confirm-dialog';
 
 
 
@@ -31,22 +29,12 @@ import CopyRight from 'src/components/copyright/CopyRight';
 
 
 const defaultTheme = createTheme();
-// export async function loaderFunction(req,params){
-//   console.log("THIS IS REQ AND PARAMS",req,params)
-//   const res = await fetch('https://jsonplaceholder.typicode.com/todos');
-//   console.log(res,"Loader is called");
-//   return {data:res}
-// }
 
 export default function SignInView() {
 const dispatch = useDispatch();
 const navigate = useNavigate();
-  // dispatchLoginAction(authActions.login())
   const   isLoggedIn = useSelector(state=>state.auth.isLoggedIn);
   console.log("LOGGED IN STATUS",isLoggedIn)
-  // const onLogoutHandler = async ()=>{
-  //   await dispatch(authActions.logout())
-  // }
   const loginHandler = ()=>{
     console.log("submitting")
     dispatch(authActions.login())
@@ -78,11 +66,15 @@ const navigate = useNavigate();
       password: data.get('password'),
     });
   };
+  // const onConfirmedHandler = ()=>{
+
+  // }
 
   return (
    
     <ThemeProvider theme={defaultTheme}>
        {/* {navigation.state==='loading' &&<p>Loading....</p>} */}
+       {/* <ConfirmDialog onConfirmed={onConfirmedHandler} onCanceled={onConfirmedHandler} /> */}
       <Grid container component="main" sx={{ height: '100vh' }}>
        
         <CssBaseline />
@@ -137,10 +129,6 @@ const navigate = useNavigate();
                 id="password"
                 autoComplete="current-password"
               />
-              {/* <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              /> */}
               <Button onClick={loginHandler}
                 type="submit"
                 fullWidth
@@ -151,12 +139,12 @@ const navigate = useNavigate();
               </Button>
               <Grid container>
                 <Grid item xs>
-                  <Link href='/404' variant="body2">
+                  <Link to='/home' variant="body2">
                   Back
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link href="#" variant="body2">
+                  <Link to='' href="#" variant="body2">
                     Dont have an account? Sign Up
                   </Link>
                 </Grid>

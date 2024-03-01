@@ -1,0 +1,1 @@
+export {default as DialogView} from './confirm-dialog';

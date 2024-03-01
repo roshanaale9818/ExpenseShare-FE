@@ -1,8 +1,8 @@
 {
   "name": "exepnseshare",
-  "author": "minimals.cc",
+  "author": "roshnaaale9818",
   "licence": "MIT",
-  "version": "1.8.0",
+  "version": "1.0.0",
   "private": false,
   "scripts": {
     "dev": "vite",
