@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
@@ -17,13 +17,17 @@ import Typography from '@mui/material/Typography';
 
 import { PAGES, SETTINGS_MENU } from 'src/utils/menu/pages';
 
+// import { authActions } from 'src/store';
 import { authActions } from 'src/store';
+
+import ConfirmDialog from 'src/components/confirm/confirm-dialog';
 
 // import AdbIcon from '@mui/icons-material/Adb';
 
 export default function Navbar() {
-  const authUser = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const authUser = useSelector((state) => state.auth);
+  // const dispatch = useDispatch();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -37,6 +41,12 @@ export default function Navbar() {
   const handleCloseNavMenu = (route) => {
     setAnchorElNav(null);
   };
+ const  onCanceledHandler=()=>{}
+ const onConfirmHandler = ()=>{
+  dispatch(authActions.logout());
+  navigate('/home')
+ }
+
 
   const handleCloseUserMenu = (menu) => {
     setAnchorElUser(null);
@@ -46,9 +56,9 @@ export default function Navbar() {
       switch (menu.title) {
         case 'Logout':
             
-          if (window.confirm('Are you sure you want to logout?')) {
-            logoutHandler();
-          }
+          // if (window.confirm('Are you sure you want to logout?')) {
+          //   // logoutHandler();
+          // }
 
           break;
 
@@ -59,10 +69,10 @@ export default function Navbar() {
       console.error('errror has occured');
     }
   };
-  const logoutHandler = async () => {
-    await dispatch(authActions.logout());
-    navigate('/home');
-  };
+  // const logoutHandler = async () => {
+  //   await dispatch(authActions.logout());
+  //   navigate('/home');
+  // };
   const onNavbarMainHandler = () => {
     console.log('This should route to main home');
   };
@@ -188,6 +198,14 @@ export default function Navbar() {
                     <Typography textAlign="right">{setting.title}</Typography>
                   </MenuItem>
                 ))}
+  <ConfirmDialog
+          title="Are you sure you want to Logout ?"
+          description="You have to sign in again."
+          onConfirmed={onConfirmHandler}
+          onCanceled={onCanceledHandler}
+          label="Logout"
+          sx={{ typography: 'body2',textAlign:'left', color: 'error.main', py: 1.5,width:'100%'}}
+        />
               </Menu>
             </Box>
           )}

@@ -18,7 +18,8 @@ export default function ConfirmDialog({
   onConfirmed,
   onCanceled,
   children,
-  sx
+  sx,
+  label
 }) {
   const [open, setOpen] = useState(false);
 
@@ -54,7 +55,7 @@ export default function ConfirmDialog({
   return (
     <>
       <Button color='error' onClick={handleClickOpen} sx={sx}>
-        Logout
+        {label && label} {!label &&'Logout'}
       </Button>
       <Dialog
         open={open}
@@ -86,5 +87,6 @@ ConfirmDialog.propTypes = {
   onCanceled: PropTypes.func,
   onConfirmed: PropTypes.func,
   children:PropTypes.node,
-  sx:PropTypes.object
+  sx:PropTypes.object,
+  label:PropTypes.string
 };
