@@ -12,7 +12,10 @@ export const SignInPage = lazy(() => import('src/pages/signin'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const HomePage = lazy(() => import('src/pages/home'));
-export const ExpensePage = lazy(()=>import('src/pages/expense'))
+export const ExpensePage = lazy(()=>import('src/pages/expense'));
+export const GroupPage = lazy(()=>import('src/pages/group'));
+export const ExpenseRequestPage = lazy(()=>import('src/pages/expense-request'));
+
 
 // ----------------------------------------------------------------------
 
@@ -33,6 +36,9 @@ export default function Router() {
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
         { path: 'expense', element: <ExpensePage /> },
+        { path: 'group', element: <GroupPage /> },
+        {path:'expense-request', element :<ExpenseRequestPage/>}
+
       ],
     },
     {

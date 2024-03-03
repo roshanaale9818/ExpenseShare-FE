@@ -10,19 +10,25 @@ import DialogContentText from '@mui/material/DialogContentText';
 
 import { PageHeadView } from 'src/components/page-head';
 
-import ExpenseTableView from './expense-table-view';
+import ExpenseRequestTableView from './expense-request-table-view';
 
-export default function ExpenseView() {
+export default function ExpenseRequestView() {
   const [isOpen, setOpen] = useState(false);
   const handleClose = () => {
     setOpen(false);
   };
-  const onNewClicked = ()=>{
-    setOpen(true)
-  }
+  const onNewClicked = () => {
+    setOpen(true);
+  };
+  const hideBtn = true;
   return (
     <>
-      <PageHeadView name="Expenses" labelForNewButton="New Expense" onNewClick={onNewClicked}  />
+      <PageHeadView
+        name="Expense Requests"
+        hideNewButton={hideBtn}
+        labelForNewButton="New Expense"
+        onNewClick={onNewClicked}
+      />
       <Container>
         <Dialog
           open={isOpen}
@@ -32,9 +38,7 @@ export default function ExpenseView() {
         >
           <DialogTitle id="alert-dialog-title">Add Expense</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Forms for expense
-            </DialogContentText>
+            <DialogContentText id="alert-dialog-description">Forms for expense</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
@@ -44,7 +48,7 @@ export default function ExpenseView() {
           </DialogActions>
         </Dialog>
 
-        <ExpenseTableView />
+        <ExpenseRequestTableView />
       </Container>
     </>
   );

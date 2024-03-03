@@ -23,12 +23,12 @@ const navConfig = [
     icon: icon('ic_cart'),
   },
   {
-    title: 'Expense',
+    title: 'My Expenses',
     path: '/auth/expense',
     icon: icon('ic_user'),
   },
   {
-    title: 'Groups',
+    title: 'My Groups',
     path: '/auth/group',
     icon: icon('ic_user'),
   },
@@ -37,16 +37,26 @@ const navConfig = [
     path: '',
     icon: icon('ic_blog'),
   },
+  {
+    title: 'Settlements',
+    path: '',
+    icon: icon('ic_blog'),
+  },
+  {
+    title: 'Expense Requests',
+    path: '/auth/expense-request',
+    icon: icon('ic_user'),
+  },
   // {
   //   title: 'login',
   //   path: '/login',
   //   icon: icon('ic_lock'),
   // },
-  {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic_disabled'),
-  },
+  // {
+  //   title: 'Not found',
+  //   path: '/404',
+  //   icon: icon('ic_disabled'),
+  // },
 ];
 
 export default navConfig;
