@@ -15,6 +15,7 @@ export const HomePage = lazy(() => import('src/pages/home'));
 export const ExpensePage = lazy(()=>import('src/pages/expense'));
 export const GroupPage = lazy(()=>import('src/pages/group'));
 export const ExpenseRequestPage = lazy(()=>import('src/pages/expense-request'));
+export const SignUpPage = lazy(()=>import('src/pages/signup'));
 
 
 // ----------------------------------------------------------------------
@@ -51,6 +52,10 @@ export default function Router() {
         {
           path: 'home',
           element: <HomePage />,
+        },
+        {
+          path: 'signup',
+          element: <SignUpPage />,
         },
         {
           path: '404',

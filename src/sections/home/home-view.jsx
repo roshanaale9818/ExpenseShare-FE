@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import  Grid  from '@mui/material/Grid';
 import  Paper  from '@mui/material/Paper';
 import  Button  from '@mui/material/Button';
@@ -9,6 +11,10 @@ import ThemeProvider from 'src/theme';
 // import ThemeProvider from 'src/theme';
 
 export default function HomeView() {
+  const navigate = useNavigate();
+  const onSignUpHandler = ()=>{
+      navigate('/signup');
+  }
   return (
     <ThemeProvider>
     <Grid container>
@@ -61,7 +67,7 @@ export default function HomeView() {
                 Keep track of your shared expenses and balances with housemates, trips, groups,
                 friends, and family.
               </Typography>
-              <Button variant="contained" color="primary" size="large" sx={{ margin: 2 }}>
+              <Button onClick={onSignUpHandler} variant="contained" color="primary" size="large" sx={{ margin: 2 }}>
                 Sign up
               </Button>
               <Button variant="outlined" color="primary" size="large" sx={{ margin: 2 }}>

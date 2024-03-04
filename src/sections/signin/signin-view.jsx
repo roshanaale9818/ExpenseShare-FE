@@ -144,7 +144,7 @@ const navigate = useNavigate();
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link to='' href="#" variant="body2">
+                  <Link to='/signup' variant="body2">
                     Dont have an account? Sign Up
                   </Link>
                 </Grid>
