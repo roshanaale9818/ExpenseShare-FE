@@ -1,13 +1,15 @@
 import * as yup from 'yup';
 import * as React from 'react';
+import {useState} from 'react';
 import { useFormik } from 'formik';
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
 // import { useLoaderData } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -15,7 +17,8 @@ import Typography from '@mui/material/Typography';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import { authActions } from 'src/store';
+// import { authActions } from 'src/store';
+import _http from 'src/utils/http';
 
 import CopyRight from 'src/components/copyright/CopyRight';
 
@@ -26,34 +29,64 @@ const schema = yup.object({
     .min(8, 'Password should be of minimum 8 characters length')
     .required('Password is required'),
 });
+const initialValues = {
+  email: 'yourmemail@example.com',
+  password: 'somethingsecret',
+};
 
 const defaultTheme = createTheme();
 
 export default function SignInView() {
+  const [isLoading,setLoading]= useState(false);
+  const [errorMessage,setErrorMessage]=useState(null);
   const formik = useFormik({
-    initialValues: {
-      email: 'johndoe@example.com',
-      password: 'somethingsecret',
-    },
+    initialValues,
     validationSchema: schema,
     onSubmit: (values) => {
       // alert(JSON.stringify(values, null, 2));
+      setLoading(true);
+      console.log(isLoading)
+      loginHandler(values);
     },
   });
-  const dispatch = useDispatch();
+  // console.log("FORMIK")
+  // const dispatch = useDispatch();
   const navigate = useNavigate();
-  const loginHandler = () => {
-    console.log('submitting');
-    dispatch(authActions.login());
-    navigate('/auth');
+  const loginHandler = async (formData) => {
+    try {
+      setLoading(true)
+      const data = {
+        email: formData.email,
+        password: formData.password
+      }
+
+      const response = await _http.post('/user/auth/login', data);
+      console.log("response success ", response);
+      const resData = response.data;
+      if (!response.data || !response.data.status === 'ok') {
+          setErrorMessage(resData.message)
+        // return;
+      }
+      else {
+        // success login
+        setErrorMessage(null);
+        setLoading(false);
+        console.log('submitting');
+        // dispatch(authActions.login());
+        navigate('/auth');
+      }
+    }
+    catch (err) {
+      console.log("An error has occured", err.response);
+      if(err && err.response.data.status ==="error"){
+        setErrorMessage(err.data.message)
+      }
+    }
   };
-  console.log(loginHandler)
 
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      {/* {navigation.state==='loading' &&<p>Loading....</p>} */}
-      {/* <ConfirmDialog onConfirmed={onConfirmedHandler} onCanceled={onConfirmedHandler} /> */}
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
@@ -115,6 +148,10 @@ export default function SignInView() {
                 error={formik.touched.password && Boolean(formik.errors.password)}
                 helperText={formik.touched.password && formik.errors.password}
               />
+
+              {
+                errorMessage && <Alert severity="error">{errorMessage}</Alert>
+              }
               <Button
                 type="submit"
                 fullWidth
