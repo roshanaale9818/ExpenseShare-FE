@@ -1,82 +1,60 @@
+import * as yup from 'yup';
 import * as React from 'react';
+import { useFormik } from 'formik';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 
 // import { useLoaderData } from 'react-router-dom';
-
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import { authActions } from 'src/store';
-// import FormControlLabel from '@mui/material/FormControlLabel';
-// import Checkbox from '@mui/material/Checkbox';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-
-// import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 import CopyRight from 'src/components/copyright/CopyRight';
-// import ConfirmDialog from 'src/components/confirm/confirm-dialog';
 
-
-
-
-
+const schema = yup.object({
+  email: yup.string('Enter your email').email('Enter a valid email').required('Email is required'),
+  password: yup
+    .string('Enter your password')
+    .min(8, 'Password should be of minimum 8 characters length')
+    .required('Password is required'),
+});
 
 const defaultTheme = createTheme();
 
 export default function SignInView() {
-const dispatch = useDispatch();
-const navigate = useNavigate();
-  const   isLoggedIn = useSelector(state=>state.auth.isLoggedIn);
-  console.log("LOGGED IN STATUS",isLoggedIn)
-  const loginHandler = ()=>{
-    console.log("submitting")
-    dispatch(authActions.login())
+  const formik = useFormik({
+    initialValues: {
+      email: 'johndoe@example.com',
+      password: 'somethingsecret',
+    },
+    validationSchema: schema,
+    onSubmit: (values) => {
+      // alert(JSON.stringify(values, null, 2));
+    },
+  });
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const loginHandler = () => {
+    console.log('submitting');
+    dispatch(authActions.login());
     navigate('/auth');
-  }
-
-
-
-
-
-
-  // it will get the closest loader function 
-  // const dataLoaded = useLoaderData();
-  // we can use loader data inside all components of that component or all of its children 
-  // console.log(dataLoaded);
-  // we put loader function inside the file of the component 
-
-  // useEffect(()=>{
-  //   console.log("USE EFFECT IS CALLED");
-  // }
-  // ,[])
-
-  // const navigation = useNavigation();
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
   };
-  // const onConfirmedHandler = ()=>{
+  console.log(loginHandler)
 
-  // }
 
   return (
-   
     <ThemeProvider theme={defaultTheme}>
-       {/* {navigation.state==='loading' &&<p>Loading....</p>} */}
-       {/* <ConfirmDialog onConfirmed={onConfirmedHandler} onCanceled={onConfirmedHandler} /> */}
+      {/* {navigation.state==='loading' &&<p>Loading....</p>} */}
+      {/* <ConfirmDialog onConfirmed={onConfirmedHandler} onCanceled={onConfirmedHandler} /> */}
       <Grid container component="main" sx={{ height: '100vh' }}>
-       
         <CssBaseline />
         <Grid
           item
@@ -102,13 +80,11 @@ const navigate = useNavigate();
               alignItems: 'center',
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-              {/* <LockOutlinedIcon /> */}
-            </Avatar>
+            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>{/* <LockOutlinedIcon /> */}</Avatar>
             <Typography component="h1" variant="h5">
               Sign in
             </Typography>
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            <Box component="form" noValidate onSubmit={formik.handleSubmit} sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
                 required
@@ -118,6 +94,11 @@ const navigate = useNavigate();
                 name="email"
                 autoComplete="email"
                 autoFocus
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.email && Boolean(formik.errors.email)}
+                helperText={formik.touched.email && formik.errors.email}
               />
               <TextField
                 margin="normal"
@@ -128,8 +109,13 @@ const navigate = useNavigate();
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.password && Boolean(formik.errors.password)}
+                helperText={formik.touched.password && formik.errors.password}
               />
-              <Button onClick={loginHandler}
+              <Button
                 type="submit"
                 fullWidth
                 variant="contained"
@@ -139,12 +125,12 @@ const navigate = useNavigate();
               </Button>
               <Grid container>
                 <Grid item xs>
-                  <Link to='/home' variant="body2">
-                  Back
+                  <Link to="/home" variant="body2">
+                    Back
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link to='/signup' variant="body2">
+                  <Link to="/signup" variant="body2">
                     Dont have an account? Sign Up
                   </Link>
                 </Grid>
