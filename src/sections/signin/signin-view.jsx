@@ -1,26 +1,26 @@
 import * as yup from 'yup';
 import * as React from 'react';
-import {useState} from 'react';
+import { useState } from 'react';
 import { useFormik } from 'formik';
-// import { useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
-// import { useLoaderData } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import LoadingButton from '@mui/lab/LoadingButton';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-// import { authActions } from 'src/store';
-import _http from 'src/utils/http';
+import { authActions } from 'src/store';
 
 import CopyRight from 'src/components/copyright/CopyRight';
+
+import * as loginService from '../../services/auth.service';
 
 const schema = yup.object({
   email: yup.string('Enter your email').email('Enter a valid email').required('Email is required'),
@@ -37,53 +37,48 @@ const initialValues = {
 const defaultTheme = createTheme();
 
 export default function SignInView() {
-  const [isLoading,setLoading]= useState(false);
-  const [errorMessage,setErrorMessage]=useState(null);
+  const [isLoading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const formik = useFormik({
     initialValues,
     validationSchema: schema,
     onSubmit: (values) => {
       // alert(JSON.stringify(values, null, 2));
+      if(isLoading){
+        return;
+      }
       setLoading(true);
-      console.log(isLoading)
+      console.log(isLoading);
       loginHandler(values);
     },
   });
   // console.log("FORMIK")
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const loginHandler = async (formData) => {
     try {
-      setLoading(true)
-      const data = {
-        email: formData.email,
-        password: formData.password
-      }
-
-      const response = await _http.post('/user/auth/login', data);
-      console.log("response success ", response);
-      const resData = response.data;
-      if (!response.data || !response.data.status === 'ok') {
-          setErrorMessage(resData.message)
-        // return;
-      }
-      else {
-        // success login
+      setLoading(true);
+      const response = await loginService.login(formData.email, formData.password);
+      // success login
+      if (response.status === 'ok') {
+        console.log('Successfull', response.status);
         setErrorMessage(null);
         setLoading(false);
-        console.log('submitting');
-        // dispatch(authActions.login());
+        const user = response.data;
+        sessionStorage.setItem('user', user);
+        dispatch(authActions.login({ isLoggedIn: true, currentUser: user }));
         navigate('/auth');
       }
-    }
-    catch (err) {
-      console.log("An error has occured", err.response);
-      if(err && err.response.data.status ==="error"){
-        setErrorMessage(err.data.message)
+    } catch (err) {
+      console.log('An error has occured while logging in', err.response);
+      const { response } = err;
+    
+      if (response.data.status === 'error') {
+        setErrorMessage(response.data.message);
       }
+      setLoading(false)
     }
   };
-
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -149,17 +144,19 @@ export default function SignInView() {
                 helperText={formik.touched.password && formik.errors.password}
               />
 
-              {
-                errorMessage && <Alert severity="error">{errorMessage}</Alert>
-              }
-              <Button
-                type="submit"
+              {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+              <LoadingButton
                 fullWidth
+                type="submit"
                 variant="contained"
+                color='primary'
+                loading={isLoading}
+                loadingIndicator="Signing in..."
                 sx={{ mt: 3, mb: 2 }}
+                // onClick={handleClick}
               >
                 Sign In
-              </Button>
+              </LoadingButton>
               <Grid container>
                 <Grid item xs>
                   <Link to="/home" variant="body2">

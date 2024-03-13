@@ -9,16 +9,16 @@ const authSlice = createSlice({
     name: 'auth',
     initialState: initialAuthState,
     reducers: {
-        login(state) {
-            state.isLoggedIn = true;
-            state.currentUser = {
-                name:'Roshan Aale Magar',
-                id:'122433'
-            }
+        login(state,data) {
+            // state.isLoggedIn;
+            console.log("data in reducer",data)
+            state.isLoggedIn =data.payload.isLoggedIn;
+            state.currentUser = data.payload.currentUser;
         },
         logout(state) {
             state.isLoggedIn = false;
             state.currentUser=null;
+            // sessionStorage.clear();
         }
     }
 });
