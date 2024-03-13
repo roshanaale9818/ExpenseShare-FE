@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 // import { useSelector } from 'react-redux';
 
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
+// import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
+import LoadingButton from '@mui/lab/LoadingButton';
 import CssBaseline from '@mui/material/CssBaseline';
 import Autocomplete from '@mui/material/Autocomplete';
 import Visibility from '@mui/icons-material/Visibility';
@@ -19,6 +20,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
+import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
 
 // import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -29,71 +31,103 @@ import CopyRight from 'src/components/copyright/CopyRight';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 
-import _http from 'src/utils/http';
+import * as authService from '../../services/auth.service';
+
+// import _http from 'src/utils/http';
 
 import { COUNTRIES } from '../../utils/countries';
 
+const getCharacterValidationError = (str) => {
+  if (!str) {
+    return '';
+  }
+  const msg = `Your password must have at least 1 ${str} character`;
+  return msg;
+};
+const initValues = {
+  firstName: '',
+  email: '',
+  lastName: '',
+  street: '',
+  city: '',
+  state: '',
+  country: '',
+  contact: '',
+  password: '',
+  confirmPassword: '',
+  postalCode: '',
+};
+const schema = Yup.object().shape({
+  firstName: Yup.string('Enter your firstName').required('FirstName is required'),
+  email: Yup.string('Enter your email').email('Enter a valid email').required('Email is required'),
+  lastName: Yup.string('Enter your lastname').required('LastName is required'),
+  password: Yup.string('Enter your password')
+    .min(8, 'Password should be of minimum 8 characters length')
+    .required('Password is required')
+    // different error messages for different requirements
+    .matches(/[0-9]/, getCharacterValidationError('digit'))
+    .matches(/[a-z]/, getCharacterValidationError('lowercase'))
+    .matches(/[A-Z]/, getCharacterValidationError('uppercase')),
+  confirmPassword: Yup.string('Enter your password')
+    .required('Please retype your password')
+    // use oneOf to match one of the values inside the array.
+    // use "ref" to get the value of passwrod.
+    .oneOf([Yup.ref('password')], 'Passwords does not match'),
+  street: Yup.string().required('Street is required'),
+  city: Yup.string().required('City  is required'),
+  state: Yup.string().required('State is required'),
+  country: Yup.string().required('Country is required'),
+  contact: Yup.string().required('Contact is required'),
+  postalCode: Yup.string().required('Postal Code is required'),
+});
 const defaultTheme = createTheme();
+
 export default function SignUpView() {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setLoading] = useState(false);
+  const [resMessage, setResMessage] = useState(null);
+  const [resultType, setResultType] = useState('error');
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const initValues = {
-    firstName: '',
-    email: '',
-    lastName: '',
-    street: '',
-    city: '',
-    state: '',
-    country: '',
-    contact: '',
-    password:''
+
+  const submitHandler = async (formData) => {
+    console.log('form submitting', formData);
+    try {
+      setLoading(true);
+      const response = await authService.signUp(formData);
+      // success register
+      if (response.status === 'ok') {
+        setResMessage(response.data.message);
+        setResultType('success');
+        setLoading(false);
+      }
+    } catch (err) {
+      console.log('An error has occured while signing up', err.response);
+      const { response } = err;
+
+      if (response.data.status === 'error') {
+        setResMessage(response.data.errors[0]);
+      }
+      setLoading(false);
+    }
   };
-  const schema = Yup.object().shape({
-    firstName: Yup.string().required('FirstName is required'),
-    email: Yup.string().email().required('Email is required'),
-    lastName: Yup.string().required('LastName is required'),
-    password: Yup.string().required('Password is required'),
-    street: Yup.string().required('Street is required'),
-    city: Yup.string().required('City  is required'),
-    state: Yup.string().required('State is required'),
-    country: Yup.string().required('Country is required'),
-    Contact: Yup.string().required('Contact is required'),
-  });
 
-  const submitHandler = async (formValues)=>{
-        console.log("formValues",formValues);
-        _http.post(``);
-        formik.handleBlur();
-  }
-
-
-console.log("CALLING FORMIK ");
   const formik = useFormik({
     initialValues: initValues,
     // enableReinitialize: true,
     validationSchema: schema,
-    onSubmit: async (value)=>{
-      console.log("handling submit",value);
-      submitHandler("VALUE FROM FORM");
-    }
+    onSubmit: (value) => {
+      console.log('SUBMITTING ON SUBMIT', value);
+      if (isLoading) {
+        return;
+      }
+      setLoading(true);
+      submitHandler(value);
+    },
   });
-  console.log("CALLING FORMIK ENDS")
-  // const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  // console.log('isLoggedIn', isLoggedIn);
-  // const loginHandler = () => {};
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-    formik.handleSubmit(event)
-  };
-  // const [isError, setError] = useState(false);
-  const onFocusHandler = () => {
-    // setError(true);
+  const onCountryChangeHandler = (event, value) => {
+    console.log('THIS IS CALLED', event, value);
+    formik.values.country = value.label;
+    formik.handleChange(event);
   };
 
   return (
@@ -129,7 +163,7 @@ console.log("CALLING FORMIK ");
               Sign Up
             </Typography>
             <Box sx={{ mt: 1 }}>
-              <form name='signUpForm' id='signUpForm' onSubmit={handleSubmit}>
+              <form name="signUpForm" id="signUpForm" onSubmit={formik.handleSubmit}>
                 <TextField
                   margin="normal"
                   required
@@ -140,6 +174,11 @@ console.log("CALLING FORMIK ");
                   id="firstName"
                   autoComplete="firstName"
                   autoFocus
+                  value={formik.values.firstName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+                  helperText={formik.touched.firstName && formik.errors.firstName}
                 />
                 <TextField
                   margin="normal"
@@ -150,6 +189,11 @@ console.log("CALLING FORMIK ");
                   type="text"
                   id="lastName"
                   autoComplete="lastName"
+                  value={formik.values.lastName}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+                  helperText={formik.touched.lastName && formik.errors.lastName}
                 />
                 <TextField
                   margin="normal"
@@ -159,6 +203,11 @@ console.log("CALLING FORMIK ");
                   label="Email Address"
                   name="email"
                   autoComplete="email"
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.email && Boolean(formik.errors.email)}
+                  helperText={formik.touched.email && formik.errors.email}
                 />
                 <Box>
                   <TextField
@@ -170,7 +219,11 @@ console.log("CALLING FORMIK ");
                     label="Password"
                     type={showPassword ? 'text' : 'password'}
                     id="password"
-                    onFocus={onFocusHandler}
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={formik.touched.password && Boolean(formik.errors.password)}
+                    helperText={formik.touched.password && formik.errors.password}
                     autoComplete="current-password"
                     InputProps={{
                       endAdornment: (
@@ -196,6 +249,11 @@ console.log("CALLING FORMIK ");
                   type="password"
                   id="confirmPassword"
                   autoComplete="confirm-password"
+                  value={formik.values.confirmPassword}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                  helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                 />
                 <TextField
                   margin="normal"
@@ -206,6 +264,11 @@ console.log("CALLING FORMIK ");
                   type="text"
                   id="street"
                   autoComplete="street"
+                  value={formik.values.street}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.street && Boolean(formik.errors.street)}
+                  helperText={formik.touched.street && formik.errors.street}
                 />
                 <TextField
                   margin="normal"
@@ -216,6 +279,11 @@ console.log("CALLING FORMIK ");
                   type="text"
                   id="city"
                   autoComplete="city"
+                  value={formik.values.city}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.city && Boolean(formik.errors.city)}
+                  helperText={formik.touched.city && formik.errors.city}
                 />
                 <TextField
                   margin="normal"
@@ -226,16 +294,38 @@ console.log("CALLING FORMIK ");
                   type="text"
                   id="state"
                   autoComplete="State"
+                  value={formik.values.state}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.state && Boolean(formik.errors.state)}
+                  helperText={formik.touched.state && formik.errors.state}
+                />
+
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="postalCode"
+                  label="postalCode"
+                  type="number"
+                  id="postalCode"
+                  autoComplete="postalCode"
+                  value={formik.values.postalCode}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.postalCode && Boolean(formik.errors.postalCode)}
+                  helperText={formik.touched.postalCode && formik.errors.postalCode}
                 />
 
                 <Autocomplete
                   id="country-select"
-                  // sx={{ width: 300 }}
                   margin="normal"
                   required
                   options={COUNTRIES}
                   autoHighlight
                   getOptionLabel={(option) => option.label}
+                  onChange={onCountryChangeHandler}
+                  onBlur={formik.handleBlur}
                   renderOption={(props, option) => (
                     <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
                       <img
@@ -258,6 +348,11 @@ console.log("CALLING FORMIK ");
                         ...params.inputProps,
                         autoComplete: 'new-password', // disable autocomplete and autofill
                       }}
+                      value={formik.values.country}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      error={formik.touched.country && Boolean(formik.errors.country)}
+                      helperText={formik.touched.country && formik.errors.country}
                     />
                   )}
                 />
@@ -271,17 +366,35 @@ console.log("CALLING FORMIK ");
                   type="number"
                   id="contact"
                   autoComplete="contact"
+                  value={formik.values.contact}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.contact && Boolean(formik.errors.contact)}
+                  helperText={formik.touched.contact && formik.errors.contact}
                 />
 
-                <Button
+                {/* <Button
                   type="submit"
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
-                  form='signUpForm'
+                  form="signUpForm"
                 >
                   Submit
-                </Button>
+                </Button> */}
+                {resMessage && <Alert severity={resultType}>{resMessage}</Alert>}
+                <LoadingButton
+                  fullWidth
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  loading={isLoading}
+                  loadingIndicator="Loading..."
+                  sx={{ mt: 3, mb: 2 }}
+                  // onClick={handleClick}
+                >
+                  Submit
+                </LoadingButton>
                 <Grid container>
                   <Grid item xs>
                     <Link to="/login" variant="body2">

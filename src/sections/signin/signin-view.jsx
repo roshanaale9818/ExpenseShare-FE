@@ -48,7 +48,6 @@ export default function SignInView() {
         return;
       }
       setLoading(true);
-      console.log(isLoading);
       loginHandler(values);
     },
   });
