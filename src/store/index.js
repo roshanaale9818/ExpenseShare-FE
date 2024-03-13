@@ -1,24 +1,38 @@
 import { createSlice, configureStore } from "@reduxjs/toolkit";
 
+let user = JSON.parse(sessionStorage.getItem('user'));
+let isSignedIn = JSON.parse(sessionStorage.getItem('isLoggedIn'));
+try {
+ 
+    if (!isSignedIn) {
+        isSignedIn = false;
+    }
+    if (!user) {
+        user = null
+    }
+}
+catch (err) {
+    console.log('error in store', err)
+}
 const initialAuthState = {
-    isLoggedIn: false,
-    currentUser: JSON.parse(sessionStorage.getItem('user')) ? JSON.parse(sessionStorage.getItem('user')) : null,
+    isLoggedIn: isSignedIn,
+    currentUser: user,
 };
 // slice for auth state
 const authSlice = createSlice({
     name: 'auth',
     initialState: initialAuthState,
     reducers: {
-        login(state,data) {
+        login(state, data) {
             // state.isLoggedIn;
-            console.log("data in reducer",data)
-            state.isLoggedIn =data.payload.isLoggedIn;
+            state.isLoggedIn = data.payload.isLoggedIn;
             state.currentUser = data.payload.currentUser;
         },
         logout(state) {
+   
+            sessionStorage.clear();
             state.isLoggedIn = false;
-            state.currentUser=null;
-            // sessionStorage.clear();
+            state.currentUser = null;
         }
     }
 });

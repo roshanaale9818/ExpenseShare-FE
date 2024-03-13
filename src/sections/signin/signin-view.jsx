@@ -44,7 +44,7 @@ export default function SignInView() {
     validationSchema: schema,
     onSubmit: (values) => {
       // alert(JSON.stringify(values, null, 2));
-      if(isLoading){
+      if (isLoading) {
         return;
       }
       setLoading(true);
@@ -64,18 +64,19 @@ export default function SignInView() {
         setErrorMessage(null);
         setLoading(false);
         const user = response.data;
-        sessionStorage.setItem('user', user);
+        sessionStorage.setItem('user', JSON.stringify(user));
+        sessionStorage.setItem('isLoggedIn', JSON.stringify(true));
         dispatch(authActions.login({ isLoggedIn: true, currentUser: user }));
         navigate('/auth');
       }
     } catch (err) {
       console.log('An error has occured while logging in', err.response);
       const { response } = err;
-    
+
       if (response.data.status === 'error') {
         setErrorMessage(response.data.message);
       }
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -101,7 +102,7 @@ export default function SignInView() {
           <Box
             sx={{
               my: 8,
-              mx: 4,
+              mx: 1,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -142,13 +143,20 @@ export default function SignInView() {
                 error={formik.touched.password && Boolean(formik.errors.password)}
                 helperText={formik.touched.password && formik.errors.password}
               />
+              <Box>
+              
+                {errorMessage && (
+                  <Alert severity="error">
+                    {errorMessage}
+                  </Alert>
+                )}
+              </Box>
 
-              {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
               <LoadingButton
                 fullWidth
                 type="submit"
                 variant="contained"
-                color='primary'
+                color="primary"
                 loading={isLoading}
                 loadingIndicator="Signing in..."
                 sx={{ mt: 3, mb: 2 }}

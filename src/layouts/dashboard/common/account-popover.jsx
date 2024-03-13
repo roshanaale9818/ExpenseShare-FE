@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch,useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -12,7 +12,6 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 
 import { authActions } from 'src/store';
-import { account } from 'src/_mock/account';
 
 import ConfirmDialog from 'src/components/confirm/confirm-dialog';
 
@@ -53,7 +52,13 @@ export default function AccountPopover() {
     dispatch(authActions.logout());
     navigate('/home')
   };
-  const onCancelHandler = ()=>{}
+  const onCancelHandler = ()=>{};
+  const account = useSelector((state)=>state.auth);
+  let displayName = `${account.currentUser?.firstName}  ${account.currentUser?.lastName}`;
+  if(!displayName){
+    displayName = 'User'
+  }
+
 
   return (
     <>
@@ -70,15 +75,15 @@ export default function AccountPopover() {
         }}
       >
         <Avatar
-          src={account.photoURL}
-          alt={account.displayName}
+          src='/assets/images/avatars/avatar_25.jpg'
+          alt={`${account.currentUser?.firstName}  ${account.currentUser?.lastName}`}
           sx={{
             width: 36,
             height: 36,
             border: (theme) => `solid 2px ${theme.palette.background.default}`,
           }}
         >
-          {account.displayName.charAt(0).toUpperCase()}
+          {account.currentUser.firstName.charAt(0).toUpperCase()}
         </Avatar>
       </IconButton>
 
@@ -99,10 +104,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {displayName}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {account.currentUser.email}
           </Typography>
         </Box>
 

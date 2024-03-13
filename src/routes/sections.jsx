@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { useSelector } from 'react-redux';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
 import DashboardLayout from 'src/layouts/dashboard';
@@ -21,16 +22,18 @@ export const SignUpPage = lazy(()=>import('src/pages/signup'));
 // ----------------------------------------------------------------------
 
 export default function Router() {
+  const auth = useSelector((state)=>state.auth);
   const routes = useRoutes([
     {
       path: 'auth',
-      element: (
+      element: 
+        auth.isLoggedIn && auth.currentUser ? (
         <DashboardLayout>
           <Suspense>
             <Outlet />
           </Suspense>
         </DashboardLayout>
-      ),
+      ):<Navigate to="/login" />,
       children: [
         { element: <IndexPage />, index: true },
         { path: 'user', element: <UserPage /> },

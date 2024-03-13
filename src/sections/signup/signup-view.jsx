@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-// import { useSelector } from 'react-redux';
 
 import Avatar from '@mui/material/Avatar';
-// import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -14,9 +12,8 @@ import InputAdornment from '@mui/material/InputAdornment';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-// import { authActions } from 'src/store';
-// import FormControlLabel from '@mui/material/FormControlLabel';
 // import Checkbox from '@mui/material/Checkbox';
+
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -90,33 +87,32 @@ export default function SignUpView() {
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const submitHandler = async (formData) => {
-    console.log('form submitting', formData);
     try {
       setLoading(true);
       const response = await authService.signUp(formData);
+      console.log("HEY RESPONSE",response)
       // success register
       if (response.status === 'ok') {
-        setResMessage(response.data.message);
+        setResMessage(response.message);
         setResultType('success');
+        console.log("response msg",response.data.message);
         setLoading(false);
       }
     } catch (err) {
-      console.log('An error has occured while signing up', err.response);
+      console.error('An error has occured while signing up', err,err.response);
       const { response } = err;
-
-      if (response.data.status === 'error') {
-        setResMessage(response.data.errors[0]);
-      }
       setLoading(false);
+      setResultType('error');
+      if (response.data.status === 'error') {
+        setResMessage(response.data.errors[0]); // show one error at a time
+      }
     }
   };
 
   const formik = useFormik({
     initialValues: initValues,
-    // enableReinitialize: true,
     validationSchema: schema,
     onSubmit: (value) => {
-      console.log('SUBMITTING ON SUBMIT', value);
       if (isLoading) {
         return;
       }
@@ -125,7 +121,6 @@ export default function SignUpView() {
     },
   });
   const onCountryChangeHandler = (event, value) => {
-    console.log('THIS IS CALLED', event, value);
     formik.values.country = value.label;
     formik.handleChange(event);
   };
@@ -306,7 +301,7 @@ export default function SignUpView() {
                   required
                   fullWidth
                   name="postalCode"
-                  label="postalCode"
+                  label="Postal Code"
                   type="number"
                   id="postalCode"
                   autoComplete="postalCode"
