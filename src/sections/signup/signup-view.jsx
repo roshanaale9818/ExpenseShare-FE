@@ -90,12 +90,10 @@ export default function SignUpView() {
     try {
       setLoading(true);
       const response = await authService.signUp(formData);
-      console.log("HEY RESPONSE",response)
       // success register
       if (response.status === 'ok') {
         setResMessage(response.message);
         setResultType('success');
-        console.log("response msg",response.data.message);
         setLoading(false);
       }
     } catch (err) {
