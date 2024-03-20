@@ -73,11 +73,10 @@ function Row(props) {
         </TableCell>
         <TableCell component="th" scope="row">
           {row.name}
+          {row.groupName}
         </TableCell>
         <TableCell align="right">{row.groupName}</TableCell>
         <TableCell align="right">{row.fat}</TableCell>
-        <TableCell align="right">{row.carbs}</TableCell>
-        <TableCell align="right">{row.protein}</TableCell>
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
@@ -112,7 +111,7 @@ function Row(props) {
 
 Row.propTypes = {
   row: PropTypes.shape({
-    groupName: PropTypes.string.isRequired,
+    groupName: PropTypes.string,
     carbs: PropTypes.number.isRequired,
     fat: PropTypes.number.isRequired,
     name: PropTypes.string.isRequired,
@@ -137,17 +136,19 @@ export default function GroupTableView() {
           <TableRow>
             <TableCell />
             <TableCell>Group Name</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            <TableCell align="right">Joined On</TableCell>
             <TableCell align="right"> </TableCell>
+            <TableCell align="right"> </TableCell>
+
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          
+          {rows && rows.map((row) => (
             <Row key={row.name} row={row} />
           ))}
+
+          {!rows &&<h1>No rows</h1>}
         </TableBody>
       </Table>
     </TableContainer>
