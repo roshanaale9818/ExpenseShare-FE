@@ -16,6 +16,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import  {attachToken}  from 'src/utils/http';
+
 import { authActions } from 'src/store';
 
 import CopyRight from 'src/components/copyright/CopyRight';
@@ -30,8 +32,8 @@ const schema = yup.object({
     .required('Password is required'),
 });
 const initialValues = {
-  email: 'yourmemail@example.com',
-  password: 'somethingsecret',
+  email: 'email',
+  password: 'password',
 };
 
 const defaultTheme = createTheme();
@@ -67,6 +69,8 @@ export default function SignInView() {
         sessionStorage.setItem('user', JSON.stringify(user));
         sessionStorage.setItem('isLoggedIn', JSON.stringify(true));
         dispatch(authActions.login({ isLoggedIn: true, currentUser: user }));
+        // attach token on successfull login
+        attachToken();
         navigate('/auth');
       }
     } catch (err) {

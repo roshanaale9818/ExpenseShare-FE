@@ -17,7 +17,8 @@ const _http = axios.create({
 });
 
 
-function getToken(){
+
+export function getToken(){
   try{
     const currentUser = JSON.parse(sessionStorage.getItem("user"));
     let token ='';
@@ -35,8 +36,37 @@ function getToken(){
   }
 }
 
+export function attachToken() {
+  const token = getToken();
+  if (token) {
+      _http.defaults.headers['x-access-token'] = token;
+      console.log("Token attached successfully.");
+  } else {
+      console.log("No token found. Please check your token");
+  }
+}
+
+
+export function getUserId(){
+  try{
+    const currentUser = JSON.parse(sessionStorage.getItem("user"));
+    let userId ='';
+    if(!currentUser || !currentUser.id){
+      userId = null;
+    }
+    else{
+        userId=currentUser.id;
+    }
+    return userId;
+  }
+  catch(err){
+    console.log('err',err)
+    return null;
+  }
+}
+
 export default _http;
-export {getToken};
+
 
 
 

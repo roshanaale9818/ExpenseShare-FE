@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import { useState } from 'react';
 import { useFormik } from 'formik';
+import { useMutation } from '@tanstack/react-query';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,6 +14,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 
+import { getUserId, queryClient } from 'src/utils/http';
+
 import * as GroupService from 'src/services/group.service';
 // import DialogContentText from '@mui/material/DialogContentText';
 
@@ -20,22 +23,24 @@ import { PageHeadView } from 'src/components/page-head';
 
 import GroupTableView from './group-table-view';
 
-const schema = yup.object({
-  groupName: yup.string('Enter your group name').required('Name is required'),
-});
-const initialValues = {
-  groupName: '',
-};
 export default function GroupView() {
+  const schema = yup.object({
+    groupName: yup.string('Enter your group name').required('Name is required'),
+  });
+  const initialValues = {
+    groupName: '',
+  };
   const [isLoading, setIsLoading] = useState(false);
   const [openSnack, setSnackBar] = useState(false);
-  const [snackBarMsg, setSnackBarMsg] = useState(false);
+  const [snackBarMsg, setSnackBarMsg] = useState('');
+  const [mode, setMode] = useState('new');
 
   const formik = useFormik({
     initialValues,
     validationSchema: schema,
     onSubmit: (values) => {
-      submitHandler(values);
+      // submitHandler(values);
+      mutate(values);
     },
   });
   const [isOpen, setOpen] = useState(false);
@@ -45,6 +50,8 @@ export default function GroupView() {
   };
   const onNewClicked = () => {
     setOpen(true);
+    setMode('new');
+    formik.resetForm();
   };
 
   const handleSnackBarClose = (event, reason) => {
@@ -58,24 +65,62 @@ export default function GroupView() {
 
   const submitHandler = async (formData) => {
     setIsLoading(true);
-    try {
-      const response = await GroupService.addGroup(formData.groupName);
-      if (response.status === 'ok') {
-        setSnackBarMsg(response.message);
-        setIsLoading(false);
-        setSnackBar(true);
-        setOpen(false);
-        formik.resetForm();
-      }
-    } catch (err) {
-      console.log('An error has occured while logging in', err.response);
-      const { response } = err;
-
-      if (response.data.status === 'error') {
-        // setErrorMessage(response.data.message);
-      }
-      setIsLoading(false);
+    // try {
+    console.log('MODE', mode,formData);
+    let response;
+    if (mode === 'new') {
+      response = await GroupService.addGroup(formData.groupName);
+      return response;
     }
+
+    response = await GroupService.editGroup(formData);
+    return response;
+  };
+  //   if (response.status === 'ok') {
+  //     setSnackBarMsg(response.message);
+  //     setIsLoading(false);
+  //     setSnackBar(true);
+  //     setOpen(false);
+  //     formik.resetForm();
+  //   }
+  // } catch (err) {
+  //   console.log('An error has occured while logging in', err.response);
+  //   const { response } = err;
+
+  //   if (response.data.status === 'error') {
+  //     // setErrorMessage(response.data.message);
+  //   }
+  //   setIsLoading(false);
+  // }
+  // };
+  const sucessEvent = () => {
+    setSnackBarMsg('Group saved successfull.');
+    setIsLoading(false);
+    setSnackBar(true);
+    setOpen(false);
+    formik.resetForm();
+  };
+
+  const { mutate } = useMutation({
+    mutationFn: submitHandler,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['groups', getUserId()]);
+      sucessEvent();
+    },
+    onError: (error) => {
+      console.log("Error",error)
+      setIsLoading(false);
+    },
+  });
+
+  const onEditGroupHandler = (group) => {
+    setMode('edit');
+    console.log('CALLED IN PARENT', group, mode);
+    setOpen(true);
+    formik.setValues({
+      groupName: group.groupName,
+      groupId: group.id,
+    });
   };
   return (
     <>
@@ -131,12 +176,13 @@ export default function GroupView() {
               loadingIndicator="Saving.."
               sx={{ mt: 0, mb: 0 }}
             >
-              Create
+              Save
             </LoadingButton>
           </DialogActions>
         </Dialog>
 
-        <GroupTableView />
+        {/* // grid */}
+        <GroupTableView onEdit={onEditGroupHandler} />
       </Container>
 
       <Snackbar

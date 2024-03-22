@@ -1,82 +1,106 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-
 // import Box from '@mui/material/Box';
+import { useQuery, useMutation } from '@tanstack/react-query';
+
+import Link from '@mui/material/Link';
 import Table from '@mui/material/Table';
 import Paper from '@mui/material/Paper';
 import Popover from '@mui/material/Popover';
-// import Collapse from '@mui/material/Collapse';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
 import TableHead from '@mui/material/TableHead';
 import TableCell from '@mui/material/TableCell';
 import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
-// import Typography from '@mui/material/Typography';
+import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
-// import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-// import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 import Iconify from 'src/components/iconify';
+// import ConfirmDialog from 'src/components/confirm/confirm-dialog';
+
 // import Scrollbar from 'src/components/scrollbar';
 
+// import useRunOnce from 'src/hooks/useRunOnce';
 
+import { getUserId, queryClient } from 'src/utils/http';
 
-function createData(name, calories, fat, carbs, protein, price) {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-    price,
-    history: [
-      {
-        date: '2020-01-05',
-        customerId: '11091700',
-        amount: 3,
-      },
-      {
-        date: '2020-01-02',
-        customerId: 'Anonymous',
-        amount: 1,
-      },
-    ],
-  };
-}
+import * as GroupService from 'src/services/group.service';
+
+import ErrorBlock from 'src/components/error';
+import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
 
 function Row(props) {
-  const { row } = props;
-  const [openCollpase, setOpenCollapse] = useState(false);
-  console.log("open",openCollpase)
-  
-
+  const { row, openDialog } = props;
   const handleCloseMenu = () => {
-    setOpenCollapse(null);
-    setPopOverMenu(false)
+    setPopOverMenu(false);
   };
-  const [anchorEl, setAnchorEl]= useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const handleOpenMenu = (event) => {
-    setOpenCollapse(true);
     setPopOverMenu(true);
-    setAnchorEl(event.currentTarget)
+    setAnchorEl(event.currentTarget);
   };
-  const [popoverMenuIsOpen, setPopOverMenu]= useState(false);
+  const [popoverMenuIsOpen, setPopOverMenu] = useState(false);
+  const onEditClicked = () => {
+    try {
+      openDialog(true);
+      handleCloseMenu();
+    } catch (err) {
+      console.err(err);
+    }
+  };
+  // const onDeleteHandler = () => {
+  //   try {
+  //     onDelete();
+  //     handleCloseMenu();
+  //   } catch (err) {
+  //     console.err(err);
+  //   }
+  // };
+  const deleteGroup = async ({id}) => {
+    const response = await GroupService.deleteGroup(id);
+    return response;
+  };
+
+  const { mutate } = useMutation({
+    mutationFn: deleteGroup,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['groups', getUserId()]);
+      // sucessEvent();
+    },
+    onError: (error) => {
+      console.log('Error', error);
+      // setIsLoading(false);
+    },
+  });
+  const onConfirmedHandler = (data) => {
+    console.log("friy",data)
+    mutate(data);
+    handleCloseMenu();
+  };
+  const onCanceledHandler = () => {
+    handleCloseMenu();
+  };
 
   return (
     <>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>
-          {/* <IconButton aria-label="expand row" size="small" onClick={() => setOpenCollapse(!openCollpase)}>
-            {openCollpase ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton> */}
-        </TableCell>
+        <TableCell>{}</TableCell>
         <TableCell component="th" scope="row">
-          {row.name}
-          {row.groupName}
+          <Link
+            component="button"
+            variant="contained"
+            onClick={() => {
+              console.info('navigate.');
+            }}
+          >
+            {row.groupName}
+          </Link>
         </TableCell>
-        <TableCell align="right">{row.groupName}</TableCell>
-        <TableCell align="right">{row.fat}</TableCell>
+        {/* <TableCell align="right">{row.groupName}</TableCell> */}
+        <TableCell align="right">{row.createdAt.split('T')[0]}</TableCell>
+        <TableCell align="right">{row.status}</TableCell>
+
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
@@ -94,15 +118,23 @@ function Row(props) {
             position: 'absolute',
           }}
         >
-          <MenuItem onClick={handleCloseMenu}>
+          <MenuItem onClick={onEditClicked}>
             <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
             Edit
           </MenuItem>
 
-          <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
+          {/* <MenuItem onClick={onDeleteHandler} sx={{ color: 'error.main' }}>
             <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
             Delete
-          </MenuItem>
+          </MenuItem> */}
+          <ConfirmDelete
+            title="Are you sure you want to delete ?"
+            description="You will not be able to recover this again."
+            onConfirmed={onConfirmedHandler}
+            onCanceled={onCanceledHandler}
+            data={row}
+            sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
+          />
         </Popover>
       </TableRow>
     </>
@@ -112,23 +144,71 @@ function Row(props) {
 Row.propTypes = {
   row: PropTypes.shape({
     groupName: PropTypes.string,
-    carbs: PropTypes.number.isRequired,
-    fat: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    protein: PropTypes.number.isRequired,
+    createdAt: PropTypes.string,
+    status: PropTypes.string,
   }).isRequired,
+  openDialog: PropTypes.func,
+  // onDelete: PropTypes.func,
 };
 
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 3.99),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 4.99),
-  createData('Eclair', 262, 16.0, 24, 6.0, 3.79),
-  createData('Cupcake', 305, 3.7, 67, 4.3, 2.5),
-  createData('Gingerbread', 356, 16.0, 49, 3.9, 1.5),
-];
+export default function GroupTableView(props) {
+  let rows = [];
+  const { onEdit, onDelete } = props;
+  const getGroupList = async (_data, _page = 1, _limit = 10) => {
+    const response = await GroupService.getGroupList({ page: _page, limit: _limit });
+    return response;
+  };
+  const onEditClickHandler = (group) => {
+    try {
+      onEdit(group);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const onDeleteHandler = (group) => {
+    try {
+      onDelete(group);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-export default function GroupTableView() {
+  const { isError, data, error } = useQuery({
+    queryKey: ['groups', getUserId()],
+    queryFn: getGroupList,
+  });
+  let content = '';
+  if (data && data.status === 'ok') {
+    rows = data.data;
+    content = (
+      <>
+        {rows &&
+          rows.map((row) => (
+            <Row
+              key={row.id}
+              openDialog={() => {
+                onEditClickHandler(row);
+              }}
+              row={row}
+              onDelete={() => {
+                onDeleteHandler(row);
+              }}
+            />
+          ))}
+
+        {rows.length === 0 && <Typography variant="body">No data found.</Typography>}
+      </>
+    );
+  }
+  if (isError) {
+    content = (
+      <>
+        (<ErrorBlock message={error} />)
+      </>
+    );
+  }
+  // console.log(isError, isPending, data, error);
+
   return (
     <TableContainer component={Paper}>
       <Table aria-label="collapsible table">
@@ -136,21 +216,18 @@ export default function GroupTableView() {
           <TableRow>
             <TableCell />
             <TableCell>Group Name</TableCell>
-            <TableCell align="right">Joined On</TableCell>
+            <TableCell align="right">Created On</TableCell>
+            <TableCell align="right">Status </TableCell>
             <TableCell align="right"> </TableCell>
-            <TableCell align="right"> </TableCell>
-
           </TableRow>
         </TableHead>
-        <TableBody>
-          
-          {rows && rows.map((row) => (
-            <Row key={row.name} row={row} />
-          ))}
-
-          {!rows &&<h1>No rows</h1>}
-        </TableBody>
+        <TableBody>{content}</TableBody>
       </Table>
     </TableContainer>
   );
 }
+
+GroupTableView.propTypes = {
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+};

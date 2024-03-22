@@ -95,6 +95,7 @@ export default function SignUpView() {
         setResMessage(response.message);
         setResultType('success');
         setLoading(false);
+        formik.resetForm();
       }
     } catch (err) {
       console.error('An error has occured while signing up', err,err.response);
