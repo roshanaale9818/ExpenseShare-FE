@@ -1,0 +1,1 @@
+export {default as GroupDetailView} from './group-detail-view';

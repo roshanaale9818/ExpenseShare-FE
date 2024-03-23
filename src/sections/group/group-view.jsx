@@ -6,7 +6,6 @@ import { useMutation } from '@tanstack/react-query';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import Snackbar from '@mui/material/Snackbar';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -16,8 +15,8 @@ import DialogContent from '@mui/material/DialogContent';
 
 import { getUserId, queryClient } from 'src/utils/http';
 
+import { useAppContext } from 'src/providers/AppReducer';
 import * as GroupService from 'src/services/group.service';
-// import DialogContentText from '@mui/material/DialogContentText';
 
 import { PageHeadView } from 'src/components/page-head';
 
@@ -31,8 +30,6 @@ export default function GroupView() {
     groupName: '',
   };
   const [isLoading, setIsLoading] = useState(false);
-  const [openSnack, setSnackBar] = useState(false);
-  const [snackBarMsg, setSnackBarMsg] = useState('');
   const [mode, setMode] = useState('new');
 
   const formik = useFormik({
@@ -54,19 +51,9 @@ export default function GroupView() {
     formik.resetForm();
   };
 
-  const handleSnackBarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      setSnackBar(false);
-      return;
-    }
-
-    setSnackBar(false);
-  };
-
   const submitHandler = async (formData) => {
     setIsLoading(true);
-    // try {
-    console.log('MODE', mode,formData);
+    showLoading();
     let response;
     if (mode === 'new') {
       response = await GroupService.addGroup(formData.groupName);
@@ -76,29 +63,15 @@ export default function GroupView() {
     response = await GroupService.editGroup(formData);
     return response;
   };
-  //   if (response.status === 'ok') {
-  //     setSnackBarMsg(response.message);
-  //     setIsLoading(false);
-  //     setSnackBar(true);
-  //     setOpen(false);
-  //     formik.resetForm();
-  //   }
-  // } catch (err) {
-  //   console.log('An error has occured while logging in', err.response);
-  //   const { response } = err;
 
-  //   if (response.data.status === 'error') {
-  //     // setErrorMessage(response.data.message);
-  //   }
-  //   setIsLoading(false);
-  // }
-  // };
+  const { showSnackbar, showLoading, hideLoading } = useAppContext();
+
   const sucessEvent = () => {
-    setSnackBarMsg('Group saved successfull.');
+    showSnackbar('Data saved successfull.');
     setIsLoading(false);
-    setSnackBar(true);
     setOpen(false);
     formik.resetForm();
+    hideLoading();
   };
 
   const { mutate } = useMutation({
@@ -108,14 +81,15 @@ export default function GroupView() {
       sucessEvent();
     },
     onError: (error) => {
-      console.log("Error",error)
+      console.log('Error', error);
       setIsLoading(false);
+      showSnackbar('Data failed to save.', 'error');
+      hideLoading();
     },
   });
 
   const onEditGroupHandler = (group) => {
     setMode('edit');
-    console.log('CALLED IN PARENT', group, mode);
     setOpen(true);
     formik.setValues({
       groupName: group.groupName,
@@ -184,13 +158,6 @@ export default function GroupView() {
         {/* // grid */}
         <GroupTableView onEdit={onEditGroupHandler} />
       </Container>
-
-      <Snackbar
-        open={openSnack}
-        onClose={handleSnackBarClose}
-        autoHideDuration={5000}
-        message={snackBarMsg}
-      />
     </>
   );
 }

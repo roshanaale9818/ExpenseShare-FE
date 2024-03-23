@@ -13,36 +13,44 @@ export const SignInPage = lazy(() => import('src/pages/signin'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 export const HomePage = lazy(() => import('src/pages/home'));
-export const ExpensePage = lazy(()=>import('src/pages/expense'));
-export const GroupPage = lazy(()=>import('src/pages/group'));
-export const ExpenseRequestPage = lazy(()=>import('src/pages/expense-request'));
-export const SignUpPage = lazy(()=>import('src/pages/signup'));
-
+export const ExpensePage = lazy(() => import('src/pages/expense'));
+export const GroupPage = lazy(() => import('src/pages/group'));
+export const ExpenseRequestPage = lazy(() => import('src/pages/expense-request'));
+export const SignUpPage = lazy(() => import('src/pages/signup'));
+export const GroupDetailPage = lazy(() => import('src/pages/group-detail'));
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
-  const auth = useSelector((state)=>state.auth);
+  const auth = useSelector((state) => state.auth);
   const routes = useRoutes([
     {
       path: 'auth',
-      element: 
+      element:
         auth.isLoggedIn && auth.currentUser ? (
-        <DashboardLayout>
-          <Suspense>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
-      ):<Navigate to="/login" />,
+          <DashboardLayout>
+            <Suspense>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
+        ) : (
+          <Navigate to="/login" />
+        ),
       children: [
         { element: <IndexPage />, index: true },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
         { path: 'expense', element: <ExpensePage /> },
-        { path: 'group', element: <GroupPage /> },
-        {path:'expense-request', element :<ExpenseRequestPage/>}
-
+        {
+          path: 'group',
+          element: <GroupPage />,
+        },
+        {
+          path: 'group/:groupId/detail',
+          element: <GroupDetailPage />,
+        },
+        { path: 'expense-request', element: <ExpenseRequestPage /> },
       ],
     },
     {

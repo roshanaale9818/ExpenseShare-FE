@@ -8,6 +8,7 @@ import ThemeProvider from 'src/theme';
 import { Provider } from 'react-redux';
 import { queryClient } from './utils/http';
 import store from './store';
+import { AppProvider } from './providers/AppReducer';
 
 
 // ----------------------------------------------------------------------
@@ -17,11 +18,13 @@ export default function App() {
 
   return (
     <ThemeProvider>
+      <AppProvider>
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
           <Router />
         </QueryClientProvider>
       </Provider>
+      </AppProvider>
     </ThemeProvider>
   );
 }

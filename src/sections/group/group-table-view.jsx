@@ -15,6 +15,7 @@ import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
+// import TablePagination from '@mui/material/TablePagination';
 
 import Iconify from 'src/components/iconify';
 // import ConfirmDialog from 'src/components/confirm/confirm-dialog';
@@ -25,13 +26,15 @@ import Iconify from 'src/components/iconify';
 
 import { getUserId, queryClient } from 'src/utils/http';
 
+import { useAppContext } from 'src/providers/AppReducer';
 import * as GroupService from 'src/services/group.service';
 
 import ErrorBlock from 'src/components/error';
 import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
 
 function Row(props) {
-  const { row, openDialog } = props;
+  const { showSnackbar, showLoading, hideLoading } = useAppContext();
+  const { row, openDialog, serial } = props;
   const handleCloseMenu = () => {
     setPopOverMenu(false);
   };
@@ -57,7 +60,7 @@ function Row(props) {
   //     console.err(err);
   //   }
   // };
-  const deleteGroup = async ({id}) => {
+  const deleteGroup = async ({ id }) => {
     const response = await GroupService.deleteGroup(id);
     return response;
   };
@@ -66,15 +69,20 @@ function Row(props) {
     mutationFn: deleteGroup,
     onSuccess: () => {
       queryClient.invalidateQueries(['groups', getUserId()]);
+      showSnackbar('Group deleted successfull.', 'success');
       // sucessEvent();
+      hideLoading();
     },
     onError: (error) => {
       console.log('Error', error);
+      showSnackbar('Group deletion failed.', 'error');
+      hideLoading();
       // setIsLoading(false);
     },
   });
   const onConfirmedHandler = (data) => {
-    console.log("friy",data)
+    // console.log("friy",data)
+    showLoading();
     mutate(data);
     handleCloseMenu();
   };
@@ -82,10 +90,40 @@ function Row(props) {
     handleCloseMenu();
   };
 
+  let actionContent = '';
+  if (row.isAdmin === '1') {
+    actionContent = (
+      <Popover
+        open={!!popoverMenuIsOpen}
+        anchorEl={anchorEl}
+        onClose={handleCloseMenu}
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        sx={{
+          position: 'absolute',
+        }}
+      >
+        <MenuItem onClick={onEditClicked}>
+          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+          Edit
+        </MenuItem>
+
+        <ConfirmDelete
+          title="Are you sure you want to delete ?"
+          description="You will not be able to recover this again."
+          onConfirmed={onConfirmedHandler}
+          onCanceled={onCanceledHandler}
+          data={row}
+          sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
+        />
+      </Popover>
+    );
+  }
+
   return (
     <>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>{}</TableCell>
+        <TableCell>{serial + 1}</TableCell>
         <TableCell component="th" scope="row">
           <Link
             component="button"
@@ -97,7 +135,7 @@ function Row(props) {
             {row.groupName}
           </Link>
         </TableCell>
-        {/* <TableCell align="right">{row.groupName}</TableCell> */}
+
         <TableCell align="right">{row.createdAt.split('T')[0]}</TableCell>
         <TableCell align="right">{row.status}</TableCell>
 
@@ -107,36 +145,7 @@ function Row(props) {
           </IconButton>
         </TableCell>
       </TableRow>
-      <TableRow>
-        <Popover
-          open={!!popoverMenuIsOpen}
-          anchorEl={anchorEl}
-          onClose={handleCloseMenu}
-          anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-          sx={{
-            position: 'absolute',
-          }}
-        >
-          <MenuItem onClick={onEditClicked}>
-            <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-            Edit
-          </MenuItem>
-
-          {/* <MenuItem onClick={onDeleteHandler} sx={{ color: 'error.main' }}>
-            <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-            Delete
-          </MenuItem> */}
-          <ConfirmDelete
-            title="Are you sure you want to delete ?"
-            description="You will not be able to recover this again."
-            onConfirmed={onConfirmedHandler}
-            onCanceled={onCanceledHandler}
-            data={row}
-            sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
-          />
-        </Popover>
-      </TableRow>
+      <TableRow>{actionContent}</TableRow>
     </>
   );
 }
@@ -146,7 +155,9 @@ Row.propTypes = {
     groupName: PropTypes.string,
     createdAt: PropTypes.string,
     status: PropTypes.string,
+    isAdmin: PropTypes.string,
   }).isRequired,
+  serial: PropTypes.number,
   openDialog: PropTypes.func,
   // onDelete: PropTypes.func,
 };
@@ -158,6 +169,21 @@ export default function GroupTableView(props) {
     const response = await GroupService.getGroupList({ page: _page, limit: _limit });
     return response;
   };
+  // const [page, setPage] = useState(1);
+  // const [rowsPerPage, setRowsPerPage] = useState(10);
+  // const [totalCount, setTotalCount] = useState(100);
+
+  
+
+  // const handleChangePage = (event, newPage) => {
+  //   setPage(newPage);
+  // };
+
+  // const handleChangeRowsPerPage = (event) => {
+  //   setRowsPerPage(parseInt(event.target.value, 10));
+  //   setPage(0);
+  // };
+
   const onEditClickHandler = (group) => {
     try {
       onEdit(group);
@@ -180,16 +206,18 @@ export default function GroupTableView(props) {
   let content = '';
   if (data && data.status === 'ok') {
     rows = data.data;
+    // setTotalCount(data.totalItems)
     content = (
-      <>
+      <TableBody>
         {rows &&
-          rows.map((row) => (
+          rows.map((row, index) => (
             <Row
               key={row.id}
               openDialog={() => {
                 onEditClickHandler(row);
               }}
               row={row}
+              serial={index}
               onDelete={() => {
                 onDeleteHandler(row);
               }}
@@ -197,16 +225,27 @@ export default function GroupTableView(props) {
           ))}
 
         {rows.length === 0 && <Typography variant="body">No data found.</Typography>}
-      </>
+      </TableBody>
     );
   }
   if (isError) {
     content = (
-      <>
+      <TableBody>
         (<ErrorBlock message={error} />)
-      </>
+      </TableBody>
     );
   }
+
+  // const paginationContent = (
+  //   <TablePagination
+  //     component="div"
+  //     count={totalCount}
+  //     page={page}
+  //     onPageChange={handleChangePage}
+  //     rowsPerPage={rowsPerPage}
+  //     onRowsPerPageChange={handleChangeRowsPerPage}
+  //   />
+  // );
   // console.log(isError, isPending, data, error);
 
   return (
@@ -214,15 +253,17 @@ export default function GroupTableView(props) {
       <Table aria-label="collapsible table">
         <TableHead>
           <TableRow>
-            <TableCell />
+            <TableCell>S.N</TableCell>
             <TableCell>Group Name</TableCell>
             <TableCell align="right">Created On</TableCell>
             <TableCell align="right">Status </TableCell>
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>{content}</TableBody>
+        {/* <TableBody>{content}</TableBody> */}
+        {content}
       </Table>
+      {/* {paginationContent} */}
     </TableContainer>
   );
 }
