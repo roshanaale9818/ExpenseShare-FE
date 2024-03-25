@@ -1,5 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable perfectionist/sort-imports */
+
 import { QueryClientProvider } from '@tanstack/react-query';
 import 'src/global.css';
 import { useScrollToTop } from 'src/hooks/use-scroll-to-top';

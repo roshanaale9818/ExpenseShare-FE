@@ -87,7 +87,7 @@ export const AppProvider = ({ children }) => {
       {state.isLoading &&   <LinearProgress  color="success" />}
       </Box>
 
-      <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={hideSnackbar}>
+      <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={()=>hideSnackbar}>
         <Alert severity={alertType}>{snackbarMessage}</Alert>
       </Snackbar>
     </AppContext.Provider>

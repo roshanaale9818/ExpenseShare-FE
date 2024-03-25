@@ -6,7 +6,7 @@
   },
 
   "plugins": [
-    "perfectionist",
+    // "perfectionist",
     "unused-imports",
     "prettier"
   ],
@@ -114,73 +114,73 @@
         "args": "after-used",
         "argsIgnorePattern": "^_"
       }
-    ],
+    ]
     // perfectionist
     // https://eslint-plugin-perfectionist.azat.io/
-    "perfectionist/sort-named-imports": [
-      1,
-      {
-        "order": "asc",
-        "type": "line-length"
-      }
-    ]
-    ,
-    "perfectionist/sort-named-exports": [
-      1,
-      {
-        "order": "asc",
-        "type": "line-length"
-      }
-    ],
-    "perfectionist/sort-exports": [
-      1,
-      {
-        "order": "asc",
-        "type": "line-length"
-      }
-    ],
-    "perfectionist/sort-imports": [
-      1,
-      {
-        "order": "asc",
-        "type": "line-length",
-        "newlines-between": "always",
-        "groups": [
-          [
-            "builtin",
-            "external"
-          ],
-          "custom-mui",
-          "custom-routes",
-          "custom-hooks",
-          "custom-utils",
-          "internal",
-          "custom-components",
-          "custom-sections",
-          "custom-types",
-          [
-            "parent",
-            "sibling",
-            "index"
-          ],
-          "object",
-          "unknown"
-        ],
-        "custom-groups": {
-          "value": {
-            "custom-mui": "@mui/**",
-            "custom-routes": "src/routes/**",
-            "custom-hooks": "src/hooks/**",
-            "custom-utils": "src/utils/**",
-            "custom-components": "src/components/**",
-            "custom-sections": "src/sections/**",
-            "custom-types": "src/types/**"
-          }
-        },
-        "internal-pattern": [
-          "src/**"
-        ]
-      }
-    ]
+    // "perfectionist/sort-named-imports": [
+    //   1,
+    //   {
+    //     "order": "asc",
+    //     "type": "line-length"
+    //   }
+    // ]
+    // ,
+    // "perfectionist/sort-named-exports": [
+    //   1,
+    //   {
+    //     "order": "asc",
+    //     "type": "line-length"
+    //   }
+    // ],
+    // "perfectionist/sort-exports": [
+    //   1,
+    //   {
+    //     "order": "asc",
+    //     "type": "line-length"
+    //   }
+    // ],
+    // "perfectionist/sort-imports": [
+    //   1,
+    //   {
+    //     "order": "asc",
+    //     "type": "line-length",
+    //     "newlines-between": "always",
+    //     "groups": [
+    //       [
+    //         "builtin",
+    //         "external"
+    //       ],
+    //       "custom-mui",
+    //       "custom-routes",
+    //       "custom-hooks",
+    //       "custom-utils",
+    //       "internal",
+    //       "custom-components",
+    //       "custom-sections",
+    //       "custom-types",
+    //       [
+    //         "parent",
+    //         "sibling",
+    //         "index"
+    //       ],
+    //       "object",
+    //       "unknown"
+    //     ],
+    //     "custom-groups": {
+    //       "value": {
+    //         "custom-mui": "@mui/**",
+    //         "custom-routes": "src/routes/**",
+    //         "custom-hooks": "src/hooks/**",
+    //         "custom-utils": "src/utils/**",
+    //         "custom-components": "src/components/**",
+    //         "custom-sections": "src/sections/**",
+    //         "custom-types": "src/types/**"
+    //       }
+    //     },
+    //     "internal-pattern": [
+    //       "src/**"
+    //     ]
+    //   }
+    // ]
   }
 }

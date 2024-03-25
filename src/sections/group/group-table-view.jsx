@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import PropTypes from 'prop-types';
 // import Box from '@mui/material/Box';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -31,6 +31,7 @@ import * as GroupService from 'src/services/group.service';
 
 import ErrorBlock from 'src/components/error';
 import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
+import Label from 'src/components/label';
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -137,7 +138,12 @@ function Row(props) {
         </TableCell>
 
         <TableCell align="right">{row.createdAt.split('T')[0]}</TableCell>
-        <TableCell align="right">{row.status}</TableCell>
+        <TableCell align="right">
+          <Label color={(row.status === '0' && 'error') || 'success'}>
+            {(row.status === '1' && 'Active') || 'In active'}
+          </Label>
+          {/* {row.status} */}
+        </TableCell>
 
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -162,24 +168,31 @@ Row.propTypes = {
   // onDelete: PropTypes.func,
 };
 
-export default function GroupTableView(props) {
+const GroupTableView = (props)=> {
+  const { showLoading, hideLoading } = useAppContext();
+
   let rows = [];
   const { onEdit, onDelete } = props;
+  // console.log("ONEDIT",onEdit);
   const getGroupList = async (_data, _page = 1, _limit = 10) => {
+    showLoading()
     const response = await GroupService.getGroupList({ page: _page, limit: _limit });
     return response;
   };
-  // const [page, setPage] = useState(1);
-  // const [rowsPerPage, setRowsPerPage] = useState(10);
-  // const [totalCount, setTotalCount] = useState(100);
+  // const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  
+  // const [page, setPage] = useState(1);
+  // const handleChangePage = (event, newPage) => {
+  //   setPage(newPage);
+  // };
+  // const [totalCount, setTotalCount] = useState(0);
 
   // const handleChangePage = (event, newPage) => {
   //   setPage(newPage);
   // };
 
   // const handleChangeRowsPerPage = (event) => {
+  //   console.log("MY TOPTAL COUNT", totalCount)
   //   setRowsPerPage(parseInt(event.target.value, 10));
   //   setPage(0);
   // };
@@ -206,7 +219,7 @@ export default function GroupTableView(props) {
   let content = '';
   if (data && data.status === 'ok') {
     rows = data.data;
-    // setTotalCount(data.totalItems)
+    // setTotalCount(Number(data.totalItems));
     content = (
       <TableBody>
         {rows &&
@@ -227,6 +240,7 @@ export default function GroupTableView(props) {
         {rows.length === 0 && <Typography variant="body">No data found.</Typography>}
       </TableBody>
     );
+    hideLoading()
   }
   if (isError) {
     content = (
@@ -234,6 +248,7 @@ export default function GroupTableView(props) {
         (<ErrorBlock message={error} />)
       </TableBody>
     );
+    hideLoading();
   }
 
   // const paginationContent = (
@@ -264,9 +279,23 @@ export default function GroupTableView(props) {
         {content}
       </Table>
       {/* {paginationContent} */}
+      {/* {totalCount} */}
+
+      
+        {/* <TablePagination
+          page={page}
+          component="div"
+          count={100}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handleChangePage}
+          rowsPerPageOptions={[5, 10, 25]}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        /> */}
+    
     </TableContainer>
   );
 }
+export default memo(GroupTableView)
 
 GroupTableView.propTypes = {
   onEdit: PropTypes.func,

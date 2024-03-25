@@ -1,4 +1,6 @@
 import { faker } from '@faker-js/faker';
+import { useSelector } from 'react-redux';
+
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -19,10 +21,11 @@ import AppConversionRates from '../app-conversion-rates';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
+  const auth = useSelector(state=> state.auth);
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Hi, Welcome back 👋
+        Hi {auth && auth.currentUser?.firstName}, Welcome back 👋
       </Typography>
 
       <Grid container spacing={3}>
