@@ -22,6 +22,7 @@ export default function ConfirmDelete({
   children,
   sx,
   label,
+  hideText,
 }) {
   const [open, setOpen] = useState(false);
 
@@ -57,7 +58,7 @@ export default function ConfirmDelete({
     <>
       <MenuItem onClick={handleClickOpen} sx={{ color: 'error.main' }}>
         <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-        Delete
+        {!hideText&&'Delete'}
       </MenuItem>
       <Dialog
         open={open}
@@ -91,4 +92,5 @@ ConfirmDelete.propTypes = {
   children: PropTypes.node,
   sx: PropTypes.object,
   label: PropTypes.string,
+  hideText:PropTypes.bool,
 };
