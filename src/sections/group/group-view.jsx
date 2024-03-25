@@ -156,7 +156,7 @@ export default function GroupView() {
         </Dialog>
 
         {/* // grid */}
-        <GroupTableView onEdit={onEditGroupHandler} />
+        <GroupTableView onEdit={onEditGroupHandler}  />
       </Container>
     </>
   );

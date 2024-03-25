@@ -72,3 +72,18 @@ export async function deleteGroup(id) {
     return resData;
 
 }
+
+
+export async function getGroupDetail(groupId) {
+    const response = await _http.get(`${APIURL}group/getgroup?groupId=${groupId}`);
+    if (!response.status === 200) {
+        const error = new Error('An error occurred while trying to create');
+        error.code = response.status;
+        error.info = await response.json();
+        throw error;
+    }
+
+    const resData = await response.data;
+    return resData;
+
+}

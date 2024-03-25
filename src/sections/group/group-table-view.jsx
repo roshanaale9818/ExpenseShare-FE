@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 // import Box from '@mui/material/Box';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -32,9 +32,11 @@ import * as GroupService from 'src/services/group.service';
 import ErrorBlock from 'src/components/error';
 import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
 import Label from 'src/components/label';
+import { useNavigate } from 'react-router-dom';
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
+  const navigate = useNavigate();
   const { row, openDialog, serial } = props;
   const handleCloseMenu = () => {
     setPopOverMenu(false);
@@ -53,14 +55,10 @@ function Row(props) {
       console.err(err);
     }
   };
-  // const onDeleteHandler = () => {
-  //   try {
-  //     onDelete();
-  //     handleCloseMenu();
-  //   } catch (err) {
-  //     console.err(err);
-  //   }
-  // };
+  const onGroupViewHandler = (group)=>{
+      console.log(group);
+      navigate(`/auth/group/${group.id}/detail?groupName=${group.groupName}`,group)
+  }
   const deleteGroup = async ({ id }) => {
     const response = await GroupService.deleteGroup(id);
     return response;
@@ -130,7 +128,7 @@ function Row(props) {
             component="button"
             variant="contained"
             onClick={() => {
-              console.info('navigate.');
+              onGroupViewHandler(row)
             }}
           >
             {row.groupName}
@@ -168,14 +166,13 @@ Row.propTypes = {
   // onDelete: PropTypes.func,
 };
 
-const GroupTableView = (props)=> {
-  const { showLoading, hideLoading } = useAppContext();
+export default  function  GroupTableView(props) {
+  // const { showLoading, hideLoading } = useAppContext();
 
   let rows = [];
   const { onEdit, onDelete } = props;
   // console.log("ONEDIT",onEdit);
   const getGroupList = async (_data, _page = 1, _limit = 10) => {
-    showLoading()
     const response = await GroupService.getGroupList({ page: _page, limit: _limit });
     return response;
   };
@@ -218,6 +215,7 @@ const GroupTableView = (props)=> {
   });
   let content = '';
   if (data && data.status === 'ok') {
+    // hideLoading()
     rows = data.data;
     // setTotalCount(Number(data.totalItems));
     content = (
@@ -240,15 +238,16 @@ const GroupTableView = (props)=> {
         {rows.length === 0 && <Typography variant="body">No data found.</Typography>}
       </TableBody>
     );
-    hideLoading()
+  
   }
   if (isError) {
+    // hideLoading()
     content = (
       <TableBody>
         (<ErrorBlock message={error} />)
       </TableBody>
     );
-    hideLoading();
+    // hideLoading();
   }
 
   // const paginationContent = (
@@ -295,7 +294,7 @@ const GroupTableView = (props)=> {
     </TableContainer>
   );
 }
-export default memo(GroupTableView)
+
 
 GroupTableView.propTypes = {
   onEdit: PropTypes.func,
