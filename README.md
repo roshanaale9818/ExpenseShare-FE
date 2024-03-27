@@ -14,7 +14,8 @@ The Expense Share App is a web application designed to simplify the process of m
 
 - **Frontend**: React.js with Material-UI for the user interface.
 - **Backend**: Node.js with Express.js for the API.
-- **Database**:  MongoDB, PostgreSQL
+- **Database**:  PostgreSQL
+- - **Object Relation Mapping**:  Sequelize
 - **Real-time Communication**: Socket.IO.
 
 ## Installation
