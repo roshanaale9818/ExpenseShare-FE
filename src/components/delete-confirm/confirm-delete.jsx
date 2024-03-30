@@ -23,6 +23,7 @@ export default function ConfirmDelete({
   sx,
   label,
   hideText,
+  size
 }) {
   const [open, setOpen] = useState(false);
 
@@ -93,4 +94,5 @@ ConfirmDelete.propTypes = {
   sx: PropTypes.object,
   label: PropTypes.string,
   hideText:PropTypes.bool,
+  size:PropTypes.string
 };

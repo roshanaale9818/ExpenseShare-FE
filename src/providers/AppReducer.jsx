@@ -59,6 +59,9 @@ export const AppProvider = ({ children }) => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
     setAlertType(type);
+    setTimeout(()=>{
+      setSnackbarOpen(false);
+    },3000)
   };
   // console.log(showSnackbar)
 
@@ -87,7 +90,7 @@ export const AppProvider = ({ children }) => {
       {state.isLoading &&   <LinearProgress  color="success" />}
       </Box>
 
-      <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={()=>hideSnackbar}>
+      <Snackbar open={snackbarOpen} autoHideDuration={3000} onClick={()=>hideSnackbar}>
         <Alert severity={alertType}>{snackbarMessage}</Alert>
       </Snackbar>
     </AppContext.Provider>

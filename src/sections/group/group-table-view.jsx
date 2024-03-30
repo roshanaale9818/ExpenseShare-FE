@@ -137,11 +137,17 @@ function Row(props) {
 
         <TableCell align="right">{row.createdAt.split('T')[0]}</TableCell>
         <TableCell align="right">
-          <Label color={(row.status === '0' && 'error') || 'success'}>
-            {(row.status === '1' && 'Active') || 'In active'}
+          <Label color={(row.isAdmin === '0' && 'secondary') || 'success'}>
+            {(row.isAdmin === '0' && 'Member') || 'Admin'}
           </Label>
           {/* {row.status} */}
         </TableCell>
+        {/* <TableCell align="right">
+          <Label color={(row.status === '0' && 'error') || 'success'}>
+            {(row.status === '1' && 'Active') || 'In active'}
+          </Label>
+  
+        </TableCell> */}
 
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -167,8 +173,6 @@ Row.propTypes = {
 };
 
 export default  function  GroupTableView(props) {
-  // const { showLoading, hideLoading } = useAppContext();
-
   let rows = [];
   const { onEdit, onDelete } = props;
   // console.log("ONEDIT",onEdit);
@@ -176,23 +180,6 @@ export default  function  GroupTableView(props) {
     const response = await GroupService.getGroupList({ page: _page, limit: _limit });
     return response;
   };
-  // const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  // const [page, setPage] = useState(1);
-  // const handleChangePage = (event, newPage) => {
-  //   setPage(newPage);
-  // };
-  // const [totalCount, setTotalCount] = useState(0);
-
-  // const handleChangePage = (event, newPage) => {
-  //   setPage(newPage);
-  // };
-
-  // const handleChangeRowsPerPage = (event) => {
-  //   console.log("MY TOPTAL COUNT", totalCount)
-  //   setRowsPerPage(parseInt(event.target.value, 10));
-  //   setPage(0);
-  // };
 
   const onEditClickHandler = (group) => {
     try {
@@ -270,7 +257,8 @@ export default  function  GroupTableView(props) {
             <TableCell>S.N</TableCell>
             <TableCell>Group Name</TableCell>
             <TableCell align="right">Created On</TableCell>
-            <TableCell align="right">Status </TableCell>
+            {/* <TableCell align="right">Status </TableCell> */}
+            <TableCell align="right">Your role </TableCell>
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>

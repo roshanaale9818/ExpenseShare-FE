@@ -19,9 +19,15 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import { queryClient } from 'src/utils/http';
 import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
 import Card from '@mui/material/Card';
 import CardHeader  from '@mui/material/CardHeader';
+import { useMutation } from '@tanstack/react-query';
+import { useAppContext } from 'src/providers/AppReducer';
+import * as GroupService from 'src/services/group.service';
+import { useParams } from 'react-router-dom';
+
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -31,18 +37,43 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export default function GroupMemberView({ groupMembers, isAdmin }) {
+export default function GroupMemberView({ groupMembers, isAdmin}) {
+  const {groupId} = useParams();
   const [isOpen, setOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const handleClose = () => {
     setOpen(false);
   };
-  const onConfirmedHandler = () => {};
+  const onConfirmedHandler = () => {
+    mutate();
+  };
   const onCanceledHandler = () => {};
   const onViewHandler = (member) => {
     setOpen(true);
     setSelectedMember(member);
   };
+  const { showSnackbar } = useAppContext();
+  const removeGroupMember = async ()=>{
+      const response = await GroupService.removeGroupMember();
+      return response;
+  }
+
+
+  const { mutate } = useMutation({
+    mutationFn:  removeGroupMember,
+    onSuccess: async () => {
+      // console.log("on success is called")
+      queryClient.invalidateQueries({
+        queryKey: ['group', groupId],
+      });
+      showSnackbar('Member added successfull');
+    },
+    onError: (error) => {
+      const err = error;
+      console.log('err', err);
+      showSnackbar(err.response.data.message, 'error');
+    }
+});
 
   let tableContent = '';
   const hideText = true;
@@ -60,6 +91,7 @@ export default function GroupMemberView({ groupMembers, isAdmin }) {
             //   Remove
             // </Button>
             <ConfirmDelete
+              size="small"
               title="Are you sure you want to remove?"
               description="You will not be able to recover this again."
               onConfirmed={onConfirmedHandler}
@@ -74,6 +106,7 @@ export default function GroupMemberView({ groupMembers, isAdmin }) {
             onClick={() => {
               onViewHandler(member);
             }}
+            size="small"
             color="secondary"
             sx={{ m: 1 }}
           >
@@ -109,6 +142,9 @@ export default function GroupMemberView({ groupMembers, isAdmin }) {
               <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap">
                 <Item>
                   <Typography>Name: {selectedMember?.memberName}</Typography>
+                </Item>
+                <Item>
+                  <Typography>Id: {selectedMember?.userId}</Typography>
                 </Item>
                 <Item>
                   <Typography>
