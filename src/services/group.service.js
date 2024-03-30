@@ -107,3 +107,24 @@ export async function addGroupMember(uEmail, groupId) {
 
 }
 
+
+
+
+export async function removeGroupMember(userId, groupId,memberId) {
+    const body ={
+        userId,
+        groupId,
+        memberId
+    }
+    const response = await _http.post(`${APIURL}group/member/remove?groupId=${groupId}`,body);
+    if (!response.status === 200) {
+        const error = new Error('An error occurred while trying to create');
+        error.code = response.status;
+        error.info = await response.json();
+        throw error;
+    }
+
+    const resData = await response.data;
+    return resData;
+
+}

@@ -38,14 +38,20 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function GroupMemberView({ groupMembers, isAdmin}) {
-  const {groupId} = useParams();
+  const params = useParams();
+  const {groupId} = params;
   const [isOpen, setOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const handleClose = () => {
     setOpen(false);
   };
-  const onConfirmedHandler = () => {
-    mutate();
+  const onConfirmedHandler = (data) => {
+    console.log("removing",data);
+    if(data.isAdmin==="1"){
+      console.log("cannot remove admin")
+      return;
+    }
+    mutate({userId:data.userId, memberId:data.id});
   };
   const onCanceledHandler = () => {};
   const onViewHandler = (member) => {
@@ -53,8 +59,8 @@ export default function GroupMemberView({ groupMembers, isAdmin}) {
     setSelectedMember(member);
   };
   const { showSnackbar } = useAppContext();
-  const removeGroupMember = async ()=>{
-      const response = await GroupService.removeGroupMember();
+  const removeGroupMember = async ({userId,memberId})=>{
+      const response = await GroupService.removeGroupMember(userId, groupId, memberId);
       return response;
   }
 
