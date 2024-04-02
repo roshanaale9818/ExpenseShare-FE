@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+// import Box from '@mui/material/Box';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
-import Box from '@mui/material/Box';
+import Link from '@mui/material/Link';
 import Table from '@mui/material/Table';
 import Paper from '@mui/material/Paper';
 import Popover from '@mui/material/Popover';
-import Collapse from '@mui/material/Collapse';
 import MenuItem from '@mui/material/MenuItem';
 import TableRow from '@mui/material/TableRow';
 import TableHead from '@mui/material/TableHead';
@@ -14,185 +15,253 @@ import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-
 import Iconify from 'src/components/iconify';
-// import Scrollbar from 'src/components/scrollbar';
+import { getUserId, queryClient } from 'src/utils/http';
+import { useAppContext } from 'src/providers/AppReducer';
+import * as GroupService from 'src/services/group.service';
 
-function createData(name, calories, fat, carbs, protein, price) {
-  return {
-    name,
-    calories,
-    fat,
-    carbs,
-    protein,
-    price,
-    history: [
-      {
-        date: '2020-01-05',
-        customerId: '11091700',
-        amount: 3,
-      },
-      {
-        date: '2020-01-02',
-        customerId: 'Anonymous',
-        amount: 1,
-      },
-    ],
-  };
-}
+import ErrorBlock from 'src/components/error';
+import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
+import Label from 'src/components/label';
+import { useNavigate } from 'react-router-dom';
+import Pagination from '@mui/material/Pagination';
+import Alert from '@mui/material/Alert';
 
 function Row(props) {
-  const { row } = props;
-  const [openCollpase, setOpenCollapse] = useState(false);
-  
-
+  const { showSnackbar, showLoading, hideLoading } = useAppContext();
+  const navigate = useNavigate();
+  const { row, openDialog, serial } = props;
   const handleCloseMenu = () => {
-    setOpenCollapse(null);
-    setPopOverMenu(false)
+    setPopOverMenu(false);
   };
-  const [anchorEl, setAnchorEl]= useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const handleOpenMenu = (event) => {
-    setOpenCollapse(true);
     setPopOverMenu(true);
-    setAnchorEl(event.currentTarget)
+    setAnchorEl(event.currentTarget);
   };
-  const [popoverMenuIsOpen, setPopOverMenu]= useState(false);
+  const [popoverMenuIsOpen, setPopOverMenu] = useState(false);
+  const onEditClicked = () => {
+    try {
+      openDialog(true);
+      handleCloseMenu();
+    } catch (err) {
+      console.err(err);
+    }
+  };
+  const onGroupViewHandler = (group) => {
+    console.log(group);
+    navigate(`/auth/group/${group.id}/detail?groupName=${group.groupName}`, group);
+  };
+  const deleteGroup = async ({ id }) => {
+    const response = await GroupService.deleteGroup(id);
+    return response;
+  };
+
+  const { mutate } = useMutation({
+    mutationFn: deleteGroup,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['groups', getUserId()]);
+      showSnackbar('Group deleted successfull.', 'success');
+      // sucessEvent();
+      hideLoading();
+    },
+    onError: (error) => {
+      console.log('Error', error);
+      showSnackbar('Group deletion failed.', 'error');
+      hideLoading();
+      // setIsLoading(false);
+    },
+  });
+  const onConfirmedHandler = (data) => {
+    // console.log("friy",data)
+    showLoading();
+    mutate(data);
+    handleCloseMenu();
+  };
+  const onCanceledHandler = () => {
+    handleCloseMenu();
+  };
+
+  let actionContent = '';
+  if (row.isAdmin === '1') {
+    actionContent = (
+      <Popover
+        open={!!popoverMenuIsOpen}
+        anchorEl={anchorEl}
+        onClose={handleCloseMenu}
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        sx={{
+          position: 'absolute',
+        }}
+      >
+        <MenuItem onClick={onEditClicked}>
+          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+          Edit
+        </MenuItem>
+
+        <ConfirmDelete
+          title="Are you sure you want to delete ?"
+          description="You will not be able to recover this again."
+          onConfirmed={onConfirmedHandler}
+          onCanceled={onCanceledHandler}
+          data={row}
+          sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
+        />
+      </Popover>
+    );
+  }
 
   return (
     <>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>
-          <IconButton aria-label="expand row" size="small" onClick={() => setOpenCollapse(!openCollpase)}>
-            {openCollpase ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
+        <TableCell>{serial + 1}</TableCell>
         <TableCell component="th" scope="row">
-          {row.name}
+          <Link
+            component="button"
+            variant="contained"
+            onClick={() => {
+              onGroupViewHandler(row);
+            }}
+          >
+            {row.groupName}
+          </Link>
         </TableCell>
-        <TableCell align="right">{row.calories}</TableCell>
-        <TableCell align="right">{row.fat}</TableCell>
-        <TableCell align="right">{row.carbs}</TableCell>
-        <TableCell align="right">{row.protein}</TableCell>
+
+        <TableCell align="right">{row.createdAt.split('T')[0]}</TableCell>
+        <TableCell align="right">
+          <Label color={(row.isAdmin === '0' && 'secondary') || 'success'}>
+            {(row.isAdmin === '0' && 'Member') || 'Admin'}
+          </Label>
+          {/* {row.status} */}
+        </TableCell>
+        {/* <TableCell align="right">
+          <Label color={(row.status === '0' && 'error') || 'success'}>
+            {(row.status === '1' && 'Active') || 'In active'}
+          </Label>
+  
+        </TableCell> */}
+
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
       </TableRow>
-      <TableRow>
-        <Popover
-          open={!!popoverMenuIsOpen}
-          anchorEl={anchorEl}
-          onClose={handleCloseMenu}
-          anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-          PaperProps={{
-            sx: { width: 140 },
-          }}
-          sx={{
-            position: 'absolute',
-          }}
-        >
-          <MenuItem onClick={handleCloseMenu}>
-            <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-            Edit
-          </MenuItem>
-
-          <MenuItem onClick={handleCloseMenu} sx={{ color: 'error.main' }}>
-            <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
-            Delete
-          </MenuItem>
-        </Popover>
-      </TableRow>
-
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={openCollpase} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                History
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {row.history.map((historyRow) => (
-                    <TableRow key={historyRow.date}>
-                      <TableCell component="th" scope="row">
-                        {historyRow.date}
-                      </TableCell>
-                      <TableCell>{historyRow.customerId}</TableCell>
-                      <TableCell align="right">{historyRow.amount}</TableCell>
-                      <TableCell align="right">
-                        {Math.round(historyRow.amount * row.price * 100) / 100}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
+      <TableRow>{actionContent}</TableRow>
     </>
   );
 }
 
 Row.propTypes = {
   row: PropTypes.shape({
-    calories: PropTypes.number.isRequired,
-    carbs: PropTypes.number.isRequired,
-    fat: PropTypes.number.isRequired,
-    history: PropTypes.arrayOf(
-      PropTypes.shape({
-        amount: PropTypes.number.isRequired,
-        customerId: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-      })
-    ).isRequired,
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    protein: PropTypes.number.isRequired,
+    groupName: PropTypes.string,
+    createdAt: PropTypes.string,
+    status: PropTypes.string,
+    isAdmin: PropTypes.string,
   }).isRequired,
+  serial: PropTypes.number,
+  openDialog: PropTypes.func,
+  // onDelete: PropTypes.func,
 };
 
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 3.99),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 4.99),
-  createData('Eclair', 262, 16.0, 24, 6.0, 3.79),
-  createData('Cupcake', 305, 3.7, 67, 4.3, 2.5),
-  createData('Gingerbread', 356, 16.0, 49, 3.9, 1.5),
-];
-
 export default function ExpenseRequestTableView() {
+  let rows = [];
+  // const { onEdit, onDelete } = props;
+  // console.log("ONEDIT",onEdit);
+  const getGroupList = async (_data, _page = 1, _limit = 10) => {
+    const response = await GroupService.getGroupList({ page: _page, limit: _limit });
+    return response;
+  };
+
+  const onEditClickHandler = () => {
+    try {
+      // onEdit(group);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const onDeleteHandler = (group) => {
+    try {
+      // onDelete(group);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const paginationChangeHandler = (event, page) => {
+    console.log('EVENT', event, page);
+  };
+
+  const { isError, data, error } = useQuery({
+    queryKey: ['groups', getUserId()],
+    queryFn: getGroupList,
+  });
+  let content = '';
+
+  if (data && data.status === 'ok') {
+    // hideLoading()
+    rows = data.data;
+
+    content = (
+      <TableBody>
+        {rows &&
+          rows.map((row, index) => (
+            <Row
+              key={row.id}
+              openDialog={() => {
+                onEditClickHandler(row);
+              }}
+              row={row}
+              serial={index}
+              onDelete={() => {
+                onDeleteHandler(row);
+              }}
+            />
+          ))}
+
+        {rows.length === 0 && <Typography variant="body">No data found.</Typography>}
+      </TableBody>
+    );
+  }
+  if (isError) {
+    content = (
+      <TableBody>
+        (<ErrorBlock message={error} />)
+      </TableBody>
+    );
+  }
+
   return (
+    
     <TableContainer component={Paper}>
+        <Alert variant="filled" severity="info" sx={{mb:2}}>
+         If you are admin of any group, All the expense request will appear here.
+        </Alert>
       <Table aria-label="collapsible table">
         <TableHead>
           <TableRow>
-            <TableCell />
-            <TableCell>Dessert (100g serving)</TableCell>
-            <TableCell align="right">Calories</TableCell>
-            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-            <TableCell align="right">Protein&nbsp;(g)</TableCell>
+            <TableCell>S.N</TableCell>
+            <TableCell>Expense Title</TableCell>
+            <TableCell align="right">Created On</TableCell>
+            {/* <TableCell align="right">Status </TableCell> */}
+            <TableCell align="right">Your role </TableCell>
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <Row key={row.name} row={row} />
-          ))}
-        </TableBody>
+      
+        {content}
       </Table>
+      {/* {paginationContent} */}
+      {/* {totalCount} */}
+
+      <Pagination
+        sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
+        count={data ? Number(data.totalItems) : 100}
+        variant="outlined"
+        shape="rounded"
+        onChange={paginationChangeHandler}
+      />
     </TableContainer>
   );
 }

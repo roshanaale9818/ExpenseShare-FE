@@ -18,6 +18,8 @@ import TableContainer from '@mui/material/TableContainer';
 // import TablePagination from '@mui/material/TablePagination';
 
 import Iconify from 'src/components/iconify';
+import Pagination from '@mui/material/Pagination';
+
 // import ConfirmDialog from 'src/components/confirm/confirm-dialog';
 
 // import Scrollbar from 'src/components/scrollbar';
@@ -156,6 +158,7 @@ function Row(props) {
         </TableCell>
       </TableRow>
       <TableRow>{actionContent}</TableRow>
+      
     </>
   );
 }
@@ -179,6 +182,9 @@ export default  function  GroupTableView(props) {
   const getGroupList = async (_data, _page = 1, _limit = 10) => {
     const response = await GroupService.getGroupList({ page: _page, limit: _limit });
     return response;
+  };
+  const paginationChangeHandler = (event, page) => {
+    console.log('EVENT', event, page);
   };
 
   const onEditClickHandler = (group) => {
@@ -265,19 +271,13 @@ export default  function  GroupTableView(props) {
         {/* <TableBody>{content}</TableBody> */}
         {content}
       </Table>
-      {/* {paginationContent} */}
-      {/* {totalCount} */}
-
-      
-        {/* <TablePagination
-          page={page}
-          component="div"
-          count={100}
-          rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        /> */}
+      <Pagination
+        sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
+        count={data ? Number(data.totalItems) : 100}
+        variant="outlined"
+        shape="rounded"
+        onChange={paginationChangeHandler}
+      />
     
     </TableContainer>
   );

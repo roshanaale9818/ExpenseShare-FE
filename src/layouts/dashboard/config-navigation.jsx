@@ -17,11 +17,11 @@ const navConfig = [
     path: '/auth/user',
     icon: icon('ic_user'),
   },
-  {
-    title: 'product',
-    path: '/auth/products',
-    icon: icon('ic_cart'),
-  },
+  // {
+  //   title: 'product',
+  //   path: '/auth/products',
+  //   icon: icon('ic_cart'),
+  // },
   {
     title: 'My Expenses',
     path: '/auth/expense',
