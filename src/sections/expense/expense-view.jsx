@@ -11,8 +11,10 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import LoadingButton from '@mui/lab/LoadingButton';
+// import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 import TextField from '@mui/material/TextField';
+// import { styled } from '@mui/material/styles';
 
 import { PageHeadView } from 'src/components/page-head';
 import InputLabel from '@mui/material/InputLabel';
@@ -20,17 +22,36 @@ import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import InputAdornment from '@mui/material/InputAdornment';
 
 import ExpenseTableView from './expense-table-view';
+import ExpenseFilterView from './expense-filter-view';
 
+// const VisuallyHiddenInput = styled('input')({
+//   clip: 'rect(0 0 0 0)',
+//   clipPath: 'inset(50%)',
+//   height: 1,
+//   overflow: 'hidden',
+//   position: 'absolute',
+//   bottom: 0,
+//   left: 0,
+//   whiteSpace: 'nowrap',
+//   width: 1,
+// });
 export default function ExpenseView() {
   const schema = yup.object({
     expenseTitle: yup.string('Enter Title').required('Title is required'),
     amount: yup.number('Enter Amount').required('Amount is required'),
+    description: yup.string('Enter Description').required('Description is required.'),
+    paidBy: yup.string('Enter Paid By').required('Paid By is required.'),
+    group: yup.string('Enter Group').required('Group is required.'),
   });
   const initialValues = {
     expenseTitle: '',
     amount: 0,
+    description: '',
+    paidBy: '',
+    group: '',
   };
 
   const formik = useFormik({
@@ -51,8 +72,9 @@ export default function ExpenseView() {
   const onNewClicked = () => {
     setOpen(true);
     console.log(setIsLoading);
+    formik.resetForm();
   };
-  const onAgeChangeHandler = () => {};
+  // const onAgeChangeHandler = () => {};
   return (
     <>
       <PageHeadView name="Expenses" labelForNewButton="New Expense" onNewClick={onNewClicked} />
@@ -80,9 +102,10 @@ export default function ExpenseView() {
                     fullWidth
                     margin="normal"
                     required
-                    name="title"
+                    name="expenseTitle"
                     label="Expense Title"
                     type="text"
+                    placeholder="Eg.  Groceries"
                     id="expenseTitle"
                     autoComplete="Expense Title"
                     value={formik.values.expenseTitle}
@@ -107,46 +130,67 @@ export default function ExpenseView() {
                     onBlur={formik.handleBlur}
                     error={formik.touched.amount && Boolean(formik.errors.amount)}
                     helperText={formik.touched.amount && formik.errors.amount}
+                    InputProps={{
+                      startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <FormControl sx={{ m: 1 }} fullWidth>
-                    <InputLabel id="demo-simple-select-helper-label">Group</InputLabel>
+                  <FormControl
+                    sx={{ m: 1 }}
+                    fullWidth
+                    error={formik.touched.group && Boolean(formik.errors.group)}
+                  >
+                    <InputLabel id="group-select">Group</InputLabel>
                     <Select
-                      labelId="demo-simple-select-helper-label"
+                      labelId="group-select"
                       id="demo-simple-select-helper"
-                      value={10}
                       label="Group"
-                      onChange={onAgeChangeHandler}
+                      onChange={formik.handleChange}
+                      value={formik.values.group}
+                      onBlur={formik.handleBlur}
+                      name="group"
                     >
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      <MenuItem value={10}>Ten</MenuItem>
-                      <MenuItem value={20}>Twenty</MenuItem>
-                      <MenuItem value={30}>Thirty</MenuItem>
+                      <MenuItem value={10}>Sydney Ghar</MenuItem>
+                      <MenuItem value={20}>South Windsor</MenuItem>
+                      <MenuItem value={30}>Parramatta Campus Guys</MenuItem>
                     </Select>
-                    <FormHelperText>With label + helper text</FormHelperText>
+
+                    {formik.touched.group && formik.errors.group && (
+                      <FormHelperText>{formik.errors.group}</FormHelperText>
+                    )}
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <FormControl sx={{ m: 1 }} fullWidth>
-                    <InputLabel id="demo-simple-select-helper-label">Paid By</InputLabel>
+                  <FormControl
+                    sx={{ m: 1 }}
+                    fullWidth
+                    error={formik.touched.paidBy && Boolean(formik.errors.paidBy)}
+                  >
+                    <InputLabel id="paidBy-select">Paid By</InputLabel>
                     <Select
-                      labelId="demo-simple-select-helper-label"
+                      labelId="paidBy-select"
                       id="demo-simple-select-helper"
-                      value={10}
-                      label="Paid By"
-                      onChange={onAgeChangeHandler}
+                      label="paidBy"
+                      onChange={formik.handleChange}
+                      value={formik.values.paidBy}
+                      onBlur={formik.handleBlur}
+                      name="paidBy"
                     >
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      <MenuItem value={10}>Ten</MenuItem>
-                      <MenuItem value={20}>Twenty</MenuItem>
-                      <MenuItem value={30}>Thirty</MenuItem>
+                      <MenuItem value={10}>Samir Tamang</MenuItem>
+                      <MenuItem value={20}>Roshan Aale Magar</MenuItem>
+                      <MenuItem value={30}>Rojina Ale</MenuItem>
                     </Select>
-                    <FormHelperText>With label + helper text</FormHelperText>
+
+                    {formik.touched.paidBy && formik.errors.paidBy && (
+                      <FormHelperText>{formik.errors.paidBy}</FormHelperText>
+                    )}
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -154,18 +198,33 @@ export default function ExpenseView() {
                     fullWidth
                     margin="normal"
                     required
-                    name="desc"
+                    name="description"
                     label="Description"
-                    type="number"
+                    type="text"
                     id="description"
                     autoComplete="Description"
-                    value={formik.values.amount}
+                    value={formik.values.description}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    error={formik.touched.amount && Boolean(formik.errors.amount)}
-                    helperText={formik.touched.amount && formik.errors.amount}
+                    error={formik.touched.description && Boolean(formik.errors.description)}
+                    helperText={formik.touched.description && formik.errors.description}
                   />
                 </Grid>
+                {/* <Grid item xs={12} sm={6}>
+                <Button
+                    component="label"
+                    role={undefined}
+                    variant="contained"
+                    color='secondary'
+                    tabIndex={-1}
+                    startIcon={<CloudUploadIcon />}
+                    sx={{ mt: 2 }}
+
+                  >
+                    Attach  Receipt
+                    <VisuallyHiddenInput type="file" />
+                  </Button>
+                </Grid> */}
               </Grid>
             </Box>
           </DialogContent>
@@ -187,6 +246,7 @@ export default function ExpenseView() {
           </DialogActions>
         </Dialog>
 
+        <ExpenseFilterView />
         <ExpenseTableView />
       </Container>
     </>
