@@ -12,6 +12,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import LoadingButton from '@mui/lab/LoadingButton';
 // import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import * as GroupService from 'src/services/group.service';
+import { useQuery } from '@tanstack/react-query';
 
 import TextField from '@mui/material/TextField';
 // import { styled } from '@mui/material/styles';
@@ -39,6 +41,7 @@ import ExpenseFilterView from './expense-filter-view';
 //   width: 1,
 // });
 export default function ExpenseView() {
+  let groups = [];
   const schema = yup.object({
     expenseTitle: yup.string('Enter Title').required('Title is required'),
     amount: yup.number('Enter Amount').required('Amount is required'),
@@ -74,7 +77,52 @@ export default function ExpenseView() {
     console.log(setIsLoading);
     formik.resetForm();
   };
+
+  const getUserGroups = async (_data, _page = 1, _limit = 10) => {
+    const response = await GroupService.getAllGroups({ page: _page, limit: _limit });
+    return response;
+  };
+
+  const {
+    data: userGroupData,
+  } = useQuery({
+    queryKey: ['groups', 'expense'],
+    queryFn: getUserGroups,
+  });
+  if (userGroupData) {
+    // console.log(isUserGroupError, userGroupError, userGroupData);
+    groups = userGroupData.data;
+  }
   // const onAgeChangeHandler = () => {};
+  const [memberList, setMemberList] = useState([]);
+
+  const handleGroupChange = (event) => {
+    const newGroupValue = event.target.value;
+    // Reset expenseTitle field when group is changed
+    formik.setFieldValue('paidBy', '');
+    formik.handleChange(event); // Call handleChange to update formik's state
+    // get the member list
+    console.log(formik.values);
+    if (!newGroupValue) {
+      return;
+    }
+    getMemberList(newGroupValue);
+  };
+
+  const getMemberList = async (groupId) => {
+    try {
+      const response = await GroupService.getMembers(groupId);
+      if (response.status === 'ok') {
+        setMemberList(response.data.Members);
+      }
+    } catch (err) {
+      console.error(err);
+      setMemberList([]);
+    }
+    // finally{
+    //   setMemberList([]);
+    // }
+  };
   return (
     <>
       <PageHeadView name="Expenses" labelForNewButton="New Expense" onNewClick={onNewClicked} />
@@ -146,7 +194,7 @@ export default function ExpenseView() {
                       labelId="group-select"
                       id="demo-simple-select-helper"
                       label="Group"
-                      onChange={formik.handleChange}
+                      onChange={handleGroupChange}
                       value={formik.values.group}
                       onBlur={formik.handleBlur}
                       name="group"
@@ -154,9 +202,13 @@ export default function ExpenseView() {
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      <MenuItem value={10}>Sydney Ghar</MenuItem>
+                      {/* <MenuItem value={10}>Sydney Ghar</MenuItem>
                       <MenuItem value={20}>South Windsor</MenuItem>
-                      <MenuItem value={30}>Parramatta Campus Guys</MenuItem>
+                      <MenuItem value={30}>Parramatta Campus Guys</MenuItem> */}
+                      {groups &&
+                        groups.map((row, index) => (
+                          <MenuItem value={row.id}>{row.groupName}</MenuItem>
+                        ))}
                     </Select>
 
                     {formik.touched.group && formik.errors.group && (
@@ -183,9 +235,14 @@ export default function ExpenseView() {
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      <MenuItem value={10}>Samir Tamang</MenuItem>
+                      {/* <MenuItem value={10}>Samir Tamang</MenuItem>
                       <MenuItem value={20}>Roshan Aale Magar</MenuItem>
-                      <MenuItem value={30}>Rojina Ale</MenuItem>
+                      <MenuItem value={30}>Rojina Ale</MenuItem> */}
+
+                      {memberList &&
+                        memberList.map((row, index) => (
+                          <MenuItem value={row.id}>{row.memberName}</MenuItem>
+                        ))}
                     </Select>
 
                     {formik.touched.paidBy && formik.errors.paidBy && (

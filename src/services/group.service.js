@@ -34,6 +34,34 @@ export async function getGroupList({page,limit}) {
 }
 
 
+export async function getAllGroups({page,limit}) {
+    const response = await _http.get(`${APIURL}group/list?page=${page}&limit=${limit}`,);
+    if (!response.status === 200) {
+        const error = new Error('An error occurred while trying to create');
+        error.code = response.status;
+        error.info = await response.json();
+        throw error;
+    }
+
+    const resData = await response.data;
+    return resData;
+
+}
+
+export async function getMembers(groupId) {
+    const response = await _http.get(`${APIURL}group/members?groupId=${groupId}`);
+    if (!response.status === 200) {
+        const error = new Error('An error occurred while trying to create');
+        error.code = response.status;
+        error.info = await response.json();
+        throw error;
+    }
+
+    const resData = await response.data;
+    return resData;
+
+}
+
 export async function editGroup({groupName,groupId}) {
     const data = {
         groupName,

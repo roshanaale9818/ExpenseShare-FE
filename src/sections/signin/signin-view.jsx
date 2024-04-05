@@ -82,6 +82,9 @@ export default function SignInView() {
       }
       setLoading(false);
     }
+    finally{
+      setLoading(false);
+    }
   };
 
   return (
