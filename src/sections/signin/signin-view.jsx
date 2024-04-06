@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAppContext } from 'src/providers/AppReducer';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -16,7 +17,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import  {attachToken}  from 'src/utils/http';
+import { attachToken } from 'src/utils/http';
 
 import { authActions } from 'src/store';
 
@@ -39,6 +40,8 @@ const initialValues = {
 const defaultTheme = createTheme();
 
 export default function SignInView() {
+  const { showSnackbar } = useAppContext();
+
   const [isLoading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const formik = useFormik({
@@ -75,14 +78,16 @@ export default function SignInView() {
       }
     } catch (err) {
       console.log('An error has occured while logging in', err.response);
+      showSnackbar('Something went wrong', 'error');
+
       const { response } = err;
 
       if (response.data.status === 'error') {
         setErrorMessage(response.data.message);
+        showSnackbar(response.data.message, 'error');
       }
       setLoading(false);
-    }
-    finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -150,14 +155,7 @@ export default function SignInView() {
                 error={formik.touched.password && Boolean(formik.errors.password)}
                 helperText={formik.touched.password && formik.errors.password}
               />
-              <Box>
-              
-                {errorMessage && (
-                  <Alert severity="error">
-                    {errorMessage}
-                  </Alert>
-                )}
-              </Box>
+              <Box>{errorMessage && <Alert severity="error">{errorMessage}</Alert>}</Box>
 
               <LoadingButton
                 fullWidth

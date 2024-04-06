@@ -13,7 +13,11 @@ import DialogContent from '@mui/material/DialogContent';
 import LoadingButton from '@mui/lab/LoadingButton';
 // import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import * as GroupService from 'src/services/group.service';
-import { useQuery } from '@tanstack/react-query';
+import * as ExpenseService from 'src/services/expense.service';
+
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { queryClient } from 'src/utils/http';
+import { useAppContext } from 'src/providers/AppReducer';
 
 import TextField from '@mui/material/TextField';
 // import { styled } from '@mui/material/styles';
@@ -41,10 +45,11 @@ import ExpenseFilterView from './expense-filter-view';
 //   width: 1,
 // });
 export default function ExpenseView() {
+  const { showSnackbar } = useAppContext();
   let groups = [];
   const schema = yup.object({
     expenseTitle: yup.string('Enter Title').required('Title is required'),
-    amount: yup.number('Enter Amount').required('Amount is required'),
+    amount: yup.number('Enter Amount').required('Amount is required').min(1),
     description: yup.string('Enter Description').required('Description is required.'),
     paidBy: yup.string('Enter Paid By').required('Paid By is required.'),
     group: yup.string('Enter Group').required('Group is required.'),
@@ -63,6 +68,8 @@ export default function ExpenseView() {
     onSubmit: (values) => {
       // submitHandler(values);
       // mutate(values);
+      // console.log(values,expenseMutate)
+      expenseMutate(values);
     },
   });
   const [isOpen, setOpen] = useState(false);
@@ -82,18 +89,31 @@ export default function ExpenseView() {
     const response = await GroupService.getAllGroups({ page: _page, limit: _limit });
     return response;
   };
+  const addExpenseHandler = async (values) => {
+    const response = await ExpenseService.addExpense(values);
+    return response;
+  };
+  const { mutate: expenseMutate } = useMutation({
+    mutationFn: addExpenseHandler,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['groups', 'expense']);
+      showSnackbar('Expense added successfull.', 'success');
+      handleClose();
+    },
+    onError: (error) => {
+      console.log('Error', error);
+      showSnackbar('Something went wrong. Please try again later.','error');
+    },
+  });
 
-  const {
-    data: userGroupData,
-  } = useQuery({
+  const { data: userGroupData } = useQuery({
     queryKey: ['groups', 'expense'],
     queryFn: getUserGroups,
   });
   if (userGroupData) {
-    // console.log(isUserGroupError, userGroupError, userGroupData);
     groups = userGroupData.data;
   }
-  // const onAgeChangeHandler = () => {};
+
   const [memberList, setMemberList] = useState([]);
 
   const handleGroupChange = (event) => {
@@ -207,7 +227,9 @@ export default function ExpenseView() {
                       <MenuItem value={30}>Parramatta Campus Guys</MenuItem> */}
                       {groups &&
                         groups.map((row, index) => (
-                          <MenuItem value={row.id}>{row.groupName}</MenuItem>
+                          <MenuItem key={row.id} value={row.id}>
+                            {row.groupName}
+                          </MenuItem>
                         ))}
                     </Select>
 
@@ -241,7 +263,9 @@ export default function ExpenseView() {
 
                       {memberList &&
                         memberList.map((row, index) => (
-                          <MenuItem value={row.id}>{row.memberName}</MenuItem>
+                          <MenuItem key={row.id} value={row.id}>
+                            {row.memberName}
+                          </MenuItem>
                         ))}
                     </Select>
 
