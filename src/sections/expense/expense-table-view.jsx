@@ -19,13 +19,11 @@ import { useAppContext } from 'src/providers/AppReducer';
 import * as GroupService from 'src/services/group.service';
 import * as ExpenseService from 'src/services/expense.service';
 
-
 import ErrorBlock from 'src/components/error';
 import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
 import Label from 'src/components/label';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
-
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -50,8 +48,8 @@ function Row(props) {
   };
   const onGroupViewHandler = (group) => {
     console.log(group);
-    navigate(`/auth/group/${group.id}/detail?groupName=${group.groupName}`, group)
-  }
+    navigate(`/auth/group/${group.group_id}/detail?groupName=${group.groupName}`, group);
+  };
   const deleteGroup = async ({ id }) => {
     const response = await GroupService.deleteGroup(id);
     return response;
@@ -124,7 +122,7 @@ function Row(props) {
             component="button"
             variant="contained"
             onClick={() => {
-              onGroupViewHandler(row)
+              onGroupViewHandler(row);
             }}
           >
             {row.groupName}
@@ -134,13 +132,11 @@ function Row(props) {
           <Label color={(row.settlementStatus === 'PENDING' && 'secondary') || 'success'}>
             {row.settlementStatus}
           </Label>
-     
         </TableCell>
         <TableCell align="right">
           <Label color={(row.isAdmin === '0' && 'secondary') || 'success'}>
             {(row.isAdmin === '0' && 'Member') || 'Admin'}
           </Label>
-     
         </TableCell>
         {/* <TableCell align="right">
           <Label color={(row.status === '0' && 'error') || 'success'}>
@@ -166,8 +162,8 @@ Row.propTypes = {
     createdAt: PropTypes.string,
     status: PropTypes.string,
     isAdmin: PropTypes.string,
-    title:PropTypes.string,
-    settlementStatus:PropTypes.string
+    title: PropTypes.string,
+    settlementStatus: PropTypes.string,
   }).isRequired,
   serial: PropTypes.number,
   openDialog: PropTypes.func,
@@ -188,9 +184,7 @@ export default function ExpenseTableView() {
       console.error(err);
     }
   };
-  const paginationChangeHandler = () => {
-
-  }
+  const paginationChangeHandler = () => {};
   const onDeleteHandler = (group) => {
     try {
       // onDelete(group);
@@ -224,27 +218,29 @@ export default function ExpenseTableView() {
             />
           ))}
 
-{rows.length === 0 && 
-<TableBody>
-  <TableRow>
-    <TableCell colSpan={5} align='center'>
-    <Typography variant="body" align='center'>No data found.</Typography>
-    </TableCell>
-  </TableRow>
-  </TableBody>
-
-}
+        {rows.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={5} align="center">
+              <Typography variant="body" align="center">
+                No data found.
+              </Typography>
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     );
-
   }
   if (isError) {
     content = (
       <TableBody>
         <TableRow>
           <TableCell>
-            (<ErrorBlock sx={{ width: 100 }} message={error ? error.message : 'An error has occured'} />)
-
+            (
+            <ErrorBlock
+              sx={{ width: 100 }}
+              message={error ? error.message : 'An error has occured'}
+            />
+            )
           </TableCell>
         </TableRow>
       </TableBody>
@@ -262,27 +258,24 @@ export default function ExpenseTableView() {
             <TableCell>Associated Group</TableCell>
             <TableCell>SettleMent Status</TableCell>
             <TableCell>Created By</TableCell>
-            {/* <TableCell align="right">Your role </TableCell> */}
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
         {content}
       </Table>
 
-
-
-      {(data && data.totalPages > 1) && <Pagination
-        sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
-        count={data ? Number(data.totalPages) : 100}
-        variant="outlined"
-        shape="rounded"
-        onChange={paginationChangeHandler}
-      />}
-
+      {data && data.totalPages > 1 && (
+        <Pagination
+          sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
+          count={data ? Number(data.totalPages) : 100}
+          variant="outlined"
+          shape="rounded"
+          onChange={paginationChangeHandler}
+        />
+      )}
     </TableContainer>
   );
 }
-
 
 ExpenseTableView.propTypes = {
   // onEdit: PropTypes.func,

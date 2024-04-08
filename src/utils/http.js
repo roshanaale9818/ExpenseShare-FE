@@ -2,8 +2,10 @@ import axios from 'axios';
 // react query for caching 
 import { QueryClient } from "@tanstack/react-query";
 
+const api = import.meta.env.VITE_API_URL;
+
 export const queryClient = new QueryClient();
-export const APIURL = "http://localhost:8081/api/v1/";
+export const APIURL = api || "http://localhost:8081/api/v1/";
 
 
 // axios instance

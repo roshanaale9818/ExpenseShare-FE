@@ -103,12 +103,10 @@ export default function ExpenseView() {
     onError: (error) => {
       try {
         console.log('Error', error);
-        const errMsg = error.response.data.errors[0] || 'Something went wrong.'
+        const errMsg = error.response.data.errors[0] || 'Something went wrong.';
         showSnackbar(errMsg, 'error');
-      }
-      catch (err) {
+      } catch (err) {
         showSnackbar(error.message, 'error');
-
       }
     },
   });

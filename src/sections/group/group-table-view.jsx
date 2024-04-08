@@ -15,16 +15,9 @@ import TableBody from '@mui/material/TableBody';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
-// import TablePagination from '@mui/material/TablePagination';
 
 import Iconify from 'src/components/iconify';
 import Pagination from '@mui/material/Pagination';
-
-// import ConfirmDialog from 'src/components/confirm/confirm-dialog';
-
-// import Scrollbar from 'src/components/scrollbar';
-
-// import useRunOnce from 'src/hooks/useRunOnce';
 
 import { getUserId, queryClient } from 'src/utils/http';
 
@@ -57,10 +50,10 @@ function Row(props) {
       console.err(err);
     }
   };
-  const onGroupViewHandler = (group)=>{
-      console.log(group);
-      navigate(`/auth/group/${group.id}/detail?groupName=${group.groupName}`,group)
-  }
+  const onGroupViewHandler = (group) => {
+    console.log(group);
+    navigate(`/auth/group/${group.id}/detail?groupName=${group.groupName}`, group);
+  };
   const deleteGroup = async ({ id }) => {
     const response = await GroupService.deleteGroup(id);
     return response;
@@ -130,7 +123,7 @@ function Row(props) {
             component="button"
             variant="contained"
             onClick={() => {
-              onGroupViewHandler(row)
+              onGroupViewHandler(row);
             }}
           >
             {row.groupName}
@@ -158,7 +151,6 @@ function Row(props) {
         </TableCell>
       </TableRow>
       <TableRow>{actionContent}</TableRow>
-      
     </>
   );
 }
@@ -175,7 +167,7 @@ Row.propTypes = {
   // onDelete: PropTypes.func,
 };
 
-export default  function  GroupTableView(props) {
+export default function GroupTableView(props) {
   let rows = [];
   const { onEdit, onDelete } = props;
   // console.log("ONEDIT",onEdit);
@@ -228,10 +220,17 @@ export default  function  GroupTableView(props) {
             />
           ))}
 
-        {rows.length === 0 && <Typography variant="body">No data found.</Typography>}
+        {rows.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={5} align="center">
+              <Typography variant="body" align="center">
+                No data found.
+              </Typography>
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     );
-  
   }
   if (isError) {
     // hideLoading()
@@ -268,21 +267,20 @@ export default  function  GroupTableView(props) {
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
-        {/* <TableBody>{content}</TableBody> */}
         {content}
       </Table>
-      <Pagination
-        sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
-        count={data ? Number(data.totalItems) : 100}
-        variant="outlined"
-        shape="rounded"
-        onChange={paginationChangeHandler}
-      />
-    
+      {data && data.totalPages > 1 && (
+        <Pagination
+          sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
+          count={data ? Number(data.totalPages) : 100}
+          variant="outlined"
+          shape="rounded"
+          onChange={paginationChangeHandler}
+        />
+      )}
     </TableContainer>
   );
 }
-
 
 GroupTableView.propTypes = {
   onEdit: PropTypes.func,

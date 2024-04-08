@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAppContext } from 'src/providers/AppReducer';
+
 
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
@@ -86,6 +88,9 @@ export default function SignUpView() {
   const [resultType, setResultType] = useState('error');
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
+  const { showSnackbar } = useAppContext();
+
+
   const submitHandler = async (formData) => {
     try {
       setLoading(true);
@@ -96,6 +101,8 @@ export default function SignUpView() {
         setResultType('success');
         setLoading(false);
         formik.resetForm();
+        // show alert
+        showSnackbar(response.message)
       }
     } catch (err) {
       console.error('An error has occured while signing up', err,err.response);
@@ -104,6 +111,9 @@ export default function SignUpView() {
       setResultType('error');
       if (response.data.status === 'error') {
         setResMessage(response.data.errors[0]); // show one error at a time
+
+        // show alert
+        showSnackbar(response.data.errors[0],'error')
       }
     }
   };
