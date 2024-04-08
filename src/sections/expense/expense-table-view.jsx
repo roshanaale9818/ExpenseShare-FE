@@ -17,12 +17,14 @@ import Iconify from 'src/components/iconify';
 import { getUserId, queryClient } from 'src/utils/http';
 import { useAppContext } from 'src/providers/AppReducer';
 import * as GroupService from 'src/services/group.service';
+import * as ExpenseService from 'src/services/expense.service';
+
 
 import ErrorBlock from 'src/components/error';
 import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
 import Label from 'src/components/label';
 import { useNavigate } from 'react-router-dom';
-import  Pagination from '@mui/material/Pagination';
+import Pagination from '@mui/material/Pagination';
 
 
 function Row(props) {
@@ -46,9 +48,9 @@ function Row(props) {
       console.err(err);
     }
   };
-  const onGroupViewHandler = (group)=>{
-      console.log(group);
-      navigate(`/auth/group/${group.id}/detail?groupName=${group.groupName}`,group)
+  const onGroupViewHandler = (group) => {
+    console.log(group);
+    navigate(`/auth/group/${group.id}/detail?groupName=${group.groupName}`, group)
   }
   const deleteGroup = async ({ id }) => {
     const response = await GroupService.deleteGroup(id);
@@ -115,6 +117,9 @@ function Row(props) {
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>{serial + 1}</TableCell>
         <TableCell component="th" scope="row">
+          {row.title}
+        </TableCell>
+        <TableCell component="th" scope="row">
           <Link
             component="button"
             variant="contained"
@@ -125,13 +130,17 @@ function Row(props) {
             {row.groupName}
           </Link>
         </TableCell>
-
-        <TableCell align="right">{row.createdAt.split('T')[0]}</TableCell>
+        <TableCell>
+          <Label color={(row.settlementStatus === 'PENDING' && 'secondary') || 'success'}>
+            {row.settlementStatus}
+          </Label>
+     
+        </TableCell>
         <TableCell align="right">
           <Label color={(row.isAdmin === '0' && 'secondary') || 'success'}>
             {(row.isAdmin === '0' && 'Member') || 'Admin'}
           </Label>
-          {/* {row.status} */}
+     
         </TableCell>
         {/* <TableCell align="right">
           <Label color={(row.status === '0' && 'error') || 'success'}>
@@ -157,16 +166,18 @@ Row.propTypes = {
     createdAt: PropTypes.string,
     status: PropTypes.string,
     isAdmin: PropTypes.string,
+    title:PropTypes.string,
+    settlementStatus:PropTypes.string
   }).isRequired,
   serial: PropTypes.number,
   openDialog: PropTypes.func,
   // onDelete: PropTypes.func,
 };
 
-export default  function  ExpenseTableView() {
+export default function ExpenseTableView() {
   let rows = [];
-  const getGroupList = async (_data, _page = 1, _limit = 10) => {
-    const response = await GroupService.getGroupList({ page: _page, limit: _limit });
+  const getExpenseList = async (_data, _page = 1, _limit = 10) => {
+    const response = await ExpenseService.getExpenseList({ page: _page, limit: _limit });
     return response;
   };
 
@@ -177,7 +188,7 @@ export default  function  ExpenseTableView() {
       console.error(err);
     }
   };
-  const paginationChangeHandler = ()=>{
+  const paginationChangeHandler = () => {
 
   }
   const onDeleteHandler = (group) => {
@@ -189,14 +200,13 @@ export default  function  ExpenseTableView() {
   };
 
   const { isError, data, error } = useQuery({
-    queryKey: ['groups', getUserId()],
-    queryFn: getGroupList,
+    queryKey: ['expense', getUserId()],
+    queryFn: getExpenseList,
   });
   let content = '';
 
   if (data && data.status === 'ok') {
     rows = data.data;
-    
     content = (
       <TableBody>
         {rows &&
@@ -214,15 +224,29 @@ export default  function  ExpenseTableView() {
             />
           ))}
 
-        {rows.length === 0 && <Typography variant="body">No data found.</Typography>}
+{rows.length === 0 && 
+<TableBody>
+  <TableRow>
+    <TableCell colSpan={5} align='center'>
+    <Typography variant="body" align='center'>No data found.</Typography>
+    </TableCell>
+  </TableRow>
+  </TableBody>
+
+}
       </TableBody>
     );
-  
+
   }
   if (isError) {
     content = (
       <TableBody>
-        (<ErrorBlock sx={{width:100}} message={error ? error.message:'An error has occured'} />)
+        <TableRow>
+          <TableCell>
+            (<ErrorBlock sx={{ width: 100 }} message={error ? error.message : 'An error has occured'} />)
+
+          </TableCell>
+        </TableRow>
       </TableBody>
     );
   }
@@ -233,9 +257,12 @@ export default  function  ExpenseTableView() {
         <TableHead>
           <TableRow>
             <TableCell>S.N</TableCell>
-            <TableCell>Group Name</TableCell>
-            <TableCell align="right">Created On</TableCell>
-            <TableCell align="right">Your role </TableCell>
+            <TableCell>Title</TableCell>
+            {/* <TableCell>S.N</TableCell> */}
+            <TableCell>Associated Group</TableCell>
+            <TableCell>SettleMent Status</TableCell>
+            <TableCell>Created By</TableCell>
+            {/* <TableCell align="right">Your role </TableCell> */}
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
@@ -243,15 +270,15 @@ export default  function  ExpenseTableView() {
       </Table>
 
 
-      
-      <Pagination
+
+      {(data && data.totalPages > 1) && <Pagination
         sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
-        count={data ? Number(data.totalItems) : 100}
+        count={data ? Number(data.totalPages) : 100}
         variant="outlined"
         shape="rounded"
         onChange={paginationChangeHandler}
-      />
-    
+      />}
+
     </TableContainer>
   );
 }

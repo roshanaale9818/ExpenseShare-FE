@@ -101,8 +101,15 @@ export default function ExpenseView() {
       handleClose();
     },
     onError: (error) => {
-      console.log('Error', error);
-      showSnackbar('Something went wrong. Please try again later.','error');
+      try {
+        console.log('Error', error);
+        const errMsg = error.response.data.errors[0] || 'Something went wrong.'
+        showSnackbar(errMsg, 'error');
+      }
+      catch (err) {
+        showSnackbar(error.message, 'error');
+
+      }
     },
   });
 
