@@ -162,7 +162,7 @@ export default function GroupDetailView() {
   const hideBtn = false;
   const params = useParams();
   const { groupId } = params;
-  const groupPhoto = 'path_to_group_photo.jpg';
+  const groupPhoto = '@src/assets/images/account.jpg';
   const groupStatus = 'Active';
   const getGroupDetail = async () => {
     const response = await GroupService.getGroupDetail(groupId);
@@ -205,7 +205,6 @@ export default function GroupDetailView() {
 
   if (isError) {
     console.log('Error', errorObject);
-    // setError(errorObject)
     content = (
       <Container>
         <ErrorBlock message={errorObject.response.data.message} />

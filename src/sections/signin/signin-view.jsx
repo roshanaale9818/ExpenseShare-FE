@@ -155,7 +155,11 @@ export default function SignInView() {
                 error={formik.touched.password && Boolean(formik.errors.password)}
                 helperText={formik.touched.password && formik.errors.password}
               />
-              <Box>{errorMessage && <Alert severity="error">{errorMessage}</Alert>}</Box>
+              <Box>
+                <div className="container">
+                {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+                </div>
+                </Box>
 
               <LoadingButton
                 fullWidth

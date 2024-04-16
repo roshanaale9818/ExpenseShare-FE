@@ -66,9 +66,6 @@ export default function ExpenseView() {
     initialValues,
     validationSchema: schema,
     onSubmit: (values) => {
-      // submitHandler(values);
-      // mutate(values);
-      // console.log(values,expenseMutate)
       expenseMutate(values);
     },
   });
@@ -126,8 +123,6 @@ export default function ExpenseView() {
     // Reset expenseTitle field when group is changed
     formik.setFieldValue('paidBy', '');
     formik.handleChange(event); // Call handleChange to update formik's state
-    // get the member list
-    console.log(formik.values);
     if (!newGroupValue) {
       return;
     }

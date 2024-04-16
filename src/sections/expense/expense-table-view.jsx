@@ -24,6 +24,7 @@ import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
 import Label from 'src/components/label';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
+// import { CircularProgress } from '@mui/material';
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -278,6 +279,4 @@ export default function ExpenseTableView() {
 }
 
 ExpenseTableView.propTypes = {
-  // onEdit: PropTypes.func,
-  // onDelete: PropTypes.func,
 };
