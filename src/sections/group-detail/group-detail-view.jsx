@@ -40,6 +40,7 @@ import * as userService from 'src/services/user.service';
 import GroupMemberView from './group-member-view';
 import GroupChartView from './group-chart-view';
 import GroupChatView from './group-chat-view';
+import GroupExpenseView from './group-expense-view';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -419,7 +420,7 @@ export default function GroupDetailView() {
               <Grid item lg={12}>
                 <GroupChartView
                   title="Group Activities"
-                  subheader="last month"
+                  subheader="current"
                   chart={{
                     labels: [
                       '01/01/2003',
@@ -460,6 +461,13 @@ export default function GroupDetailView() {
             </Grid>
 
             {/* group detail ends  */}
+
+            
+            <Grid item xs={12} sm={6} md={6}>
+              <Card sx={{ padding: 2 }}>
+                <GroupExpenseView groupMembers={data.data.Members} group={data.data} isAdmin={data.data.isAdmin} />
+              </Card>
+            </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <Card sx={{ padding: 2 }}>
                 <GroupMemberView groupMembers={data.data.Members} isAdmin={data.data.isAdmin} />
@@ -468,6 +476,8 @@ export default function GroupDetailView() {
             <Grid item xs={12} sm={6} md={6}>
               <GroupChatView />
             </Grid>
+
+
           </Grid>
         </Container>
       </>

@@ -18,6 +18,9 @@ export const GroupPage = lazy(() => import('src/pages/group'));
 export const ExpenseRequestPage = lazy(() => import('src/pages/expense-request'));
 export const SignUpPage = lazy(() => import('src/pages/signup'));
 export const GroupDetailPage = lazy(() => import('src/pages/group-detail'));
+export const GroupExpenseDetailPage = lazy(() => import('src/pages/group-expense'));
+
+
 
 // ----------------------------------------------------------------------
 
@@ -29,7 +32,7 @@ export default function Router() {
       element:
         auth.isLoggedIn && auth.currentUser ? (
           <DashboardLayout>
-            <Suspense>
+            <Suspense fallback={<p>Loading.....</p>}>
               <Outlet />
             </Suspense>
           </DashboardLayout>
@@ -49,6 +52,10 @@ export default function Router() {
         {
           path: 'group/:groupId/detail',
           element: <GroupDetailPage />,
+        },
+        {
+          path: 'group/:groupId/expense',
+          element: <GroupExpenseDetailPage />,
         },
         { path: 'expense-request', element: <ExpenseRequestPage /> },
       ],

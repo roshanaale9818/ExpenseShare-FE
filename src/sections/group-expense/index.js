@@ -1,0 +1,1 @@
+export {default as GroupExpenseView} from './group-expense-view';

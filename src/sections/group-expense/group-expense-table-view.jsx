@@ -134,7 +134,17 @@ function Row(props) {
             {row.settlementStatus}
           </Label>
         </TableCell>
-    
+        <TableCell align="right">
+          <Label color={(row.isAdmin === '0' && 'secondary') || 'success'}>
+            {(row.isAdmin === '0' && 'Member') || 'Admin'}
+          </Label>
+        </TableCell>
+        {/* <TableCell align="right">
+          <Label color={(row.status === '0' && 'error') || 'success'}>
+            {(row.status === '1' && 'Active') || 'In active'}
+          </Label>
+  
+        </TableCell> */}
 
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -161,7 +171,7 @@ Row.propTypes = {
   // onDelete: PropTypes.func,
 };
 
-export default function ExpenseTableView() {
+export default function GroupExpenseTableView() {
   let rows = [];
   const getExpenseList = async (_data, _page = 1, _limit = 10) => {
     const response = await ExpenseService.getExpenseList({ page: _page, limit: _limit });
@@ -248,7 +258,7 @@ export default function ExpenseTableView() {
             {/* <TableCell>S.N</TableCell> */}
             <TableCell>Associated Group</TableCell>
             <TableCell>SettleMent Status</TableCell>
-            {/* <TableCell>Created By</TableCell> */}
+            <TableCell>Created By</TableCell>
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
@@ -268,5 +278,5 @@ export default function ExpenseTableView() {
   );
 }
 
-ExpenseTableView.propTypes = {
+GroupExpenseTableView.propTypes = {
 };
