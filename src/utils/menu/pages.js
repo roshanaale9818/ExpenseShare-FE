@@ -12,4 +12,14 @@ const SETTINGS_MENU = [
     // { title: 'Logout', url: 'logout', icon: '' },
 ]
 
-export {PAGES,SETTINGS_MENU};
+// expense status with the value for listing 
+const EXPENSE_STATUS = [
+    { value: 'all', label: 'All' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'settled', label: 'Settled' },
+    { value: 'rejected', label: 'Rejected' },
+  ];
+
+
+export {PAGES,SETTINGS_MENU,EXPENSE_STATUS};

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import * as yup from 'yup';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-
 import { useFormik } from 'formik';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -13,7 +12,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import LoadingButton from '@mui/lab/LoadingButton';
-// import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import * as GroupService from 'src/services/group.service';
 import * as ExpenseService from 'src/services/expense.service';
 
@@ -32,8 +30,8 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import InputAdornment from '@mui/material/InputAdornment';
 
-import ExpenseTableView from './group-expense-table-view';
-import ExpenseFilterView from './group-expense-filter-view';
+import GroupExpenseTableView from './group-expense-table-view';
+import GroupExpenseFilterView from './group-expense-filter-view';
 
 // const VisuallyHiddenInput = styled('input')({
 //   clip: 'rect(0 0 0 0)',
@@ -67,7 +65,7 @@ export default function GroupExpenseView() {
     amount: 0,
     description: '',
     paidBy: '',
-    group: '',
+    group: id,
   };
 
   const formik = useFormik({
@@ -92,6 +90,10 @@ export default function GroupExpenseView() {
 
   const getUserGroups = async (_data, _page = 1, _limit = 10) => {
     const response = await GroupService.getAllGroups({ page: _page, limit: _limit });
+    return response;
+  };
+  const getGroupMembers = async () => {
+    const response = await GroupService.getMembers(id);
     return response;
   };
   const addExpenseHandler = async (values) => {
@@ -120,37 +122,44 @@ export default function GroupExpenseView() {
     queryKey: ['groups', 'expense'],
     queryFn: getUserGroups,
   });
+
+  const {data:memberListData} = useQuery({
+    queryKey:['member',id],
+    queryFn:getGroupMembers
+  })
+  console.log("Memberlist data", memberListData);
   if (userGroupData) {
     groups = userGroupData.data;
   }
+  let members= [];
+  if(memberListData){
+    members = memberListData.data.Members;
+  }
 
-  const [memberList, setMemberList] = useState([]);
+  // const [memberList, setMemberList] = useState([]);
 
-  const handleGroupChange = (event) => {
-    const newGroupValue = event.target.value;
-    // Reset expenseTitle field when group is changed
-    formik.setFieldValue('paidBy', '');
-    formik.handleChange(event); // Call handleChange to update formik's state
-    if (!newGroupValue) {
-      return;
-    }
-    getMemberList(newGroupValue);
-  };
+  // const handleGroupChange = (event) => {
+  //   const newGroupValue = event.target.value;
+  //   // Reset expenseTitle field when group is changed
+  //   formik.setFieldValue('paidBy', '');
+  //   formik.handleChange(event); // Call handleChange to update formik's state
+  //   if (!newGroupValue) {
+  //     return;
+  //   }
+  //   getMemberList(newGroupValue);
+  // };
 
-  const getMemberList = async (groupId) => {
-    try {
-      const response = await GroupService.getMembers(groupId);
-      if (response.status === 'ok') {
-        setMemberList(response.data.Members);
-      }
-    } catch (err) {
-      console.error(err);
-      setMemberList([]);
-    }
-    // finally{
-    //   setMemberList([]);
-    // }
-  };
+  // const getMemberList = async (groupId) => {
+  //   try {
+  //     const response = await GroupService.getMembers(groupId);
+  //     if (response.status === 'ok') {
+  //       setMemberList(response.data.Members);
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     setMemberList([]);
+  //   }
+  // };
   return (
     <>
       <PageHeadView name={`${groupName} Expenses`} labelForNewButton="New Expense" onNewClick={onNewClicked} />
@@ -218,11 +227,13 @@ export default function GroupExpenseView() {
                     error={formik.touched.group && Boolean(formik.errors.group)}
                   >
                     <InputLabel id="group-select">Group</InputLabel>
+                   
                     <Select
+                     readOnly
                       labelId="group-select"
                       id="demo-simple-select-helper"
                       label="Group"
-                      onChange={handleGroupChange}
+                      // onChange={handleGroupChange}
                       value={formik.values.group}
                       onBlur={formik.handleBlur}
                       name="group"
@@ -230,9 +241,6 @@ export default function GroupExpenseView() {
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      {/* <MenuItem value={10}>Sydney Ghar</MenuItem>
-                      <MenuItem value={20}>South Windsor</MenuItem>
-                      <MenuItem value={30}>Parramatta Campus Guys</MenuItem> */}
                       {groups &&
                         groups.map((row, index) => (
                           <MenuItem key={row.id} value={row.id}>
@@ -265,12 +273,8 @@ export default function GroupExpenseView() {
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      {/* <MenuItem value={10}>Samir Tamang</MenuItem>
-                      <MenuItem value={20}>Roshan Aale Magar</MenuItem>
-                      <MenuItem value={30}>Rojina Ale</MenuItem> */}
-
-                      {memberList &&
-                        memberList.map((row, index) => (
+                      {members &&
+                        members.map((row, index) => (
                           <MenuItem key={row.id} value={row.id}>
                             {row.memberName}
                           </MenuItem>
@@ -335,8 +339,8 @@ export default function GroupExpenseView() {
           </DialogActions>
         </Dialog>
 
-        <ExpenseFilterView />
-        <ExpenseTableView />
+        <GroupExpenseFilterView members={members} />
+        <GroupExpenseTableView />
       </Container>
     </>
   );

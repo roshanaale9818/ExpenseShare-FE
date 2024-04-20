@@ -11,16 +11,18 @@ import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/Expand';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
+import { EXPENSE_STATUS } from 'src/utils/menu/pages';
+import { PropTypes } from 'prop-types';
 
-export default function GroupExpenseFilterView() {
+export default function GroupExpenseFilterView({members}) {
   const [open, setOpen] = useState(false);
   const schema = yup.object({
-    group: yup.string('Enter Group').required('Group is required'),
+    // group: yup.string('Enter Group').required('Group is required'),
     paidBy: yup.string('Enter Paid By'),
-    status: yup.string('Enter status'),
+    status: yup.string('Enter status').required("Status is required"),
   });
   const initialValues = {
-    group: '',
+    // group: '',
     paidBy: '',
     status: '',
   };
@@ -30,21 +32,8 @@ export default function GroupExpenseFilterView() {
     validationSchema: schema,
     onSubmit: (values) => {
       console.log('values', values);
-      // submitHandler(values);
-      //   mutate(values);
     },
   });
-
-
-  const handleGroupChange = (event) => {
-    const newGroupValue = event.target.value;
-    // Reset expenseTitle field when group is changed
-    if (newGroupValue !== formik.values.group) {
-        formik.setFieldValue('status', ''); // Reset expenseTitle
-        formik.setFieldValue('paidBy','');
-    }
-    formik.handleChange(event); // Call handleChange to update formik's state
-};
 
   return (
     <Card>
@@ -67,30 +56,6 @@ export default function GroupExpenseFilterView() {
                   <TextField
                     fullWidth
                     select
-                    label="Group *"
-                    name="group"
-                    variant="outlined"
-                    type="text"
-                    id="group"
-                    autoComplete="group"
-                    value={formik.values.group}
-                    onChange={handleGroupChange}
-                    onBlur={formik.handleBlur}
-                    error={formik.touched.group && Boolean(formik.errors.group)}
-                    helperText={formik.touched.group && formik.errors.group}
-                  >
-                    <MenuItem value="">Select Group</MenuItem>
-                    <MenuItem value="">All</MenuItem>
-                    <MenuItem value="group1">Group 1</MenuItem>
-                    <MenuItem value="group2">Group 2</MenuItem>
-                    <MenuItem value="group3">Group 3</MenuItem>
-                  </TextField>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    select
                     label="Paid By"
                     name="paidBy"
                     variant="outlined"
@@ -101,9 +66,13 @@ export default function GroupExpenseFilterView() {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   >
-                    <MenuItem value="pending">Pending</MenuItem>
-                    <MenuItem value="approved">Approved</MenuItem>
-                    <MenuItem value="rejected">Rejected</MenuItem>
+                    <MenuItem value="any">Anyone</MenuItem>
+                    {members &&
+                        members.map((member, index) => (
+                          <MenuItem key={member.id} value={member.id}>
+                            {member.memberName}
+                          </MenuItem>
+                        ))}
                   </TextField>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -119,10 +88,15 @@ export default function GroupExpenseFilterView() {
                     value={formik.values.status}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
+                    error={formik.touched.status && Boolean(formik.errors.status)}
+                    helperText={formik.touched.status && formik.errors.status}
                   >
-                    <MenuItem value="pending">Pending</MenuItem>
-                    <MenuItem value="approved">Approved</MenuItem>
-                    <MenuItem value="rejected">Rejected</MenuItem>
+                    {EXPENSE_STATUS &&
+                        EXPENSE_STATUS.map((expense, index) => (
+                          <MenuItem key={expense.value} value={expense.value}>
+                            {expense.label}
+                          </MenuItem>
+                        ))}
                   </TextField>
                 </Grid>
               </Grid>
@@ -135,4 +109,7 @@ export default function GroupExpenseFilterView() {
       </CardContent>
     </Card>
   );
+}
+GroupExpenseFilterView.propTypes = {
+  members:PropTypes.array
 }

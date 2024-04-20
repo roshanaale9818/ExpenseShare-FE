@@ -34,3 +34,18 @@ export async function getExpenseList({page,limit}) {
     return resData;
 
 }
+
+export async function getGroupExpense({page,limit,groupId}) {
+    const response = await _http.get(`${APIURL}group/expense?groupId=${groupId}&page=${page}&limit=${limit}`,);
+    if (!response.status === 200) {
+        const error = new Error('An error occurred');
+        error.code = response.status;
+        error.info = await response.json();
+        throw error;
+    }
+
+    const resData = await response.data;
+    return resData;
+
+}
+
