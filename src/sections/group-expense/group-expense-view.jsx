@@ -21,7 +21,7 @@ import { useAppContext } from 'src/providers/AppReducer';
 
 import TextField from '@mui/material/TextField';
 // import { styled } from '@mui/material/styles';
-
+import ErrorBlock from 'src/components/error/ErrorBlock';
 import { PageHeadView } from 'src/components/page-head';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -123,7 +123,7 @@ export default function GroupExpenseView() {
     queryFn: getUserGroups,
   });
 
-  const {data:memberListData} = useQuery({
+  const {data:memberListData,isError,error} = useQuery({
     queryKey:['member',id],
     queryFn:getGroupMembers
   })
@@ -135,31 +135,15 @@ export default function GroupExpenseView() {
   if(memberListData){
     members = memberListData.data.Members;
   }
+  const filterSubmitHandler = (values)=>{
+    console.log("values from form",values)
+  }
+  let errorContent ='';
+  if(isError){
+    console.log(error)
+    errorContent = <ErrorBlock message="Something went wrong please try again later." />
+  }
 
-  // const [memberList, setMemberList] = useState([]);
-
-  // const handleGroupChange = (event) => {
-  //   const newGroupValue = event.target.value;
-  //   // Reset expenseTitle field when group is changed
-  //   formik.setFieldValue('paidBy', '');
-  //   formik.handleChange(event); // Call handleChange to update formik's state
-  //   if (!newGroupValue) {
-  //     return;
-  //   }
-  //   getMemberList(newGroupValue);
-  // };
-
-  // const getMemberList = async (groupId) => {
-  //   try {
-  //     const response = await GroupService.getMembers(groupId);
-  //     if (response.status === 'ok') {
-  //       setMemberList(response.data.Members);
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //     setMemberList([]);
-  //   }
-  // };
   return (
     <>
       <PageHeadView name={`${groupName} Expenses`} labelForNewButton="New Expense" onNewClick={onNewClicked} />
@@ -339,8 +323,9 @@ export default function GroupExpenseView() {
           </DialogActions>
         </Dialog>
 
-        <GroupExpenseFilterView members={members} />
-        <GroupExpenseTableView />
+   {isError ? errorContent:     (<>
+    <GroupExpenseFilterView members={members} onFormSubmit={filterSubmitHandler} />
+        <GroupExpenseTableView /></>)}
       </Container>
     </>
   );

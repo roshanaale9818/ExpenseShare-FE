@@ -14,7 +14,7 @@ import { useFormik } from 'formik';
 import { EXPENSE_STATUS } from 'src/utils/menu/pages';
 import { PropTypes } from 'prop-types';
 
-export default function GroupExpenseFilterView({members}) {
+export default function GroupExpenseFilterView({members,onFormSubmit}) {
   const [open, setOpen] = useState(false);
   const schema = yup.object({
     // group: yup.string('Enter Group').required('Group is required'),
@@ -31,7 +31,8 @@ export default function GroupExpenseFilterView({members}) {
     initialValues,
     validationSchema: schema,
     onSubmit: (values) => {
-      console.log('values', values);
+     console.log("valid");
+     onFormSubmit(values)
     },
   });
 
@@ -111,5 +112,6 @@ export default function GroupExpenseFilterView({members}) {
   );
 }
 GroupExpenseFilterView.propTypes = {
-  members:PropTypes.array
+  members:PropTypes.array,
+  onFormSubmit:PropTypes.func
 }
