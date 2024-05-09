@@ -24,6 +24,7 @@ import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
 import Label from 'src/components/label';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
+import { getTwoDigitNumber } from 'src/utils/format-number';
 // import { CircularProgress } from '@mui/material';
 
 function Row(props) {
@@ -130,6 +131,9 @@ function Row(props) {
           </Link>
         </TableCell>
         <TableCell>
+           AUD {getTwoDigitNumber(row.amount)}
+        </TableCell>
+        <TableCell>
           <Label color={(row.settlementStatus === 'PENDING' && 'secondary') || 'success'}>
             {row.settlementStatus}
           </Label>
@@ -155,6 +159,7 @@ Row.propTypes = {
     isAdmin: PropTypes.string,
     title: PropTypes.string,
     settlementStatus: PropTypes.string,
+    amount:PropTypes.number
   }).isRequired,
   serial: PropTypes.number,
   openDialog: PropTypes.func,
@@ -245,8 +250,8 @@ export default function ExpenseTableView() {
           <TableRow>
             <TableCell>S.N</TableCell>
             <TableCell>Title</TableCell>
-            {/* <TableCell>S.N</TableCell> */}
             <TableCell>Associated Group</TableCell>
+            <TableCell>Amount</TableCell>
             <TableCell>SettleMent Status</TableCell>
             {/* <TableCell>Created By</TableCell> */}
             <TableCell align="right"> </TableCell>

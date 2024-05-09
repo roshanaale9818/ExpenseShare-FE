@@ -11,17 +11,16 @@ import Collapse from '@mui/material/Collapse';
 import ExpandMoreIcon from '@mui/icons-material/Expand';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
+import { PropTypes } from 'prop-types';
 
-export default function ExpenseFilterView() {
+export default function ExpenseFilterView({data}) {
   const [open, setOpen] = useState(false);
   const schema = yup.object({
     group: yup.string('Enter Group').required('Group is required'),
-    paidBy: yup.string('Enter Paid By'),
     status: yup.string('Enter status'),
   });
   const initialValues = {
     group: '',
-    paidBy: '',
     status: '',
   };
 
@@ -35,13 +34,16 @@ export default function ExpenseFilterView() {
     },
   });
 
+  // reset form handler get initial form 
+  const onResetHandler = ()=>{
+      console.log("calling reset")
+  }
 
   const handleGroupChange = (event) => {
     const newGroupValue = event.target.value;
     // Reset expenseTitle field when group is changed
     if (newGroupValue !== formik.values.group) {
         formik.setFieldValue('status', ''); // Reset expenseTitle
-        formik.setFieldValue('paidBy','');
     }
     formik.handleChange(event); // Call handleChange to update formik's state
 };
@@ -79,15 +81,21 @@ export default function ExpenseFilterView() {
                     error={formik.touched.group && Boolean(formik.errors.group)}
                     helperText={formik.touched.group && formik.errors.group}
                   >
-                    <MenuItem value="">Select Group</MenuItem>
-                    <MenuItem value="">All</MenuItem>
-                    <MenuItem value="group1">Group 1</MenuItem>
-                    <MenuItem value="group2">Group 2</MenuItem>
-                    <MenuItem value="group3">Group 3</MenuItem>
+                <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+
+                      {/* // dynamic group list  */}
+                      {data &&
+                        data.map((row, index) => (
+                          <MenuItem key={row.id} value={row.id}>
+                            {row.groupName}
+                          </MenuItem>
+                        ))}
                   </TextField>
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
+                {/* <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
                     select
@@ -105,7 +113,7 @@ export default function ExpenseFilterView() {
                     <MenuItem value="approved">Approved</MenuItem>
                     <MenuItem value="rejected">Rejected</MenuItem>
                   </TextField>
-                </Grid>
+                </Grid> */}
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -129,10 +137,17 @@ export default function ExpenseFilterView() {
               <Button sx={{ mt: 2 }} type="submit" variant="contained" color="primary">
                 Search
               </Button>
+              <Button sx={{ mt: 2,ml:2 }} type="button" onClick={onResetHandler} variant="contained" color="error">
+                Reset
+              </Button>
             </form>
           </Container>
         </Collapse>
       </CardContent>
     </Card>
   );
+}
+
+ExpenseFilterView.propTypes = {
+  data:PropTypes.array
 }

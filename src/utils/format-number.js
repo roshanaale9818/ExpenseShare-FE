@@ -35,3 +35,16 @@ function result(format, key = '.00') {
 
   return isInteger ? format.replace(key, '') : format;
 }
+
+
+// for currency rounding upto two number 
+export function getTwoDigitNumber(number){
+  let num;
+  if(!number){
+    num = "0.00"
+  }
+  else{
+    num = number.toFixed(2);
+  }
+  return num;
+}

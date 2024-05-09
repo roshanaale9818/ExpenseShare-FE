@@ -327,7 +327,7 @@ export default function ExpenseView() {
           </DialogActions>
         </Dialog>
 
-        <ExpenseFilterView />
+        <ExpenseFilterView data={groups} />
         <ExpenseTableView />
       </Container>
     </>
