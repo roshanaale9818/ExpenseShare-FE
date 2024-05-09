@@ -78,7 +78,7 @@ export default function SignInView() {
       }
     } catch (err) {
       console.log('An error has occured while logging in', err.response);
-      showSnackbar('Something went wrong', 'error');
+      showSnackbar('Login failed. Something went wrong. Please check your internet', 'error');
 
       const { response } = err;
 
