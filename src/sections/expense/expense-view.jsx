@@ -11,7 +11,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import LoadingButton from '@mui/lab/LoadingButton';
-// import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import * as GroupService from 'src/services/group.service';
 import * as ExpenseService from 'src/services/expense.service';
 
@@ -20,7 +19,6 @@ import { queryClient } from 'src/utils/http';
 import { useAppContext } from 'src/providers/AppReducer';
 
 import TextField from '@mui/material/TextField';
-// import { styled } from '@mui/material/styles';
 
 import { PageHeadView } from 'src/components/page-head';
 import InputLabel from '@mui/material/InputLabel';
@@ -33,17 +31,6 @@ import InputAdornment from '@mui/material/InputAdornment';
 import ExpenseTableView from './expense-table-view';
 import ExpenseFilterView from './expense-filter-view';
 
-// const VisuallyHiddenInput = styled('input')({
-//   clip: 'rect(0 0 0 0)',
-//   clipPath: 'inset(50%)',
-//   height: 1,
-//   overflow: 'hidden',
-//   position: 'absolute',
-//   bottom: 0,
-//   left: 0,
-//   whiteSpace: 'nowrap',
-//   width: 1,
-// });
 export default function ExpenseView() {
   const { showSnackbar } = useAppContext();
   let groups = [];
@@ -145,7 +132,7 @@ export default function ExpenseView() {
   };
   return (
     <>
-      <PageHeadView name="Expenses" labelForNewButton="New Expense" onNewClick={onNewClicked} />
+      <PageHeadView name="My Expenses" labelForNewButton="New Expense" onNewClick={onNewClicked} />
       <Container>
         <Dialog
           open={isOpen}

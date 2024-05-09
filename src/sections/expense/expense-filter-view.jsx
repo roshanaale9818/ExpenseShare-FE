@@ -12,6 +12,8 @@ import ExpandMoreIcon from '@mui/icons-material/Expand';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { PropTypes } from 'prop-types';
+import { StatusOptions } from 'src/utils/helper';
+
 
 export default function ExpenseFilterView({data}) {
   const [open, setOpen] = useState(false);
@@ -128,9 +130,14 @@ export default function ExpenseFilterView({data}) {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   >
-                    <MenuItem value="pending">Pending</MenuItem>
-                    <MenuItem value="approved">Approved</MenuItem>
-                    <MenuItem value="rejected">Rejected</MenuItem>
+                     {StatusOptions &&
+                        StatusOptions.map((status, index) => (
+                          <MenuItem key={index} value={status.value}>
+                            {status.label}
+                          </MenuItem>
+                        ))}
+            
+          
                   </TextField>
                 </Grid>
               </Grid>
