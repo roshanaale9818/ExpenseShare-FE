@@ -57,7 +57,7 @@ export default function ExpenseView() {
     },
   });
   const [isOpen, setOpen] = useState(false);
-
+  const [mode, setMode] = useState('new');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClose = () => {
@@ -77,8 +77,12 @@ export default function ExpenseView() {
     const response = await ExpenseService.addExpense(values);
     return response;
   };
+  const editExpense = async (values)=>{
+    const response = await ExpenseService.addExpense(values);
+    return response;
+  }
   const { mutate: expenseMutate } = useMutation({
-    mutationFn: addExpenseHandler,
+    mutationFn: mode ==='new'? addExpenseHandler:editExpense,
     onSuccess: () => {
       queryClient.invalidateQueries(['groups', 'expense']);
       showSnackbar('Expense added successfull.', 'success');
@@ -95,6 +99,28 @@ export default function ExpenseView() {
     },
   });
 
+  const onExpenseEditHandler = async (data) => {
+    console.log('Data in edit', data);
+    // open popup
+    setOpen(true);
+    setMode('edit');
+    console.log('mode', mode);
+    // patch the value to the form
+    formik.setValues({
+      expenseTitle: data.title ?? '',
+      amount: data.amount ?? '',
+      description: data.description ?? '',
+      group: data.groupId ?? '',
+    });
+
+
+    // setTimeout(()=>{
+    //   formik.setValues({
+    //     paidBy: data.MemberId ?? '',
+    //   })
+    // },2000)
+  };
+
   const { data: userGroupData } = useQuery({
     queryKey: ['groups', 'expense'],
     queryFn: getUserGroups,
@@ -106,7 +132,7 @@ export default function ExpenseView() {
   const [memberList, setMemberList] = useState([]);
 
   const handleGroupChange = (event) => {
-    const newGroupValue = event.target.value;
+    const newGroupValue = event;
     // Reset expenseTitle field when group is changed
     formik.setFieldValue('paidBy', '');
     formik.handleChange(event); // Call handleChange to update formik's state
@@ -315,7 +341,7 @@ export default function ExpenseView() {
         </Dialog>
 
         <ExpenseFilterView data={groups} />
-        <ExpenseTableView />
+        <ExpenseTableView onEdit={onExpenseEditHandler} />
       </Container>
     </>
   );

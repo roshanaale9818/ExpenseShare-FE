@@ -30,7 +30,7 @@ import { getTwoDigitNumber } from 'src/utils/format-number';
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
   const navigate = useNavigate();
-  const { row, openDialog, serial } = props;
+  const { row, onEdit, serial } = props;
   const handleCloseMenu = () => {
     setPopOverMenu(false);
   };
@@ -42,16 +42,21 @@ function Row(props) {
   const [popoverMenuIsOpen, setPopOverMenu] = useState(false);
   const onEditClicked = () => {
     try {
-      openDialog(true);
+      // pass the data into the parent
+      onEdit();
       handleCloseMenu();
     } catch (err) {
       console.err(err);
     }
   };
+
+  // navigate to group detail
   const onGroupViewHandler = (group) => {
     console.log(group);
     navigate(`/auth/group/${group.group_id}/detail?groupName=${group.groupName}`, group);
   };
+
+  // delete expense if not settled yet
   const deleteGroup = async ({ id }) => {
     const response = await GroupService.deleteGroup(id);
     return response;
@@ -82,35 +87,12 @@ function Row(props) {
     handleCloseMenu();
   };
 
-  let actionContent = '';
-  if (row.isAdmin === '1') {
-    actionContent = (
-      <Popover
-        open={!!popoverMenuIsOpen}
-        anchorEl={anchorEl}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-        sx={{
-          position: 'absolute',
-        }}
-      >
-        <MenuItem onClick={onEditClicked}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
+  // let actionContent = '';
+  // // if (true) {
+  //   actionContent = (
 
-        <ConfirmDelete
-          title="Are you sure you want to delete ?"
-          description="You will not be able to recover this again."
-          onConfirmed={onConfirmedHandler}
-          onCanceled={onCanceledHandler}
-          data={row}
-          sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
-        />
-      </Popover>
-    );
-  }
+  //   );
+  // }
 
   return (
     <>
@@ -130,15 +112,12 @@ function Row(props) {
             {row.groupName}
           </Link>
         </TableCell>
-        <TableCell>
-           AUD {getTwoDigitNumber(row.amount)}
-        </TableCell>
+        <TableCell>AUD {getTwoDigitNumber(row.amount)}</TableCell>
         <TableCell>
           <Label color={(row.settlementStatus === 'PENDING' && 'secondary') || 'success'}>
             {row.settlementStatus}
           </Label>
         </TableCell>
-    
 
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -146,7 +125,39 @@ function Row(props) {
           </IconButton>
         </TableCell>
       </TableRow>
-      <TableRow>{actionContent}</TableRow>
+      <TableRow>
+        {/* //action content  */}
+        <TableCell>
+          <Popover
+            open={!!popoverMenuIsOpen}
+            anchorEl={anchorEl}
+            onClose={handleCloseMenu}
+            anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+            sx={{
+              position: 'absolute',
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                onEditClicked();
+              }}
+            >
+              <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+              Edit
+            </MenuItem>
+
+            <ConfirmDelete
+              title="Are you sure you want to delete ?"
+              description="You will not be able to recover this again."
+              onConfirmed={onConfirmedHandler}
+              onCanceled={onCanceledHandler}
+              data={row}
+              sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
+            />
+          </Popover>
+        </TableCell>
+      </TableRow>
     </>
   );
 }
@@ -159,23 +170,23 @@ Row.propTypes = {
     isAdmin: PropTypes.string,
     title: PropTypes.string,
     settlementStatus: PropTypes.string,
-    amount:PropTypes.number
+    amount: PropTypes.number,
   }).isRequired,
   serial: PropTypes.number,
-  openDialog: PropTypes.func,
+  onEdit: PropTypes.func,
   // onDelete: PropTypes.func,
 };
 
-export default function ExpenseTableView() {
+export default function ExpenseTableView({onEdit}) {
   let rows = [];
   const getExpenseList = async (_data, _page = 1, _limit = 10) => {
     const response = await ExpenseService.getExpenseList({ page: _page, limit: _limit });
     return response;
   };
 
-  const onEditClickHandler = () => {
+  const onEditClickHandler = (data) => {
     try {
-      // onEdit(group);
+      onEdit(data);
     } catch (err) {
       console.error(err);
     }
@@ -203,7 +214,7 @@ export default function ExpenseTableView() {
           rows.map((row, index) => (
             <Row
               key={row.id}
-              openDialog={() => {
+              onEdit={() => {
                 onEditClickHandler(row);
               }}
               row={row}
@@ -274,4 +285,5 @@ export default function ExpenseTableView() {
 }
 
 ExpenseTableView.propTypes = {
+  onEdit:PropTypes.func
 };
