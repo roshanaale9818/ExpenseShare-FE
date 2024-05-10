@@ -40,10 +40,15 @@ function Row(props) {
     setAnchorEl(event.currentTarget);
   };
   const [popoverMenuIsOpen, setPopOverMenu] = useState(false);
-  const onEditClicked = () => {
+  const onEditClicked = (data) => {
     try {
+      if (data.settlementStatus === 'settled') {
+        showSnackbar('Expense cannot be changed.', 'error');
+        return;
+      }
+      console.log('Data:::', data);
       // pass the data into the parent
-      onEdit();
+      onEdit(data);
       handleCloseMenu();
     } catch (err) {
       console.err(err);
@@ -87,13 +92,6 @@ function Row(props) {
     handleCloseMenu();
   };
 
-  // let actionContent = '';
-  // // if (true) {
-  //   actionContent = (
-
-  //   );
-  // }
-
   return (
     <>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -126,7 +124,6 @@ function Row(props) {
         </TableCell>
       </TableRow>
       <TableRow>
-        {/* //action content  */}
         <TableCell>
           <Popover
             open={!!popoverMenuIsOpen}
@@ -140,21 +137,23 @@ function Row(props) {
           >
             <MenuItem
               onClick={() => {
-                onEditClicked();
+                onEditClicked(row);
               }}
             >
               <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
               Edit
             </MenuItem>
 
-            <ConfirmDelete
-              title="Are you sure you want to delete ?"
-              description="You will not be able to recover this again."
-              onConfirmed={onConfirmedHandler}
-              onCanceled={onCanceledHandler}
-              data={row}
-              sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
-            />
+            {row.settlementStatus !== 'setteled' && (
+              <ConfirmDelete
+                title="Are you sure you want to delete ?"
+                description="You will not be able to recover this again."
+                onConfirmed={onConfirmedHandler}
+                onCanceled={onCanceledHandler}
+                data={row}
+                sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
+              />
+            )}
           </Popover>
         </TableCell>
       </TableRow>
@@ -177,7 +176,7 @@ Row.propTypes = {
   // onDelete: PropTypes.func,
 };
 
-export default function ExpenseTableView({onEdit}) {
+export default function ExpenseTableView({ onEdit }) {
   let rows = [];
   const getExpenseList = async (_data, _page = 1, _limit = 10) => {
     const response = await ExpenseService.getExpenseList({ page: _page, limit: _limit });
@@ -192,8 +191,9 @@ export default function ExpenseTableView({onEdit}) {
     }
   };
   const paginationChangeHandler = () => {};
-  const onDeleteHandler = (group) => {
+  const onDeleteHandler = (data) => {
     try {
+      console.log(data);
       // onDelete(group);
     } catch (err) {
       console.error(err);
@@ -285,5 +285,5 @@ export default function ExpenseTableView({onEdit}) {
 }
 
 ExpenseTableView.propTypes = {
-  onEdit:PropTypes.func
+  onEdit: PropTypes.func,
 };

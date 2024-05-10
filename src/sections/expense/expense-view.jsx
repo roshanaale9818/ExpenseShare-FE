@@ -132,7 +132,7 @@ export default function ExpenseView() {
   const [memberList, setMemberList] = useState([]);
 
   const handleGroupChange = (event) => {
-    const newGroupValue = event;
+    const newGroupValue = event.target.value;
     // Reset expenseTitle field when group is changed
     formik.setFieldValue('paidBy', '');
     formik.handleChange(event); // Call handleChange to update formik's state
@@ -166,7 +166,7 @@ export default function ExpenseView() {
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
         >
-          <DialogTitle id="alert-dialog-title">Add Request Expense</DialogTitle>
+          <DialogTitle id="alert-dialog-title">Add Expense</DialogTitle>
           <DialogContent>
             <Box
               component="form"
