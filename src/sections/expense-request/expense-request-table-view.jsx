@@ -16,16 +16,18 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import Iconify from 'src/components/iconify';
-import { getUserId, queryClient } from 'src/utils/http';
+import { queryClient } from 'src/utils/http';
 import { useAppContext } from 'src/providers/AppReducer';
-import * as GroupService from 'src/services/group.service';
+import * as ExpenseService from 'src/services/expense.service';
 
 import ErrorBlock from 'src/components/error';
 import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
-import Label from 'src/components/label';
+// import Label from 'src/components/label';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
 import Alert from '@mui/material/Alert';
+import { getTwoDigitNumber } from 'src/utils/format-number';
+import Button from '@mui/material/Button';
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -50,17 +52,17 @@ function Row(props) {
   };
   const onGroupViewHandler = (group) => {
     console.log(group);
-    navigate(`/auth/group/${group.id}/detail?groupName=${group.groupName}`, group);
+    navigate(`/auth/group/${group.groupId}/detail?groupName=${group.groupName}`, group);
   };
   const deleteGroup = async ({ id }) => {
-    const response = await GroupService.deleteGroup(id);
+    const response = await ExpenseService.deleteExpense(id);
     return response;
   };
 
   const { mutate } = useMutation({
     mutationFn: deleteGroup,
     onSuccess: () => {
-      queryClient.invalidateQueries(['groups', getUserId()]);
+      queryClient.invalidateQueries(['expense']);
       showSnackbar('Group deleted successfull.', 'success');
       // sucessEvent();
       hideLoading();
@@ -73,7 +75,6 @@ function Row(props) {
     },
   });
   const onConfirmedHandler = (data) => {
-    // console.log("friy",data)
     showLoading();
     mutate(data);
     handleCloseMenu();
@@ -83,39 +84,38 @@ function Row(props) {
   };
 
   let actionContent = '';
-  if (row.isAdmin === '1') {
-    actionContent = (
-      <Popover
-        open={!!popoverMenuIsOpen}
-        anchorEl={anchorEl}
-        onClose={handleCloseMenu}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-        sx={{
-          position: 'absolute',
-        }}
-      >
-        <MenuItem onClick={onEditClicked}>
-          <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
+  actionContent = (
+    <Popover
+      open={!!popoverMenuIsOpen}
+      anchorEl={anchorEl}
+      onClose={handleCloseMenu}
+      anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+      transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+      sx={{
+        position: 'absolute',
+      }}
+    >
+      <MenuItem onClick={onEditClicked}>
+        <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+        Edit
+      </MenuItem>
 
-        <ConfirmDelete
-          title="Are you sure you want to delete ?"
-          description="You will not be able to recover this again."
-          onConfirmed={onConfirmedHandler}
-          onCanceled={onCanceledHandler}
-          data={row}
-          sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
-        />
-      </Popover>
-    );
-  }
+      <ConfirmDelete
+        title="Are you sure you want to delete ?"
+        description="You will not be able to recover this again."
+        onConfirmed={onConfirmedHandler}
+        onCanceled={onCanceledHandler}
+        data={row}
+        sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
+      />
+    </Popover>
+  );
 
   return (
     <>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>{serial + 1}</TableCell>
+        <TableCell>{row.title}</TableCell>
         <TableCell component="th" scope="row">
           <Link
             component="button"
@@ -127,20 +127,26 @@ function Row(props) {
             {row.groupName}
           </Link>
         </TableCell>
-
-        <TableCell align="right">{row.createdAt.split('T')[0]}</TableCell>
         <TableCell align="right">
-          <Label color={(row.isAdmin === '0' && 'secondary') || 'success'}>
-            {(row.isAdmin === '0' && 'Member') || 'Admin'}
-          </Label>
+          $AUD{' '}
+          <Typography sx={{ fontWeight: 'bold', typography: 'body' }}>
+            {getTwoDigitNumber(row.amount)}
+          </Typography>
+        </TableCell>
+        <TableCell>{row.description}</TableCell>
+        <TableCell>
+          {row.addedBy}
           {/* {row.status} */}
         </TableCell>
-        {/* <TableCell align="right">
-          <Label color={(row.status === '0' && 'error') || 'success'}>
-            {(row.status === '1' && 'Active') || 'In active'}
-          </Label>
-  
-        </TableCell> */}
+
+        <TableCell sx={{display:'flex'}}>
+          <Button sx={{marginRight:'4px'}} variant="outlined" size="small" color="success">
+            Accept
+          </Button>
+          <Button variant="outlined" size="small" color="error">
+            Reject
+          </Button>
+        </TableCell>
 
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -158,7 +164,11 @@ Row.propTypes = {
     groupName: PropTypes.string,
     createdAt: PropTypes.string,
     status: PropTypes.string,
+    addedBy: PropTypes.string,
     isAdmin: PropTypes.string,
+    title: PropTypes.string,
+    amount: PropTypes.string,
+    description: PropTypes.string,
   }).isRequired,
   serial: PropTypes.number,
   openDialog: PropTypes.func,
@@ -169,8 +179,8 @@ export default function ExpenseRequestTableView() {
   let rows = [];
   // const { onEdit, onDelete } = props;
   // console.log("ONEDIT",onEdit);
-  const getGroupList = async (_data, _page = 1, _limit = 10) => {
-    const response = await GroupService.getGroupList({ page: _page, limit: _limit });
+  const getExpenseRequest = async (_data, _page = 1, _limit = 10) => {
+    const response = await ExpenseService.getExpenseRequest({ page: _page, limit: _limit });
     return response;
   };
 
@@ -194,15 +204,14 @@ export default function ExpenseRequestTableView() {
   };
 
   const { isError, data, error } = useQuery({
-    queryKey: ['groups', getUserId()],
-    queryFn: getGroupList,
+    queryKey: ['expense'],
+    queryFn: getExpenseRequest,
   });
   let content = '';
 
   if (data && data.status === 'ok') {
     // hideLoading()
     rows = data.data;
-
     content = (
       <TableBody>
         {rows &&
@@ -225,36 +234,38 @@ export default function ExpenseRequestTableView() {
     );
   }
   if (isError) {
+    console.log(error);
     content = (
       <TableBody>
-        (<ErrorBlock message={error} />)
+        <TableRow>
+          <TableCell>
+            <ErrorBlock message="An Error occured on pending Request" />
+          </TableCell>
+        </TableRow>
       </TableBody>
     );
   }
 
   return (
-    
     <TableContainer component={Paper}>
-        <Alert variant="filled" severity="info" sx={{mb:2,p:2}}>
-         If you are admin of any group, All the pending expense request will appear here.
-        </Alert>
+      <Alert variant="filled" severity="info" sx={{ mb: 2, p: 2 }}>
+        If you are admin of any group, All the pending expense request will appear here.
+      </Alert>
       <Table aria-label="collapsible table">
         <TableHead>
           <TableRow>
             <TableCell>S.N</TableCell>
             <TableCell>Expense Title</TableCell>
-            <TableCell align="right">Created On</TableCell>
-            {/* <TableCell align="right">Status </TableCell> */}
-            <TableCell align="right">Your role </TableCell>
+            <TableCell>Associated Group</TableCell>
+            <TableCell>Amount</TableCell>
+            <TableCell>Description</TableCell>
+            <TableCell align="right">Added By </TableCell>
+            <TableCell align="right">Action</TableCell>
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
-      
         {content}
       </Table>
-      {/* {paginationContent} */}
-      {/* {totalCount} */}
-
       <Pagination
         sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
         count={data ? Number(data.totalItems) : 100}

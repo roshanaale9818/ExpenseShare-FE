@@ -15,7 +15,6 @@ export default function ExpenseRequestView() {
         name="Expense Requests"
         hideNewButton={hideBtn}
         labelForNewButton="New Expense"
-        
       />
       <Container>
         {/* <ExpenseRequestSearchForm/> */}

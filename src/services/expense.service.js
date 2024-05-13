@@ -85,3 +85,17 @@ export async function deleteExpense(id) {
     return resData;
 }
 
+// all the expense request
+export async function getExpenseRequest({page,limit}) {
+    const response = await _http.get(`${APIURL}expense/request?page=${page}&limit=${limit}`,);
+    if (!response.status === 200) {
+        const error = new Error('An error occurred while trying to create');
+        error.code = response.status;
+        error.info = await response.json();
+        throw error;
+    }
+
+    const resData = await response.data;
+    return resData;
+
+}
