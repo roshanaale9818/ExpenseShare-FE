@@ -19,3 +19,9 @@ export const StatusOptions = [
         value: "rejected"
     }
 ]
+
+export const SettlementStatus = {
+    PENDING:"PENDING",
+    SETTLED:"SETTLED",
+    ACCEPTED:"ACCEPTED"
+}

@@ -16,7 +16,6 @@ import TableContainer from '@mui/material/TableContainer';
 import Iconify from 'src/components/iconify';
 import { getUserId, queryClient } from 'src/utils/http';
 import { useAppContext } from 'src/providers/AppReducer';
-import * as GroupService from 'src/services/group.service';
 import * as ExpenseService from 'src/services/expense.service';
 
 import ErrorBlock from 'src/components/error';
@@ -25,7 +24,8 @@ import Label from 'src/components/label';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
 import { getTwoDigitNumber } from 'src/utils/format-number';
-// import { CircularProgress } from '@mui/material';
+import { SettlementStatus } from 'src/utils/helper';
+
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -42,11 +42,11 @@ function Row(props) {
   const [popoverMenuIsOpen, setPopOverMenu] = useState(false);
   const onEditClicked = (data) => {
     try {
-      if (data.settlementStatus === 'settled') {
+      if (data.settlementStatus !== SettlementStatus.PENDING) {
         showSnackbar('Expense cannot be changed.', 'error');
         return;
       }
-      console.log('Data:::', data);
+      // if this is still editable
       // pass the data into the parent
       onEdit(data);
       handleCloseMenu();
@@ -62,24 +62,22 @@ function Row(props) {
   };
 
   // delete expense if not settled yet
-  const deleteGroup = async ({ id }) => {
-    const response = await GroupService.deleteGroup(id);
+  const deleteExpense = async ({ id }) => {
+    const response = await ExpenseService.deleteExpense(id);
     return response;
   };
 
   const { mutate } = useMutation({
-    mutationFn: deleteGroup,
+    mutationFn: deleteExpense,
     onSuccess: () => {
-      queryClient.invalidateQueries(['groups', getUserId()]);
+      queryClient.invalidateQueries(['expense']);
       showSnackbar('Group deleted successfull.', 'success');
-      // sucessEvent();
       hideLoading();
     },
     onError: (error) => {
       console.log('Error', error);
-      showSnackbar('Group deletion failed.', 'error');
+      showSnackbar(error.response.data.message, 'error');
       hideLoading();
-      // setIsLoading(false);
     },
   });
   const onConfirmedHandler = (data) => {
@@ -112,51 +110,63 @@ function Row(props) {
         </TableCell>
         <TableCell>AUD {getTwoDigitNumber(row.amount)}</TableCell>
         <TableCell>
-          <Label color={(row.settlementStatus === 'PENDING' && 'secondary') || 'success'}>
+          <Label
+            color={(row.settlementStatus === SettlementStatus.PENDING && 'secondary') || 'success'}
+          >
             {row.settlementStatus}
           </Label>
         </TableCell>
 
         <TableCell align="right">
-          <IconButton onClick={handleOpenMenu}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell>
-          <Popover
-            open={!!popoverMenuIsOpen}
-            anchorEl={anchorEl}
-            onClose={handleCloseMenu}
-            anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-            sx={{
-              position: 'absolute',
-            }}
-          >
-            <MenuItem
-              onClick={() => {
-                onEditClicked(row);
-              }}
-            >
-              <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-              Edit
-            </MenuItem>
+          {row.settlementStatus === SettlementStatus.PENDING && (
+            <IconButton onClick={handleOpenMenu}>
+              <Iconify icon="eva:more-vertical-fill" />
+            </IconButton>
+          )}
 
-            {row.settlementStatus !== 'setteled' && (
-              <ConfirmDelete
-                title="Are you sure you want to delete ?"
-                description="You will not be able to recover this again."
-                onConfirmed={onConfirmedHandler}
-                onCanceled={onCanceledHandler}
-                data={row}
-                sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
-              />
-            )}
-          </Popover>
+
+
+{/* <TableCell> */}
+          {/* allow edit or delete if the settlement is on pending status  */}
+          {row.settlementStatus === SettlementStatus.PENDING && (
+            <div>
+              <Popover
+                open={!!popoverMenuIsOpen}
+                anchorEl={anchorEl}
+                onClose={handleCloseMenu}
+                anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                sx={{
+                  position: 'absolute',
+                }}
+              >
+                <MenuItem
+                  onClick={() => {
+                    onEditClicked(row);
+                  }}
+                >
+                  <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
+                  Edit
+                </MenuItem>
+
+                <ConfirmDelete
+                  title="Are you sure you want to delete ?"
+                  description="You will not be able to recover this again."
+                  onConfirmed={onConfirmedHandler}
+                  onCanceled={onCanceledHandler}
+                  data={row}
+                  sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
+                />
+              </Popover>
+              
+            </div>
+          )}
+        {/* </TableCell> */}
         </TableCell>
       </TableRow>
+      {/* <TableRow> */}
+
+      {/* </TableRow> */}
     </>
   );
 }
@@ -193,7 +203,7 @@ export default function ExpenseTableView({ onEdit }) {
   const paginationChangeHandler = () => {};
   const onDeleteHandler = (data) => {
     try {
-      console.log(data);
+      console.log('deleting the expense', data);
       // onDelete(group);
     } catch (err) {
       console.error(err);
@@ -208,6 +218,7 @@ export default function ExpenseTableView({ onEdit }) {
 
   if (data && data.status === 'ok') {
     rows = data.data;
+    console.log("rows",rows)
     content = (
       <TableBody>
         {rows &&
@@ -242,12 +253,12 @@ export default function ExpenseTableView({ onEdit }) {
       <TableBody>
         <TableRow>
           <TableCell>
-            (
+            
             <ErrorBlock
               sx={{ width: 100 }}
               message={error ? error.message : 'An error has occured'}
             />
-            )
+            
           </TableCell>
         </TableRow>
       </TableBody>
@@ -264,7 +275,6 @@ export default function ExpenseTableView({ onEdit }) {
             <TableCell>Associated Group</TableCell>
             <TableCell>Amount</TableCell>
             <TableCell>SettleMent Status</TableCell>
-            {/* <TableCell>Created By</TableCell> */}
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>

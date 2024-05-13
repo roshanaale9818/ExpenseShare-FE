@@ -34,12 +34,16 @@ import ExpenseFilterView from './expense-filter-view';
 export default function ExpenseView() {
   const { showSnackbar } = useAppContext();
   let groups = [];
+
+  // loaded form data when edit is clicked
+  // let formData = {};
   const schema = yup.object({
     expenseTitle: yup.string('Enter Title').required('Title is required'),
     amount: yup.number('Enter Amount').required('Amount is required').min(1),
     description: yup.string('Enter Description').required('Description is required.'),
     paidBy: yup.string('Enter Paid By').required('Paid By is required.'),
     group: yup.string('Enter Group').required('Group is required.'),
+    id: yup.string(),
   });
   const initialValues = {
     expenseTitle: '',
@@ -47,6 +51,7 @@ export default function ExpenseView() {
     description: '',
     paidBy: '',
     group: '',
+    id: '',
   };
 
   const formik = useFormik({
@@ -57,7 +62,7 @@ export default function ExpenseView() {
     },
   });
   const [isOpen, setOpen] = useState(false);
-  const [mode, setMode] = useState('new');
+  // const [mode, setMode] = useState('new');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClose = () => {
@@ -74,17 +79,25 @@ export default function ExpenseView() {
     return response;
   };
   const addExpenseHandler = async (values) => {
-    const response = await ExpenseService.addExpense(values);
+    console.log("submitting",values)
+    let response;
+
+    // if it is edit
+    if (values.id) {
+      response = await ExpenseService.editExpense(values);
+    } else {
+      response = await ExpenseService.addExpense(values);
+    }
     return response;
   };
-  const editExpense = async (values)=>{
-    const response = await ExpenseService.addExpense(values);
-    return response;
-  }
+  // const editExpense = async (values) => {
+  //   const response = await ExpenseService.editExpense(values);
+  //   return response;
+  // };
   const { mutate: expenseMutate } = useMutation({
-    mutationFn: mode ==='new'? addExpenseHandler:editExpense,
+    mutationFn:addExpenseHandler,
     onSuccess: () => {
-      queryClient.invalidateQueries(['groups', 'expense']);
+      queryClient.invalidateQueries(['expense']);
       showSnackbar('Expense added successfull.', 'success');
       handleClose();
     },
@@ -94,25 +107,26 @@ export default function ExpenseView() {
         const errMsg = error.response.data.errors[0] || 'Something went wrong.';
         showSnackbar(errMsg, 'error');
       } catch (err) {
-        showSnackbar(error.message, 'error');
+        showSnackbar(error.response.data.message, 'error');
       }
     },
   });
 
   const onExpenseEditHandler = async (data) => {
-    console.log('Data in edit', data);
+    // formData = data;
     // open popup
     setOpen(true);
-    setMode('edit');
-    console.log('mode', mode);
+    // setMode('edit');
+    // console.log('mode', mode);
     // patch the value to the form
     formik.setValues({
       expenseTitle: data.title ?? '',
       amount: data.amount ?? '',
       description: data.description ?? '',
       group: data.groupId ?? '',
+      id: data.id,
+      paidBy: '',
     });
-
 
     // setTimeout(()=>{
     //   formik.setValues({
@@ -122,7 +136,7 @@ export default function ExpenseView() {
   };
 
   const { data: userGroupData } = useQuery({
-    queryKey: ['groups', 'expense'],
+    queryKey: ['expense'],
     queryFn: getUserGroups,
   });
   if (userGroupData) {

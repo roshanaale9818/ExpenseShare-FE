@@ -20,6 +20,26 @@ export async function addExpense(expense) {
 }
 
 
+export async function editExpense(expense) {
+    const data = {
+        ...expense
+    }
+    const response = await _http.post(`${APIURL}expense/update?groupId=${expense.group}`, data);
+
+
+    if (!response.status === 200) {
+        const error = new Error('An error occurred while trying to create');
+        error.code = response.status;
+        error.info = await response.json();
+        throw error;
+    }
+
+    const resData = await response.data;
+    return resData;
+
+}
+
+
 
 export async function getExpenseList({page,limit}) {
     const response = await _http.get(`${APIURL}expense/list?page=${page}&limit=${limit}`,);
@@ -47,5 +67,21 @@ export async function getGroupExpense({page,limit,groupId}) {
     const resData = await response.data;
     return resData;
 
+}
+export async function deleteExpense(id) {
+    const data = {
+        expenseId:id
+    }
+    const response = await _http.post(`${APIURL}expense/delete`, data);
+
+
+    if (!response.status === 200) {
+        const error = new Error('An error occurred while trying to create');
+        error.code = response.status;
+        error.info = await response.json();
+        throw error;
+    }
+    const resData = await response.data;
+    return resData;
 }
 
