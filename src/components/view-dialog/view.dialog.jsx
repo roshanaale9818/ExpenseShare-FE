@@ -45,8 +45,8 @@ export default function ViewDialog({ children,title }) {
         <DialogTitle>{title} Details</DialogTitle>
         <DialogContent > {children} </DialogContent>
         <DialogActions>
-          <Button onClick={onConfirmHandler} variant="outlined" color="error">
-            ok
+          <Button onClick={onConfirmHandler} variant="outlined" color="success">
+            Ok
           </Button>
         </DialogActions>
       </Dialog>

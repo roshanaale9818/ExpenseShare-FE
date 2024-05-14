@@ -97,24 +97,28 @@ function Row(props) {
         <ViewDialog title='Expense'>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Typography variant="body1" className="label">Title:</Typography>
-            <Typography variant="body1" sx={{fontWeight:500}}>{row.title}</Typography>
+            <Typography variant="subtitle" sx={{fontWeight:600}} className="label">Title:</Typography>
+            <Typography variant="body1" >{row.title}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body1" className="label">Amount:</Typography>
-            <Typography variant="body1">{row.amount}</Typography>
+            <Typography variant="body1" sx={{fontWeight:600}}  className="label">Amount:</Typography>
+            <Typography variant="body1">{getTwoDigitNumber(row.amount)}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body1" className="label">Added By:</Typography>
+            <Typography variant="body1" sx={{fontWeight:600}}  className="label">Added By:</Typography>
             <Typography variant="body1">{row.addedBy}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body1" className="label">Group Name:</Typography>
+            <Typography variant="body1" sx={{fontWeight:600}}  className="label">Group Name:</Typography>
             <Typography variant="body1">{row.groupName}</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="body1" className="label">Created At:</Typography>
-            <Typography variant="body1">{row.createdAt}</Typography>
+            <Typography variant="body1" sx={{fontWeight:600}}   className="label">Description:</Typography>
+            <Typography variant="body1">{row.description}</Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="body1" sx={{fontWeight:600}}  className="label">Created At:</Typography>
+            <Typography variant="body1">{row.createdAt.replace("T"," ")}</Typography>
           </Grid>
           {/* Add more details here as needed */}
         </Grid>
