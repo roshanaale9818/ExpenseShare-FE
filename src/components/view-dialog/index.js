@@ -1,0 +1,1 @@
+export {default as ViewDialog} from './view.dialog';

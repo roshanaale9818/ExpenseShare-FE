@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-// import Box from '@mui/material/Box';
 import { useQuery, useMutation } from '@tanstack/react-query';
 
+import Grid from "@mui/material/Grid";
 import Link from '@mui/material/Link';
 import Table from '@mui/material/Table';
 import Paper from '@mui/material/Paper';
@@ -21,18 +21,19 @@ import { useAppContext } from 'src/providers/AppReducer';
 import * as ExpenseService from 'src/services/expense.service';
 
 import ErrorBlock from 'src/components/error';
-import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
-// import Label from 'src/components/label';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
 import Alert from '@mui/material/Alert';
 import { getTwoDigitNumber } from 'src/utils/format-number';
-import Button from '@mui/material/Button';
+import ConfirmDialog from 'src/components/confirm/confirm-dialog';
+import { SettlementStatus } from 'src/utils/helper';
+import  ViewDialog  from 'src/components/view-dialog/view.dialog';
+
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
   const navigate = useNavigate();
-  const { row, openDialog, serial } = props;
+  const { row, serial } = props;
   const handleCloseMenu = () => {
     setPopOverMenu(false);
   };
@@ -42,46 +43,43 @@ function Row(props) {
     setAnchorEl(event.currentTarget);
   };
   const [popoverMenuIsOpen, setPopOverMenu] = useState(false);
-  const onEditClicked = () => {
-    try {
-      openDialog(true);
-      handleCloseMenu();
-    } catch (err) {
-      console.err(err);
-    }
-  };
+
   const onGroupViewHandler = (group) => {
     console.log(group);
     navigate(`/auth/group/${group.groupId}/detail?groupName=${group.groupName}`, group);
   };
-  const deleteGroup = async ({ id }) => {
-    const response = await ExpenseService.deleteExpense(id);
+  const updateExpenseRequest = async (expense) => {
+    const response = await ExpenseService.updateExpenseRequest(expense);
     return response;
   };
 
   const { mutate } = useMutation({
-    mutationFn: deleteGroup,
+    mutationFn: updateExpenseRequest,
     onSuccess: () => {
       queryClient.invalidateQueries(['expense']);
-      showSnackbar('Group deleted successfull.', 'success');
+      showSnackbar('Expense saved successfull.', 'success');
       // sucessEvent();
       hideLoading();
     },
     onError: (error) => {
       console.log('Error', error);
-      showSnackbar('Group deletion failed.', 'error');
+      showSnackbar('Expense save failed.', 'error');
       hideLoading();
       // setIsLoading(false);
     },
   });
-  const onConfirmedHandler = (data) => {
+  const onConfirmedHandler = (data,action) => {
     showLoading();
-    mutate(data);
+    const _data = {
+      ...data,
+      isVerified:'1',
+      settlementStatus:action==='accept'?SettlementStatus.ACCEPTED:SettlementStatus.REJECTED
+    }
+
+    mutate(_data);
     handleCloseMenu();
   };
-  const onCanceledHandler = () => {
-    handleCloseMenu();
-  };
+
 
   let actionContent = '';
   actionContent = (
@@ -95,19 +93,33 @@ function Row(props) {
         position: 'absolute',
       }}
     >
-      <MenuItem onClick={onEditClicked}>
-        <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
-        Edit
+      <MenuItem>
+        <ViewDialog title='Expense'>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="body1" className="label">Title:</Typography>
+            <Typography variant="body1" sx={{fontWeight:500}}>{row.title}</Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="body1" className="label">Amount:</Typography>
+            <Typography variant="body1">{row.amount}</Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="body1" className="label">Added By:</Typography>
+            <Typography variant="body1">{row.addedBy}</Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="body1" className="label">Group Name:</Typography>
+            <Typography variant="body1">{row.groupName}</Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="body1" className="label">Created At:</Typography>
+            <Typography variant="body1">{row.createdAt}</Typography>
+          </Grid>
+          {/* Add more details here as needed */}
+        </Grid>
+        </ViewDialog>
       </MenuItem>
-
-      <ConfirmDelete
-        title="Are you sure you want to delete ?"
-        description="You will not be able to recover this again."
-        onConfirmed={onConfirmedHandler}
-        onCanceled={onCanceledHandler}
-        data={row}
-        sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
-      />
     </Popover>
   );
 
@@ -139,13 +151,36 @@ function Row(props) {
           {/* {row.status} */}
         </TableCell>
 
-        <TableCell sx={{display:'flex'}}>
-          <Button sx={{marginRight:'4px'}} variant="outlined" size="small" color="success">
-            Accept
-          </Button>
-          <Button variant="outlined" size="small" color="error">
-            Reject
-          </Button>
+        <TableCell sx={{ display: 'flex' }}>
+          {/* accept the request  */}
+          <ConfirmDialog
+            title={`Are you sure you want to accept ${row.title}?`}
+            description="You are going to accept the expense."
+            onConfirmed={()=>{
+              onConfirmedHandler(row,'accept')
+            }}
+            onCanceled={() => {}}
+            color="success"
+            buttonSize="small"
+            label="Accept"
+            variant="outlined"
+            sx={{ marginRight: '4px' }}
+          />
+
+          {/* reject the request  */}
+          <ConfirmDialog
+            title={`Are you sure you want to reject ${row.title}?`}
+            description="You are going to reject the expense."
+            onConfirmed={()=>{
+              onConfirmedHandler(row,'reject')
+            }}
+            onCanceled={() => {}}
+            color="error"
+            buttonSize="small"
+            label="Reject"
+            variant="outlined"
+            sx={{ marginRight: '4px' }}
+          />
         </TableCell>
 
         <TableCell align="right">
@@ -167,11 +202,11 @@ Row.propTypes = {
     addedBy: PropTypes.string,
     isAdmin: PropTypes.string,
     title: PropTypes.string,
-    amount: PropTypes.string,
+    amount: PropTypes.number,
     description: PropTypes.string,
   }).isRequired,
   serial: PropTypes.number,
-  openDialog: PropTypes.func,
+  // openDialog: PropTypes.func,
   // onDelete: PropTypes.func,
 };
 
@@ -184,13 +219,6 @@ export default function ExpenseRequestTableView() {
     return response;
   };
 
-  const onEditClickHandler = () => {
-    try {
-      // onEdit(group);
-    } catch (err) {
-      console.error(err);
-    }
-  };
   const onDeleteHandler = (group) => {
     try {
       // onDelete(group);
@@ -218,9 +246,6 @@ export default function ExpenseRequestTableView() {
           rows.map((row, index) => (
             <Row
               key={row.id}
-              openDialog={() => {
-                onEditClickHandler(row);
-              }}
               row={row}
               serial={index}
               onDelete={() => {
@@ -266,13 +291,16 @@ export default function ExpenseRequestTableView() {
         </TableHead>
         {content}
       </Table>
-      <Pagination
-        sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
-        count={data ? Number(data.totalItems) : 100}
-        variant="outlined"
-        shape="rounded"
-        onChange={paginationChangeHandler}
-      />
+
+      {data && data.totalPages > 1 && (
+        <Pagination
+          sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
+          count={data ? Number(data.totalPages) : 100}
+          variant="outlined"
+          shape="rounded"
+          onChange={paginationChangeHandler}
+        />
+      )}
     </TableContainer>
   );
 }

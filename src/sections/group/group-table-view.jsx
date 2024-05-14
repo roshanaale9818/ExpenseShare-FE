@@ -115,7 +115,7 @@ function Row(props) {
   }
 
   return (
-    <>
+    
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>{serial + 1}</TableCell>
         <TableCell component="th" scope="row">
@@ -149,9 +149,8 @@ function Row(props) {
             <Iconify icon="eva:more-vertical-fill" />
           </IconButton>
         </TableCell>
+      <TableCell>{actionContent}</TableCell>
       </TableRow>
-      <TableRow>{actionContent}</TableRow>
-    </>
   );
 }
 

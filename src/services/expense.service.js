@@ -99,3 +99,17 @@ export async function getExpenseRequest({page,limit}) {
     return resData;
 
 }
+
+export async function updateExpenseRequest(body) {
+    const response = await _http.post(`${APIURL}expense/request/update`,body);
+    if (!response.status === 200) {
+        const error = new Error('An error occurred');
+        error.code = response.status;
+        error.info = await response.json();
+        throw error;
+    }
+
+    const resData = await response.data;
+    return resData;
+
+}

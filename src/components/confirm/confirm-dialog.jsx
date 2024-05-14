@@ -19,7 +19,10 @@ export default function ConfirmDialog({
   onCanceled,
   children,
   sx,
-  label
+  label,
+  color="error",
+  variant,
+  buttonSize
 }) {
   const [open, setOpen] = useState(false);
 
@@ -54,9 +57,10 @@ export default function ConfirmDialog({
   };
   return (
     <>
-      <Button color='error' onClick={handleClickOpen} sx={sx}>
+      <Button color={color} variant={variant?'outlined':'text'} size={buttonSize} onClick={handleClickOpen} sx={sx}>
         {label && label} {!label &&'Logout'}
       </Button>
+
       <Dialog
         open={open}
         keepMounted
@@ -88,5 +92,10 @@ ConfirmDialog.propTypes = {
   onConfirmed: PropTypes.func,
   children:PropTypes.node,
   sx:PropTypes.object,
-  label:PropTypes.string
+  label:PropTypes.string,
+  color:PropTypes.string,
+  variant:PropTypes.string,
+  buttonSize:PropTypes.string
+
+
 };

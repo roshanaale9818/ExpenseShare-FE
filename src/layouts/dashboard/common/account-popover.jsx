@@ -120,21 +120,13 @@ export default function AccountPopover() {
         ))}
 
         <Divider sx={{ borderStyle: 'dashed', m: 0 }} />
-
-        {/* <MenuItem
-          disableRipple
-          disableTouchRipple
-          onClick={onLogoutHandler}
-          sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
-        >
-          Logout
-        </MenuItem> */}
         <ConfirmDialog
           title="Are you sure you want to Logout ?"
           description="You have to sign in again."
           onConfirmed={onConfirmedHandler}
           onCanceled={onCancelHandler}
-          sx={{ typography: 'body2', color: 'error.main', py: 1.5,width:'100%'}}
+          variant='contained'
+          sx={{ typography: 'body2', color: 'error.main',margin:"3px",width:'95%'}}
         />
       </Popover>
     </>

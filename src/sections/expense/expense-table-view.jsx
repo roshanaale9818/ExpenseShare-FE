@@ -26,7 +26,6 @@ import Pagination from '@mui/material/Pagination';
 import { getTwoDigitNumber } from 'src/utils/format-number';
 import { SettlementStatus } from 'src/utils/helper';
 
-
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
   const navigate = useNavigate();
@@ -65,6 +64,25 @@ function Row(props) {
   const deleteExpense = async ({ id }) => {
     const response = await ExpenseService.deleteExpense(id);
     return response;
+  };
+
+  const getStatusLabel = (status) => {
+    let label = '';
+    switch (status) {
+      case SettlementStatus.PENDING:
+        label = 'primary';
+        break;
+      case SettlementStatus.REJECTED:
+          label = 'error';
+          break;
+      case SettlementStatus.ACCEPTED:
+            label = 'success';
+            break;
+      default:
+        label = 'secondary';
+        break;
+    }
+    return label;
   };
 
   const { mutate } = useMutation({
@@ -110,9 +128,7 @@ function Row(props) {
         </TableCell>
         <TableCell>AUD {getTwoDigitNumber(row.amount)}</TableCell>
         <TableCell>
-          <Label
-            color={(row.settlementStatus === SettlementStatus.PENDING && 'secondary') || 'success'}
-          >
+          <Label color={getStatusLabel(row.settlementStatus)}>
             {row.settlementStatus}
           </Label>
         </TableCell>
@@ -123,10 +139,6 @@ function Row(props) {
               <Iconify icon="eva:more-vertical-fill" />
             </IconButton>
           )}
-
-
-
-{/* <TableCell> */}
           {/* allow edit or delete if the settlement is on pending status  */}
           {row.settlementStatus === SettlementStatus.PENDING && (
             <div>
@@ -158,10 +170,9 @@ function Row(props) {
                   sx={{ typography: 'body2', color: 'error.main', py: 1.5, width: '100%' }}
                 />
               </Popover>
-              
             </div>
           )}
-        {/* </TableCell> */}
+          {/* </TableCell> */}
         </TableCell>
       </TableRow>
       {/* <TableRow> */}
@@ -218,7 +229,7 @@ export default function ExpenseTableView({ onEdit }) {
 
   if (data && data.status === 'ok') {
     rows = data.data;
-    console.log("rows",rows)
+    console.log('rows', rows);
     content = (
       <TableBody>
         {rows &&
@@ -253,12 +264,10 @@ export default function ExpenseTableView({ onEdit }) {
       <TableBody>
         <TableRow>
           <TableCell>
-            
             <ErrorBlock
               sx={{ width: 100 }}
               message={error ? error.message : 'An error has occured'}
             />
-            
           </TableCell>
         </TableRow>
       </TableBody>
