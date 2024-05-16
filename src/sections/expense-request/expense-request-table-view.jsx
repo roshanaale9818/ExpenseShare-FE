@@ -2,7 +2,7 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery, useMutation } from '@tanstack/react-query';
 
-import Grid from "@mui/material/Grid";
+import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import Table from '@mui/material/Table';
 import Paper from '@mui/material/Paper';
@@ -27,8 +27,7 @@ import Alert from '@mui/material/Alert';
 import { getTwoDigitNumber } from 'src/utils/format-number';
 import ConfirmDialog from 'src/components/confirm/confirm-dialog';
 import { SettlementStatus } from 'src/utils/helper';
-import  ViewDialog  from 'src/components/view-dialog/view.dialog';
-
+import ViewDialog from 'src/components/view-dialog/view.dialog';
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -45,7 +44,6 @@ function Row(props) {
   const [popoverMenuIsOpen, setPopOverMenu] = useState(false);
 
   const onGroupViewHandler = (group) => {
-    console.log(group);
     navigate(`/auth/group/${group.groupId}/detail?groupName=${group.groupName}`, group);
   };
   const updateExpenseRequest = async (expense) => {
@@ -68,18 +66,17 @@ function Row(props) {
       // setIsLoading(false);
     },
   });
-  const onConfirmedHandler = (data,action) => {
+  const onConfirmedHandler = (data, action) => {
     showLoading();
     const _data = {
       ...data,
-      isVerified:'1',
-      settlementStatus:action==='accept'?SettlementStatus.ACCEPTED:SettlementStatus.REJECTED
-    }
+      isVerified: '1',
+      settlementStatus: action === 'accept' ? SettlementStatus.ACCEPTED : SettlementStatus.REJECTED,
+    };
 
     mutate(_data);
     handleCloseMenu();
   };
-
 
   let actionContent = '';
   actionContent = (
@@ -94,34 +91,46 @@ function Row(props) {
       }}
     >
       <MenuItem>
-        <ViewDialog title='Expense'>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant="subtitle" sx={{fontWeight:600}} className="label">Title:</Typography>
-            <Typography variant="body1" >{row.title}</Typography>
+        <ViewDialog title="Expense">
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="subtitle" sx={{ fontWeight: 600 }} className="label">
+                Title:
+              </Typography>
+              <Typography variant="body1">{row.title}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
+                Amount:
+              </Typography>
+              <Typography variant="body1">{getTwoDigitNumber(row.amount)}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
+                Added By:
+              </Typography>
+              <Typography variant="body1">{row.addedBy}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
+                Group Name:
+              </Typography>
+              <Typography variant="body1">{row.groupName}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
+                Description:
+              </Typography>
+              <Typography variant="body1">{row.description}</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
+                Created At:
+              </Typography>
+              <Typography variant="body1">{row.createdAt.replace('T', ' ')}</Typography>
+            </Grid>
+            {/* Add more details here as needed */}
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1" sx={{fontWeight:600}}  className="label">Amount:</Typography>
-            <Typography variant="body1">{getTwoDigitNumber(row.amount)}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1" sx={{fontWeight:600}}  className="label">Added By:</Typography>
-            <Typography variant="body1">{row.addedBy}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1" sx={{fontWeight:600}}  className="label">Group Name:</Typography>
-            <Typography variant="body1">{row.groupName}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1" sx={{fontWeight:600}}   className="label">Description:</Typography>
-            <Typography variant="body1">{row.description}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="body1" sx={{fontWeight:600}}  className="label">Created At:</Typography>
-            <Typography variant="body1">{row.createdAt.replace("T"," ")}</Typography>
-          </Grid>
-          {/* Add more details here as needed */}
-        </Grid>
         </ViewDialog>
       </MenuItem>
     </Popover>
@@ -160,8 +169,8 @@ function Row(props) {
           <ConfirmDialog
             title={`Are you sure you want to accept ${row.title}?`}
             description="You are going to accept the expense."
-            onConfirmed={()=>{
-              onConfirmedHandler(row,'accept')
+            onConfirmed={() => {
+              onConfirmedHandler(row, 'accept');
             }}
             onCanceled={() => {}}
             color="success"
@@ -175,8 +184,8 @@ function Row(props) {
           <ConfirmDialog
             title={`Are you sure you want to reject ${row.title}?`}
             description="You are going to reject the expense."
-            onConfirmed={()=>{
-              onConfirmedHandler(row,'reject')
+            onConfirmed={() => {
+              onConfirmedHandler(row, 'reject');
             }}
             onCanceled={() => {}}
             color="error"
@@ -216,8 +225,6 @@ Row.propTypes = {
 
 export default function ExpenseRequestTableView() {
   let rows = [];
-  // const { onEdit, onDelete } = props;
-  // console.log("ONEDIT",onEdit);
   const getExpenseRequest = async (_data, _page = 1, _limit = 10) => {
     const response = await ExpenseService.getExpenseRequest({ page: _page, limit: _limit });
     return response;
@@ -258,7 +265,13 @@ export default function ExpenseRequestTableView() {
             />
           ))}
 
-        {rows.length === 0 && <Typography variant="body">No data found.</Typography>}
+        {rows.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={6} align="center">
+              <Typography variant="body">No request found.</Typography>
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     );
   }

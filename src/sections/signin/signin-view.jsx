@@ -65,7 +65,6 @@ export default function SignInView() {
       const response = await loginService.login(formData.email, formData.password);
       // success login
       if (response.status === 'ok') {
-        console.log('Successfull', response.status);
         setErrorMessage(null);
         setLoading(false);
         const user = response.data;
@@ -157,9 +156,9 @@ export default function SignInView() {
               />
               <Box>
                 <div className="container">
-                {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+                  {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
                 </div>
-                </Box>
+              </Box>
 
               <LoadingButton
                 fullWidth
