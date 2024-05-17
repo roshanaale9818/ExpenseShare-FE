@@ -223,7 +223,7 @@ Row.propTypes = {
   // onDelete: PropTypes.func,
 };
 
-export default function ExpenseRequestTableView() {
+export default function SettlementTableView() {
   let rows = [];
   const getExpenseRequest = async (_data, _page = 1, _limit = 10) => {
     const response = await ExpenseService.getExpenseRequest({ page: _page, limit: _limit });
@@ -276,7 +276,7 @@ export default function ExpenseRequestTableView() {
     );
   }
   if (isError) {
-    console.error(error);
+    console.log(error);
     content = (
       <TableBody>
         <TableRow>

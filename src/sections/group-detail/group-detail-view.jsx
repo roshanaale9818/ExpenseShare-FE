@@ -40,7 +40,7 @@ import * as userService from 'src/services/user.service';
 import GroupMemberView from './group-member-view';
 import GroupChartView from './group-chart-view';
 import GroupChatView from './group-chat-view';
-import GroupExpenseView from './group-expense-view';
+import GroupExpenseSummary from './group-expense-summary';
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -123,30 +123,11 @@ export default function GroupDetailView() {
     } else {
       console.log('addding', selectedMember);
       // addGroupMember();
-      mutate({ email:selectedMember?.email });
+      mutate({ email: selectedMember?.email });
     }
   };
 
-  // async function addGroupMember() {
-  //   // showLoading();
-  //   try {
-  //   const groupId = data.data.id;
-  //     const response = await GroupService.addGroupMember(selectedMember.email, groupId);
-  //     if (response.status === 'ok') {
-  //       showSnackbar('Member added successfull');
-  //       setOpenConfirm(false);
-  //       setOpen(false);
-  //       hideLoading();
-  //     }
-  //   } catch (err) {
-  //     console.log('err', err.response);
-  //     showSnackbar(err.response.data.message, 'error');
-  //   }
-  // }
-
   const addGroupMember = async ({ email }) => {
-    console.log('mutating,', email);
-    // showLoading();
     const groupId = data.data.id;
     const response = await GroupService.addGroupMember(email, groupId);
     return response;
@@ -180,7 +161,7 @@ export default function GroupDetailView() {
   });
 
   const { mutate } = useMutation({
-    mutationFn:  addGroupMember,
+    mutationFn: addGroupMember,
     onSuccess: async () => {
       // console.log("on success is called")
       queryClient.invalidateQueries({
@@ -462,10 +443,9 @@ export default function GroupDetailView() {
 
             {/* group detail ends  */}
 
-            
             <Grid item xs={12} sm={6} md={6}>
               <Card sx={{ padding: 2 }}>
-                <GroupExpenseView groupMembers={data.data.Members} group={data.data} isAdmin={data.data.isAdmin} />
+                <GroupExpenseSummary />
               </Card>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
@@ -476,8 +456,6 @@ export default function GroupDetailView() {
             <Grid item xs={12} sm={6} md={6}>
               <GroupChatView />
             </Grid>
-
-
           </Grid>
         </Container>
       </>

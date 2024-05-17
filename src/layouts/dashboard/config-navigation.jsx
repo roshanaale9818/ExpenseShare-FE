@@ -39,7 +39,7 @@ const navConfig = [
   },
   {
     title: 'Settlements',
-    path: '',
+    path: '/auth/settlement',
     icon: icon('ic_blog'),
   },
   {

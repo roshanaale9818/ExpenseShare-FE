@@ -19,8 +19,8 @@ import ErrorBlock from 'src/components/error';
 import Label from 'src/components/label';
 import { useParams } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
+// import Button from '@mui/material/Button';
+// import Tooltip from '@mui/material/Tooltip';
 import { getTwoDigitNumber } from 'src/utils/format-number';
 
 function Row(props) {
@@ -28,6 +28,7 @@ function Row(props) {
   // const navigate = useNavigate();
   const { row, serial } = props;
   const deleteGroup = async ({ id }) => {
+    console.log(serial);
     const response = await GroupService.deleteGroup(id);
     return response;
   };
@@ -50,7 +51,7 @@ function Row(props) {
 
   return (
     <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-      <TableCell>{serial + 1}</TableCell>
+      {/* <TableCell>{serial + 1}</TableCell> */}
       <TableCell component="th" scope="row">
         {row.title}
       </TableCell>
@@ -60,23 +61,13 @@ function Row(props) {
           {getTwoDigitNumber(row.amount)}
         </Typography>
       </TableCell>
-      <TableCell component="th" scope="row">
-        {row.description}
-      </TableCell>
       <TableCell>
         <Label color={(row.settlementStatus === 'PENDING' && 'secondary') || 'success'}>
           {row.settlementStatus}
         </Label>
       </TableCell>
       <TableCell align="right">{new Date(row.createdAt).toISOString().split('T')[0]}</TableCell>
-      <TableCell align="right">
-        {row.Member.memberName}{' '}
-        <Tooltip title="View Member Info">
-          <Button sx={{ ml: 1 }} variant="outlined" color="info" size="small">
-            View
-          </Button>
-        </Tooltip>
-      </TableCell>
+      <TableCell align="right">{row.Member.memberName} </TableCell>
     </TableRow>
   );
 }
@@ -94,11 +85,11 @@ Row.propTypes = {
   serial: PropTypes.number,
 };
 
-export default function GroupExpenseTableView() {
+export default function GroupExpenseSummary() {
   const params = useParams();
   const { groupId } = params;
   let rows = [];
-  const getExpenseList = async ({ _data, _page = 1, _limit = 10 }) => {
+  const getExpenseList = async ({ _data, _page = 1, _limit = 5 }) => {
     const response = await ExpenseService.getGroupExpense({ page: _page, limit: _limit, groupId });
     return response;
   };
@@ -121,7 +112,6 @@ export default function GroupExpenseTableView() {
     }
   };
   const paginationChangeHandler = (event, currentPage) => {
-    console.log('page', currentPage);
     mutate({ _data: [], _page: currentPage });
   };
   const onDeleteHandler = (group) => {
@@ -191,11 +181,11 @@ export default function GroupExpenseTableView() {
       <Table aria-label="collapsible table">
         <TableHead>
           <TableRow>
-            <TableCell>S.N</TableCell>
+            {/* <TableCell>S.N</TableCell> */}
             <TableCell>Title</TableCell>
             <TableCell>Amount</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>SettleMent Status</TableCell>
+            {/* <TableCell>Description</TableCell> */}
+            <TableCell>Settlement Status</TableCell>
             <TableCell>Created On</TableCell>
             <TableCell align="right">Created By </TableCell>
           </TableRow>
@@ -216,4 +206,4 @@ export default function GroupExpenseTableView() {
   );
 }
 
-GroupExpenseTableView.propTypes = {};
+GroupExpenseSummary.propTypes = {};

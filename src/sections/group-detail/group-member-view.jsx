@@ -22,12 +22,11 @@ import Box from '@mui/material/Box';
 import { queryClient } from 'src/utils/http';
 import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
 import Card from '@mui/material/Card';
-import CardHeader  from '@mui/material/CardHeader';
+import CardHeader from '@mui/material/CardHeader';
 import { useMutation } from '@tanstack/react-query';
 import { useAppContext } from 'src/providers/AppReducer';
 import * as GroupService from 'src/services/group.service';
 import { useParams } from 'react-router-dom';
-
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -37,21 +36,21 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export default function GroupMemberView({ groupMembers, isAdmin}) {
+export default function GroupMemberView({ groupMembers, isAdmin }) {
   const params = useParams();
-  const {groupId} = params;
+  const { groupId } = params;
   const [isOpen, setOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const handleClose = () => {
     setOpen(false);
   };
   const onConfirmedHandler = (data) => {
-    console.log("removing",data);
-    if(data.isAdmin==="1"){
-      console.log("cannot remove admin")
+    console.log('removing', data);
+    if (data.isAdmin === '1') {
+      console.log('cannot remove admin');
       return;
     }
-    mutate({userId:data.userId, memberId:data.id});
+    mutate({ userId: data.userId, memberId: data.id });
   };
   const onCanceledHandler = () => {};
   const onViewHandler = (member) => {
@@ -59,14 +58,13 @@ export default function GroupMemberView({ groupMembers, isAdmin}) {
     setSelectedMember(member);
   };
   const { showSnackbar } = useAppContext();
-  const removeGroupMember = async ({userId,memberId})=>{
-      const response = await GroupService.removeGroupMember(userId, groupId, memberId);
-      return response;
-  }
-
+  const removeGroupMember = async ({ userId, memberId }) => {
+    const response = await GroupService.removeGroupMember(userId, groupId, memberId);
+    return response;
+  };
 
   const { mutate } = useMutation({
-    mutationFn:  removeGroupMember,
+    mutationFn: removeGroupMember,
     onSuccess: async () => {
       // console.log("on success is called")
       queryClient.invalidateQueries({
@@ -78,8 +76,8 @@ export default function GroupMemberView({ groupMembers, isAdmin}) {
       const err = error;
       console.log('err', err);
       showSnackbar(err.response.data.message, 'error');
-    }
-});
+    },
+  });
 
   let tableContent = '';
   const hideText = true;
@@ -126,9 +124,11 @@ export default function GroupMemberView({ groupMembers, isAdmin}) {
   }
   return (
     <Card>
-      <CardHeader title={`Group Members (${groupMembers.length})`} subheader='Members' sx={{mb:2}} />
-        
-
+      <CardHeader
+        title={`Group Members (${groupMembers.length})`}
+        subheader="Members"
+        sx={{ mb: 2 }}
+      />
 
       <Container>
         <Dialog
