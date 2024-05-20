@@ -71,7 +71,7 @@ function Row(props) {
     const _data = {
       ...data,
       isVerified: '1',
-      settlementStatus: action === 'accept' ? SettlementStatus.ACCEPTED : SettlementStatus.REJECTED,
+      status: action === 'accept' ? SettlementStatus.ACCEPTED : SettlementStatus.REJECTED,
     };
 
     mutate(_data);

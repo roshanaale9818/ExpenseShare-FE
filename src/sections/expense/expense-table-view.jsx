@@ -41,7 +41,7 @@ function Row(props) {
   const [popoverMenuIsOpen, setPopOverMenu] = useState(false);
   const onEditClicked = (data) => {
     try {
-      if (data.settlementStatus !== SettlementStatus.PENDING) {
+      if (data.status !== SettlementStatus.PENDING) {
         showSnackbar('Expense cannot be changed.', 'error');
         return;
       }
@@ -128,11 +128,11 @@ function Row(props) {
         </TableCell>
         <TableCell>AUD {getTwoDigitNumber(row.amount)}</TableCell>
         <TableCell>
-          <Label color={getStatusLabel(row.settlementStatus)}>{row.settlementStatus}</Label>
+          <Label color={getStatusLabel(row.status)}>{row.status}</Label>
         </TableCell>
 
         <TableCell align="right">
-          {row.settlementStatus === SettlementStatus.PENDING && (
+          {row.status === SettlementStatus.PENDING && (
             <IconButton onClick={handleOpenMenu}>
               <Iconify icon="eva:more-vertical-fill" />
             </IconButton>
@@ -280,7 +280,7 @@ export default function ExpenseTableView({ onEdit }) {
             <TableCell>Title</TableCell>
             <TableCell>Associated Group</TableCell>
             <TableCell>Amount</TableCell>
-            <TableCell>SettleMent Status</TableCell>
+            <TableCell> Status</TableCell>
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
