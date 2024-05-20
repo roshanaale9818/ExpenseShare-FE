@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
@@ -16,8 +16,10 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import Iconify from 'src/components/iconify';
-import { queryClient } from 'src/utils/http';
-import { useAppContext } from 'src/providers/AppReducer';
+import Label from 'src/components/label';
+
+// import { queryClient } from 'src/utils/http';
+// import { useAppContext } from 'src/providers/AppReducer';
 import * as ExpenseService from 'src/services/expense.service';
 
 import ErrorBlock from 'src/components/error';
@@ -25,12 +27,12 @@ import { useNavigate } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
 import Alert from '@mui/material/Alert';
 import { getTwoDigitNumber } from 'src/utils/format-number';
-import ConfirmDialog from 'src/components/confirm/confirm-dialog';
-import { SettlementStatus } from 'src/utils/helper';
+// import ConfirmDialog from 'src/components/confirm/confirm-dialog';
+// import { SettlementStatus } from 'src/utils/helper';
 import ViewDialog from 'src/components/view-dialog/view.dialog';
 
 function Row(props) {
-  const { showSnackbar, showLoading, hideLoading } = useAppContext();
+  // const { showSnackbar, showLoading, hideLoading } = useAppContext();
   const navigate = useNavigate();
   const { row, serial } = props;
   const handleCloseMenu = () => {
@@ -46,37 +48,37 @@ function Row(props) {
   const onGroupViewHandler = (group) => {
     navigate(`/auth/group/${group.groupId}/detail?groupName=${group.groupName}`, group);
   };
-  const updateExpenseRequest = async (expense) => {
-    const response = await ExpenseService.updateExpenseRequest(expense);
-    return response;
-  };
+  // const updateExpenseRequest = async (expense) => {
+  //   const response = await ExpenseService.updateExpenseRequest(expense);
+  //   return response;
+  // };
 
-  const { mutate } = useMutation({
-    mutationFn: updateExpenseRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['expense']);
-      showSnackbar('Expense saved successfull.', 'success');
-      // sucessEvent();
-      hideLoading();
-    },
-    onError: (error) => {
-      console.log('Error', error);
-      showSnackbar('Expense save failed.', 'error');
-      hideLoading();
-      // setIsLoading(false);
-    },
-  });
-  const onConfirmedHandler = (data, action) => {
-    showLoading();
-    const _data = {
-      ...data,
-      isVerified: '1',
-      settlementStatus: action === 'accept' ? SettlementStatus.ACCEPTED : SettlementStatus.REJECTED,
-    };
+  // const { mutate } = useMutation({
+  //   mutationFn: updateExpenseRequest,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries(['expense']);
+  //     showSnackbar('Expense saved successfull.', 'success');
+  //     // sucessEvent();
+  //     hideLoading();
+  //   },
+  //   onError: (error) => {
+  //     console.log('Error', error);
+  //     showSnackbar('Expense save failed.', 'error');
+  //     hideLoading();
+  //     // setIsLoading(false);
+  //   },
+  // });
+  // const onConfirmedHandler = (data, action) => {
+  //   showLoading();
+  //   const _data = {
+  //     ...data,
+  //     isVerified: '1',
+  //     settlementStatus: action === 'accept' ? SettlementStatus.ACCEPTED : SettlementStatus.REJECTED,
+  //   };
 
-    mutate(_data);
-    handleCloseMenu();
-  };
+  //   mutate(_data);
+  //   handleCloseMenu();
+  // };
 
   let actionContent = '';
   actionContent = (
@@ -159,41 +161,10 @@ function Row(props) {
           </Typography>
         </TableCell>
         <TableCell>{row.description}</TableCell>
-        <TableCell>
-          {row.addedBy}
-          {/* {row.status} */}
-        </TableCell>
+        <TableCell>{row.addedBy}</TableCell>
 
         <TableCell sx={{ display: 'flex' }}>
-          {/* accept the request  */}
-          <ConfirmDialog
-            title={`Are you sure you want to accept ${row.title}?`}
-            description="You are going to accept the expense."
-            onConfirmed={() => {
-              onConfirmedHandler(row, 'accept');
-            }}
-            onCanceled={() => {}}
-            color="success"
-            buttonSize="small"
-            label="Accept"
-            variant="outlined"
-            sx={{ marginRight: '4px' }}
-          />
-
-          {/* reject the request  */}
-          <ConfirmDialog
-            title={`Are you sure you want to reject ${row.title}?`}
-            description="You are going to reject the expense."
-            onConfirmed={() => {
-              onConfirmedHandler(row, 'reject');
-            }}
-            onCanceled={() => {}}
-            color="error"
-            buttonSize="small"
-            label="Reject"
-            variant="outlined"
-            sx={{ marginRight: '4px' }}
-          />
+          <Label>settled</Label>
         </TableCell>
 
         <TableCell align="right">
@@ -290,19 +261,19 @@ export default function SettlementTableView() {
 
   return (
     <TableContainer component={Paper}>
-      <Alert variant="filled" severity="info" sx={{ mb: 2, p: 2 }}>
-        If you are admin of any group, All the pending expense request will appear here.
+      <Alert variant="filled" severity="success" sx={{ mb: 2, p: 2 }}>
+        If you are admin of any group, you can create new settlements.
       </Alert>
       <Table aria-label="collapsible table">
         <TableHead>
           <TableRow>
             <TableCell>S.N</TableCell>
-            <TableCell>Expense Title</TableCell>
+            <TableCell>Title</TableCell>
             <TableCell>Associated Group</TableCell>
             <TableCell>Amount</TableCell>
             <TableCell>Description</TableCell>
-            <TableCell align="right">Added By </TableCell>
-            <TableCell align="right">Action</TableCell>
+            <TableCell>Settled By </TableCell>
+            <TableCell align="right">Status</TableCell>
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>

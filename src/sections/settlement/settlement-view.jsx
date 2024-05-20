@@ -7,16 +7,18 @@ import ExpenseRequestTableView from './settlement-table-view';
 // import ExpenseRequestSearchForm from './expense-request-search-form';
 
 export default function SettlementView() {
-  const hideBtn = true;
+  const hideBtn = false;
   return (
     <>
       <PageHeadView
-        name="Expense Requests"
+        name="Settlements"
         hideNewButton={hideBtn}
+        onNewClick={() => {
+          console.log('Creating a new page');
+        }}
         labelForNewButton="New Settlement"
       />
       <Container>
-        {/* <ExpenseRequestSearchForm/> */}
         <Divider />
         <ExpenseRequestTableView />
       </Container>

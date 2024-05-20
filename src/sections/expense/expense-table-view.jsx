@@ -73,11 +73,11 @@ function Row(props) {
         label = 'primary';
         break;
       case SettlementStatus.REJECTED:
-          label = 'error';
-          break;
+        label = 'error';
+        break;
       case SettlementStatus.ACCEPTED:
-            label = 'success';
-            break;
+        label = 'success';
+        break;
       default:
         label = 'secondary';
         break;
@@ -128,9 +128,7 @@ function Row(props) {
         </TableCell>
         <TableCell>AUD {getTwoDigitNumber(row.amount)}</TableCell>
         <TableCell>
-          <Label color={getStatusLabel(row.settlementStatus)}>
-            {row.settlementStatus}
-          </Label>
+          <Label color={getStatusLabel(row.settlementStatus)}>{row.settlementStatus}</Label>
         </TableCell>
 
         <TableCell align="right">
@@ -229,7 +227,6 @@ export default function ExpenseTableView({ onEdit }) {
 
   if (data && data.status === 'ok') {
     rows = data.data;
-    console.log('rows', rows);
     content = (
       <TableBody>
         {rows &&
