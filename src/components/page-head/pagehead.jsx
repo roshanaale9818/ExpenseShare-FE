@@ -10,7 +10,13 @@ import Typography from '@mui/material/Typography';
 
 import Iconify from '../iconify';
 
-export default function PageHeadView({ name, labelForNewButton, onNewClick ,hideNewButton}) {
+export default function PageHeadView({
+  name,
+  labelForNewButton,
+  onNewClick,
+  hideNewButton,
+  hideIcon,
+}) {
   let pageName = 'Page';
   let labelForBtn = 'New';
   if (name) {
@@ -32,15 +38,16 @@ export default function PageHeadView({ name, labelForNewButton, onNewClick ,hide
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">{pageName}</Typography>
 
-        {!hideNewButton && <Button
-          variant="contained"
-          color="inherit"
-          onClick={onNewHandler}
-          startIcon={<Iconify icon="eva:plus-fill" />}
-        >
-          {labelForBtn}
-        </Button>
-}
+        {!hideNewButton && (
+          <Button
+            variant="contained"
+            color="inherit"
+            onClick={onNewHandler}
+            startIcon={<Iconify icon="eva:plus-fill" />}
+          >
+            {labelForBtn}
+          </Button>
+        )}
       </Stack>
     </Container>
   );
@@ -49,5 +56,6 @@ PageHeadView.propTypes = {
   name: PropTypes.string,
   labelForNewButton: PropTypes.string,
   onNewClick: PropTypes.func,
-  hideNewButton:PropTypes.bool
+  hideNewButton: PropTypes.bool,
+  hideIcon: PropTypes.bool,
 };

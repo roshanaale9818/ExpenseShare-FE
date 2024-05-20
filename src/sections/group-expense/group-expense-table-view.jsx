@@ -66,6 +66,9 @@ function Row(props) {
       <TableCell>
         <Label color={(row.status === 'PENDING' && 'secondary') || 'success'}>{row.status}</Label>
       </TableCell>
+      <TableCell>
+        <Label color={(row.status === 'PENDING' && 'secondary') || 'success'}>{row.status}</Label>
+      </TableCell>
       <TableCell align="right">{new Date(row.createdAt).toISOString().split('T')[0]}</TableCell>
       <TableCell align="right">
         {row.Member.memberName}{' '}
@@ -194,6 +197,7 @@ export default function GroupExpenseTableView() {
             <TableCell>Amount</TableCell>
             <TableCell>Description</TableCell>
             <TableCell> Status</TableCell>
+            <TableCell>Settlement Status</TableCell>
             <TableCell>Created On</TableCell>
             <TableCell align="right">Created By </TableCell>
           </TableRow>

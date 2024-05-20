@@ -445,7 +445,7 @@ export default function GroupDetailView() {
 
             <Grid item xs={12} sm={6} md={6}>
               <Card sx={{ padding: 2 }}>
-                <GroupExpenseSummary />
+                <GroupExpenseSummary groupDetail={data} />
               </Card>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>

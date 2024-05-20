@@ -30,6 +30,7 @@ import { getTwoDigitNumber } from 'src/utils/format-number';
 // import ConfirmDialog from 'src/components/confirm/confirm-dialog';
 // import { SettlementStatus } from 'src/utils/helper';
 import ViewDialog from 'src/components/view-dialog/view.dialog';
+import { getFormatedDate } from 'src/utils/helper';
 
 function Row(props) {
   // const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -129,7 +130,7 @@ function Row(props) {
               <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
                 Created At:
               </Typography>
-              <Typography variant="body1">{row.createdAt.replace('T', ' ')}</Typography>
+              <Typography variant="body1">{getFormatedDate(row.createdAt)}</Typography>
             </Grid>
             {/* Add more details here as needed */}
           </Grid>
@@ -164,7 +165,7 @@ function Row(props) {
         <TableCell>{row.addedBy}</TableCell>
 
         <TableCell sx={{ display: 'flex' }}>
-          <Label>settled</Label>
+          <Label>PENDING</Label>
         </TableCell>
 
         <TableCell align="right">

@@ -56,7 +56,6 @@ function Row(props) {
 
   // navigate to group detail
   const onGroupViewHandler = (group) => {
-    console.log(group);
     navigate(`/auth/group/${group.group_id}/detail?groupName=${group.groupName}`, group);
   };
 

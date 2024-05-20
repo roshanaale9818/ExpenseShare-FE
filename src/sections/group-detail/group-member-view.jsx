@@ -22,11 +22,12 @@ import Box from '@mui/material/Box';
 import { queryClient } from 'src/utils/http';
 import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
 import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
+// import CardHeader from '@mui/material/CardHeader';
 import { useMutation } from '@tanstack/react-query';
 import { useAppContext } from 'src/providers/AppReducer';
 import * as GroupService from 'src/services/group.service';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { PageHeadView } from 'src/components/page-head';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -41,11 +42,12 @@ export default function GroupMemberView({ groupMembers, isAdmin }) {
   const { groupId } = params;
   const [isOpen, setOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const navigate = useNavigate();
   const handleClose = () => {
     setOpen(false);
   };
   const onConfirmedHandler = (data) => {
-    console.log('removing', data);
+    // console.log('removing', data);
     if (data.isAdmin === '1') {
       console.log('cannot remove admin');
       return;
@@ -80,6 +82,7 @@ export default function GroupMemberView({ groupMembers, isAdmin }) {
   });
 
   let tableContent = '';
+  const hideIcon = true;
   const hideText = true;
   if (groupMembers) {
     tableContent = groupMembers.map((member) => (
@@ -124,10 +127,21 @@ export default function GroupMemberView({ groupMembers, isAdmin }) {
   }
   return (
     <Card>
-      <CardHeader
+      {/* <CardHeader
         title={`Group Members (${groupMembers.length})`}
         subheader="Members"
         sx={{ mb: 2 }}
+      /> */}
+      <PageHeadView
+        name="Group Members"
+        sx={{ fontSize: '16px' }}
+        hideNewButton={false}
+        labelForNewButton="View All"
+        hideIcon={hideIcon}
+        hideBtn={hideIcon}
+        onNewClick={() => {
+          navigate(`/auth/group/${groupId}/expense?groupName=${'s'}`);
+        }}
       />
 
       <Container>

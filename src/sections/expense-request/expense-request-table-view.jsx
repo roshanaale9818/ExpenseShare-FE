@@ -26,7 +26,7 @@ import Pagination from '@mui/material/Pagination';
 import Alert from '@mui/material/Alert';
 import { getTwoDigitNumber } from 'src/utils/format-number';
 import ConfirmDialog from 'src/components/confirm/confirm-dialog';
-import { SettlementStatus } from 'src/utils/helper';
+import { getFormatedDate, SettlementStatus } from 'src/utils/helper';
 import ViewDialog from 'src/components/view-dialog/view.dialog';
 
 function Row(props) {
@@ -127,7 +127,7 @@ function Row(props) {
               <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
                 Created At:
               </Typography>
-              <Typography variant="body1">{row.createdAt.replace('T', ' ')}</Typography>
+              <Typography variant="body1">{getFormatedDate(row.createdAt)}</Typography>
             </Grid>
             {/* Add more details here as needed */}
           </Grid>
@@ -164,7 +164,7 @@ function Row(props) {
           {/* {row.status} */}
         </TableCell>
 
-        <TableCell sx={{ display: 'flex' }}>
+        <TableCell align="right" sx={{ display: 'flex' }}>
           {/* accept the request  */}
           <ConfirmDialog
             title={`Are you sure you want to accept ${row.title}?`}
@@ -219,8 +219,6 @@ Row.propTypes = {
     description: PropTypes.string,
   }).isRequired,
   serial: PropTypes.number,
-  // openDialog: PropTypes.func,
-  // onDelete: PropTypes.func,
 };
 
 export default function ExpenseRequestTableView() {

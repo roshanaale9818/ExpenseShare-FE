@@ -17,11 +17,12 @@ import * as ExpenseService from 'src/services/expense.service';
 
 import ErrorBlock from 'src/components/error';
 import Label from 'src/components/label';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
 // import Button from '@mui/material/Button';
 // import Tooltip from '@mui/material/Tooltip';
 import { getTwoDigitNumber } from 'src/utils/format-number';
+import { PageHeadView } from 'src/components/page-head';
 
 function Row(props) {
   const { showSnackbar, hideLoading } = useAppContext();
@@ -51,7 +52,6 @@ function Row(props) {
 
   return (
     <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-      {/* <TableCell>{serial + 1}</TableCell> */}
       <TableCell component="th" scope="row">
         {row.title}
       </TableCell>
@@ -74,7 +74,7 @@ function Row(props) {
 
 Row.propTypes = {
   row: PropTypes.shape({
-    amount: PropTypes.string,
+    amount: PropTypes.number,
     createdAt: PropTypes.string,
     status: PropTypes.string,
     description: PropTypes.string,
@@ -85,9 +85,12 @@ Row.propTypes = {
   serial: PropTypes.number,
 };
 
-export default function GroupExpenseSummary() {
+export default function GroupExpenseSummary({ groupDetail: _groupDetail }) {
+  const { groupName } = _groupDetail.data;
   const params = useParams();
   const { groupId } = params;
+  const hideIcon = false;
+  const navigate = useNavigate();
   let rows = [];
   const getExpenseList = async ({ _data, _page = 1, _limit = 5 }) => {
     const response = await ExpenseService.getGroupExpense({ page: _page, limit: _limit, groupId });
@@ -177,33 +180,44 @@ export default function GroupExpenseSummary() {
   }
 
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="collapsible table">
-        <TableHead>
-          <TableRow>
-            {/* <TableCell>S.N</TableCell> */}
-            <TableCell>Title</TableCell>
-            <TableCell>Amount</TableCell>
-            {/* <TableCell>Description</TableCell> */}
-            <TableCell>Settlement Status</TableCell>
-            <TableCell>Created On</TableCell>
-            <TableCell align="right">Created By </TableCell>
-          </TableRow>
-        </TableHead>
-        {content}
-      </Table>
+    <>
+      <PageHeadView
+        name="Group Expense"
+        hideNewButton={false}
+        labelForNewButton="View All"
+        hideIcon={hideIcon}
+        onNewClick={() => {
+          navigate(`/auth/group/${groupId}/expense?groupName=${groupName}`);
+        }}
+      />
+      <TableContainer component={Paper}>
+        <Table aria-label="collapsible table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Title</TableCell>
+              <TableCell>Amount</TableCell>
+              <TableCell>Settlement Status</TableCell>
+              <TableCell>Created On</TableCell>
+              <TableCell align="right">Created By </TableCell>
+            </TableRow>
+          </TableHead>
+          {content}
+        </Table>
 
-      {data && data.totalPages > 1 && (
-        <Pagination
-          sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
-          count={data ? Number(data.totalPages) : 100}
-          variant="outlined"
-          shape="rounded"
-          onChange={paginationChangeHandler}
-        />
-      )}
-    </TableContainer>
+        {data && data.totalPages > 1 && (
+          <Pagination
+            sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
+            count={data ? Number(data.totalPages) : 100}
+            variant="outlined"
+            shape="rounded"
+            onChange={paginationChangeHandler}
+          />
+        )}
+      </TableContainer>
+    </>
   );
 }
 
-GroupExpenseSummary.propTypes = {};
+GroupExpenseSummary.propTypes = {
+  groupDetail: PropTypes.object,
+};
