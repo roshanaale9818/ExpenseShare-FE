@@ -79,7 +79,6 @@ export default function ExpenseView() {
     return response;
   };
   const addExpenseHandler = async (values) => {
-    console.log("submitting",values)
     let response;
 
     // if it is edit
@@ -95,7 +94,7 @@ export default function ExpenseView() {
   //   return response;
   // };
   const { mutate: expenseMutate } = useMutation({
-    mutationFn:addExpenseHandler,
+    mutationFn: addExpenseHandler,
     onSuccess: () => {
       queryClient.invalidateQueries(['expense']);
       showSnackbar('Expense added successfull.', 'success');
@@ -113,11 +112,7 @@ export default function ExpenseView() {
   });
 
   const onExpenseEditHandler = async (data) => {
-    // formData = data;
-    // open popup
     setOpen(true);
-    // setMode('edit');
-    // console.log('mode', mode);
     // patch the value to the form
     formik.setValues({
       expenseTitle: data.title ?? '',
@@ -127,12 +122,6 @@ export default function ExpenseView() {
       id: data.id,
       paidBy: '',
     });
-
-    // setTimeout(()=>{
-    //   formik.setValues({
-    //     paidBy: data.MemberId ?? '',
-    //   })
-    // },2000)
   };
 
   const { data: userGroupData } = useQuery({

@@ -160,7 +160,7 @@ export default function GroupExpenseTableView() {
 
         {rows.length === 0 && (
           <TableRow>
-            <TableCell colSpan={5} align="center">
+            <TableCell colSpan={8} align="center">
               <Typography variant="body" align="center">
                 No data found.
               </Typography>
