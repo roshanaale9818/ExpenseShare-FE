@@ -20,6 +20,7 @@ export const SignUpPage = lazy(() => import('src/pages/signup'));
 export const GroupDetailPage = lazy(() => import('src/pages/group-detail'));
 export const GroupExpenseDetailPage = lazy(() => import('src/pages/group-expense'));
 export const SettlementPage = lazy(() => import('src/pages/settlement'));
+export const SettlemetPreviewPage = lazy(() => import('src/pages/settlement-preview'));
 
 // ----------------------------------------------------------------------
 
@@ -58,6 +59,7 @@ export default function Router() {
         },
         { path: 'expense-request', element: <ExpenseRequestPage /> },
         { path: 'settlement', element: <SettlementPage /> },
+        { path: 'settlement/:groupId/preview', element: <SettlemetPreviewPage /> },
       ],
     },
     {

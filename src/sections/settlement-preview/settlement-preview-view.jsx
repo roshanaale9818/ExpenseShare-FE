@@ -1,5 +1,6 @@
 import Container from '@mui/material/Container';
 import { PageHeadView } from 'src/components/page-head';
+import { useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -17,21 +18,21 @@ import InputLabel from '@mui/material/InputLabel';
 import DialogContent from '@mui/material/DialogContent';
 import Alert from '@mui/material/Alert';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 // import { queryClient } from 'src/utils/http';
 // import { useAppContext } from 'src/providers/AppReducer';
 import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import * as settlementService from 'src/services/settlement.service';
-import SettlementTableView from './settlement-table-view';
+import SettlementTableView from './settlement-preview-table-view';
 
 // import ExpenseRequestSearchForm from './expense-request-search-form';
 
-export default function SettlementView() {
+export default function SettlementPreview() {
   // const { showSnackbar } = useAppContext();
-  let groups = [];
-  const navigate = useNavigate();
+  const groups = [];
+  const params = useParams();
+  const { groupId } = params;
 
   // loaded form data when edit is clicked
   // let formData = {};
@@ -47,8 +48,6 @@ export default function SettlementView() {
     validationSchema: schema,
     onSubmit: (values) => {
       console.log('navigating to preview');
-      console.log('values', navigate, values);
-      navigate(`/auth/settlement/${values.group}/preview?groupName`);
     },
   });
   const [isOpen, setOpen] = useState(false);
@@ -59,38 +58,17 @@ export default function SettlementView() {
     if (reason && reason === 'backdropClick') return;
     setOpen(false);
   };
-  const onNewClicked = () => {
-    setOpen(true);
-    console.log(setIsLoading);
-    formik.resetForm();
-  };
 
-  const getUserGroups = async (_data, _page = 1, _limit = 10) => {
-    const response = await settlementService.getGroupList({ page: _page, limit: _limit });
+  const getExpenses = async (_data, _page = 1, _limit = 10) => {
+    setIsLoading(true);
+    const response = await settlementService.getAccepetedExpense({
+      page: _page,
+      limit: _limit,
+      groupId,
+    });
+    setIsLoading(false);
     return response;
   };
-  // const addExpenseHandler = async (values) => {
-  //   const response = await ExpenseService.editExpense(values);
-  //   return response;
-  // };
-
-  // const { mutate: expenseMutate } = useMutation({
-  //   mutationFn: addExpenseHandler,
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries(['expense']);
-  //     showSnackbar('Expense added successfull.', 'success');
-  //     handleClose();
-  //   },
-  //   onError: (error) => {
-  //     try {
-  //       console.log('Error', error);
-  //       const errMsg = error.response.data.errors[0] || 'Something went wrong.';
-  //       showSnackbar(errMsg, 'error');
-  //     } catch (err) {
-  //       showSnackbar(error.response.data.message, 'error');
-  //     }
-  //   },
-  // });
 
   const onExpenseEditHandler = async (data) => {
     setOpen(true);
@@ -100,26 +78,19 @@ export default function SettlementView() {
     });
   };
 
-  const { data: userGroupData } = useQuery({
-    queryKey: ['settlement', 'expense'],
-    queryFn: getUserGroups,
+  const { data } = useQuery({
+    queryKey: ['settlement', 'expense', groupId],
+    queryFn: getExpenses,
   });
-  if (userGroupData) {
-    groups = userGroupData.data;
+  if (data) {
+    console.log(data);
   }
 
-  const hideBtn = false;
+  const hideBtn = true;
   const fullWidth = true;
   return (
     <>
-      <PageHeadView
-        name="Settlements"
-        hideNewButton={hideBtn}
-        onNewClick={() => {
-          onNewClicked();
-        }}
-        labelForNewButton="New Settlement"
-      />
+      <PageHeadView name={`Settlement Preview For ${hideBtn}`} hideNewButton={hideBtn} />
       <Container>
         <Box className="dialog__wrap">
           <Dialog

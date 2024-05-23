@@ -1,17 +1,17 @@
 import { Helmet } from 'react-helmet-async';
 
-import { SettlementView } from 'src/sections/settlement';
+import SettlementPreview from 'src/sections/settlement-preview/settlement-preview-view';
 
 // ----------------------------------------------------------------------
 
-export default function ExpensePage() {
+export default function SettlementPreviewPage() {
   return (
     <>
       <Helmet>
         <title> Settlement Preview | Expense Share </title>
       </Helmet>
 
-      <SettlementView />
+      <SettlementPreview />
     </>
   );
 }

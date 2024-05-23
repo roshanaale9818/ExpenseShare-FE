@@ -115,42 +115,43 @@ function Row(props) {
   }
 
   return (
-    
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>{serial + 1}</TableCell>
-        <TableCell component="th" scope="row">
-          <Link
-            component="button"
-            variant="contained"
-            onClick={() => {
-              onGroupViewHandler(row);
-            }}
-          >
-            {row.groupName}
-          </Link>
-        </TableCell>
+    <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+      <TableCell>{serial + 1}</TableCell>
+      <TableCell component="th" scope="row">
+        <Link
+          color="inherit"
+          underline="hover"
+          component="button"
+          variant="contained"
+          onClick={() => {
+            onGroupViewHandler(row);
+          }}
+        >
+          {row.groupName}
+        </Link>
+      </TableCell>
 
-        <TableCell align="right">{row.createdAt.split('T')[0]}</TableCell>
-        <TableCell align="right">
-          <Label color={(row.isAdmin === '0' && 'secondary') || 'success'}>
-            {(row.isAdmin === '0' && 'Member') || 'Admin'}
-          </Label>
-          {/* {row.status} */}
-        </TableCell>
-        {/* <TableCell align="right">
+      <TableCell align="right">{row.createdAt.split('T')[0]}</TableCell>
+      <TableCell align="right">
+        <Label color={(row.isAdmin === '0' && 'secondary') || 'success'}>
+          {(row.isAdmin === '0' && 'Member') || 'Admin'}
+        </Label>
+        {/* {row.status} */}
+      </TableCell>
+      {/* <TableCell align="right">
           <Label color={(row.status === '0' && 'error') || 'success'}>
             {(row.status === '1' && 'Active') || 'In active'}
           </Label>
   
         </TableCell> */}
 
-        <TableCell align="right">
-          <IconButton onClick={handleOpenMenu}>
-            <Iconify icon="eva:more-vertical-fill" />
-          </IconButton>
-        </TableCell>
+      <TableCell align="right">
+        <IconButton onClick={handleOpenMenu}>
+          <Iconify icon="eva:more-vertical-fill" />
+        </IconButton>
+      </TableCell>
       <TableCell>{actionContent}</TableCell>
-      </TableRow>
+    </TableRow>
   );
 }
 
