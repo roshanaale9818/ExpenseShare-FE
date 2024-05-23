@@ -28,8 +28,8 @@ import navConfig from './config-navigation';
 
 export default function Nav({ openNav, onCloseNav }) {
   const pathname = usePathname();
-  const  photoURL= '/assets/images/avatars/avatar_25.jpg';
-  const account = useSelector((state)=>state.auth.currentUser);
+  const photoURL = '/assets/images/avatars/avatar_25.jpg';
+  const account = useSelector((state) => state.auth.currentUser);
   const displayName = `${account.firstName} ${account.lastName}`;
 
   const upLg = useResponsive('up', 'lg');
@@ -74,34 +74,34 @@ export default function Nav({ openNav, onCloseNav }) {
     </Stack>
   );
 
-//   const renderUpgrade = (
-//     <Box sx={{ px: 2.5, pb: 3, mt: 10 }}>
-//       <Stack alignItems="center" spacing={3} sx={{ pt: 5, borderRadius: 2, position: 'relative' }}>
-//         <Box
-//           component="img"
-//           src="/assets/illustrations/illustration_avatar.png"
-//           sx={{ width: 100, position: 'absolute', top: -50 }}
-//         />
+  //   const renderUpgrade = (
+  //     <Box sx={{ px: 2.5, pb: 3, mt: 10 }}>
+  //       <Stack alignItems="center" spacing={3} sx={{ pt: 5, borderRadius: 2, position: 'relative' }}>
+  //         <Box
+  //           component="img"
+  //           src="/assets/illustrations/illustration_avatar.png"
+  //           sx={{ width: 100, position: 'absolute', top: -50 }}
+  //         />
 
-//         {/* <Box sx={{ textAlign: 'center' }}>
-//           <Typography variant="h6">Get more?</Typography>
+  //         {/* <Box sx={{ textAlign: 'center' }}>
+  //           <Typography variant="h6">Get more?</Typography>
 
-//           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-//             From only $69
-//           </Typography>
-//         </Box> */}
-// {/* 
-//         <Button
-//           href="https://material-ui.com/store/items/minimal-dashboard/"
-//           target="_blank"
-//           variant="contained"
-//           color="inherit"
-//         >
-//           Upgrade to Pro
-//         </Button> */}
-//       </Stack>
-//     </Box>
-//   );
+  //           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
+  //             From only $69
+  //           </Typography>
+  //         </Box> */}
+  // {/*
+  //         <Button
+  //           href="https://material-ui.com/store/items/minimal-dashboard/"
+  //           target="_blank"
+  //           variant="contained"
+  //           color="inherit"
+  //         >
+  //           Upgrade to Pro
+  //         </Button> */}
+  //       </Stack>
+  //     </Box>
+  //   );
 
   const renderContent = (
     <Scrollbar
@@ -114,16 +114,13 @@ export default function Nav({ openNav, onCloseNav }) {
         },
       }}
     >
-      <Logo sx={{ mt: 3, ml: 4 }} />
-      {/* Expense Share */}
+      <Logo sx={{ mt: 3, ml: 4, mb: 3 }} />
 
       {renderAccount}
 
       {renderMenu}
 
       <Box sx={{ flexGrow: 1 }} />
-
-      {/* {renderUpgrade} */}
     </Scrollbar>
   );
 

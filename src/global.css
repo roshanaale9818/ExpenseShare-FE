@@ -1,2 +1,6 @@
 /* scrollbar */
 @import 'simplebar-react/dist/simplebar.min.css';
+.logo__container {
+  display: flex;
+  align-items: center;
+}

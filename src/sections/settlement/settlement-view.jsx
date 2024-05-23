@@ -15,20 +15,20 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 
 import DialogContent from '@mui/material/DialogContent';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { queryClient } from 'src/utils/http';
-import { useAppContext } from 'src/providers/AppReducer';
+import Alert from '@mui/material/Alert';
+import { useQuery } from '@tanstack/react-query';
+// import { queryClient } from 'src/utils/http';
+// import { useAppContext } from 'src/providers/AppReducer';
 import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import * as ExpenseService from 'src/services/expense.service';
 import * as settlementService from 'src/services/settlement.service';
 import SettlementTableView from './settlement-table-view';
 
 // import ExpenseRequestSearchForm from './expense-request-search-form';
 
 export default function SettlementView() {
-  const { showSnackbar } = useAppContext();
+  // const { showSnackbar } = useAppContext();
   let groups = [];
 
   // loaded form data when edit is clicked
@@ -44,7 +44,8 @@ export default function SettlementView() {
     initialValues,
     validationSchema: schema,
     onSubmit: (values) => {
-      expenseMutate(values);
+      // expenseMutate(values);
+      console.log('navigating to preview');
     },
   });
   const [isOpen, setOpen] = useState(false);
@@ -65,28 +66,28 @@ export default function SettlementView() {
     const response = await settlementService.getGroupList({ page: _page, limit: _limit });
     return response;
   };
-  const addExpenseHandler = async (values) => {
-    const response = await ExpenseService.editExpense(values);
-    return response;
-  };
+  // const addExpenseHandler = async (values) => {
+  //   const response = await ExpenseService.editExpense(values);
+  //   return response;
+  // };
 
-  const { mutate: expenseMutate } = useMutation({
-    mutationFn: addExpenseHandler,
-    onSuccess: () => {
-      queryClient.invalidateQueries(['expense']);
-      showSnackbar('Expense added successfull.', 'success');
-      handleClose();
-    },
-    onError: (error) => {
-      try {
-        console.log('Error', error);
-        const errMsg = error.response.data.errors[0] || 'Something went wrong.';
-        showSnackbar(errMsg, 'error');
-      } catch (err) {
-        showSnackbar(error.response.data.message, 'error');
-      }
-    },
-  });
+  // const { mutate: expenseMutate } = useMutation({
+  //   mutationFn: addExpenseHandler,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries(['expense']);
+  //     showSnackbar('Expense added successfull.', 'success');
+  //     handleClose();
+  //   },
+  //   onError: (error) => {
+  //     try {
+  //       console.log('Error', error);
+  //       const errMsg = error.response.data.errors[0] || 'Something went wrong.';
+  //       showSnackbar(errMsg, 'error');
+  //     } catch (err) {
+  //       showSnackbar(error.response.data.message, 'error');
+  //     }
+  //   },
+  // });
 
   const onExpenseEditHandler = async (data) => {
     setOpen(true);
@@ -126,7 +127,9 @@ export default function SettlementView() {
             fullWidth={fullWidth}
           >
             <DialogTitle id="alert-dialog-title">Select Group</DialogTitle>
+
             <DialogContent>
+              <Alert severity="info">Groups where you are admin appears here.</Alert>
               <Box
                 component="form"
                 onSubmit={formik.handleSubmit}

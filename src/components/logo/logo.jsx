@@ -8,7 +8,6 @@ import Link from '@mui/material/Link';
 
 import { RouterLink } from 'src/routes/components';
 
-
 // ----------------------------------------------------------------------
 
 const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
@@ -24,10 +23,24 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   // -------------------------------------------------------
   const logo = (
     <Box
-      src="/logo/logo_single.svg"
-      sx={{ width: 40, height: 40, cursor: 'pointer', ...sx }}
+      sx={{
+        height: '80px',
+        cursor: 'pointer',
+        fontSize: '18px',
+        display: 'block',
+        ...sx,
+      }}
     >
-    Expense Share
+      <div className="logo__container">
+        <div className="logo__wrap">
+          <div>
+            <img src="/assets/logo.jpg" width="90x" alt="logo" />
+          </div>
+          <div>
+            <b>Expense Share</b>
+          </div>
+        </div>
+      </div>
     </Box>
   );
 
@@ -87,7 +100,7 @@ const Logo = forwardRef(({ disabledLink = false, sx, ...other }, ref) => {
   }
 
   return (
-    <Link component={RouterLink} href="/" sx={{ display: 'contents' }}>
+    <Link component={RouterLink} href="/home" sx={{ display: 'contents' }}>
       {logo}
     </Link>
   );
