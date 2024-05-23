@@ -42,7 +42,8 @@ export default function GroupView() {
   });
   const [isOpen, setOpen] = useState(false);
   // const [mode,setMode]= useState('add');
-  const handleClose = () => {
+  const handleClose = (event, reason = null) => {
+    if (reason && reason === 'backdropClick') return;
     setOpen(false);
   };
   const onNewClicked = () => {
@@ -156,7 +157,7 @@ export default function GroupView() {
         </Dialog>
 
         {/* // grid */}
-        <GroupTableView onEdit={onEditGroupHandler}  />
+        <GroupTableView onEdit={onEditGroupHandler} />
       </Container>
     </>
   );

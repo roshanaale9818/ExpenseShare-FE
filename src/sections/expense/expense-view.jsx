@@ -65,12 +65,13 @@ export default function ExpenseView() {
   // const [mode, setMode] = useState('new');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleClose = () => {
+  const handleClose = (event, reason = null) => {
+    if (reason && reason === 'backdropClick') return;
     setOpen(false);
   };
   const onNewClicked = () => {
     setOpen(true);
-    console.log(setIsLoading);
+    setIsLoading(false);
     formik.resetForm();
   };
 

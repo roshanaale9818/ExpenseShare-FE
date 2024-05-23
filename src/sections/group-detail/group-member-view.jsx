@@ -43,7 +43,8 @@ export default function GroupMemberView({ groupMembers, isAdmin }) {
   const [isOpen, setOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const navigate = useNavigate();
-  const handleClose = () => {
+  const handleClose = (event, reason = null) => {
+    if (reason && reason === 'backdropClick') return;
     setOpen(false);
   };
   const onConfirmedHandler = (data) => {

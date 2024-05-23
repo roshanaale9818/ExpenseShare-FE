@@ -116,6 +116,8 @@ function Row(props) {
         </TableCell>
         <TableCell component="th" scope="row">
           <Link
+            color="inherit"
+            underline="hover"
             component="button"
             variant="contained"
             onClick={() => {

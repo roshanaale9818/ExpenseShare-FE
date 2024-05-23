@@ -47,8 +47,8 @@ import GroupExpenseFilterView from './group-expense-filter-view';
 export default function GroupExpenseView() {
   const { showSnackbar } = useAppContext();
   const params = useParams();
-  const {groupId:id}= params;
-  console.log("GroupID,", id);
+  const { groupId: id } = params;
+  console.log('GroupID,', id);
   const [searchParams] = useSearchParams();
   const groupName = searchParams.get('groupName');
   // console.log(params,searchParams.get('groupName'))
@@ -79,7 +79,8 @@ export default function GroupExpenseView() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleClose = () => {
+  const handleClose = (event, reason = null) => {
+    if (reason && reason === 'backdropClick') return;
     setOpen(false);
   };
   const onNewClicked = () => {
@@ -123,30 +124,38 @@ export default function GroupExpenseView() {
     queryFn: getUserGroups,
   });
 
-  const {data:memberListData,isError,error} = useQuery({
-    queryKey:['member',id],
-    queryFn:getGroupMembers
-  })
-  console.log("Memberlist data", memberListData);
+  const {
+    data: memberListData,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['member', id],
+    queryFn: getGroupMembers,
+  });
+  console.log('Memberlist data', memberListData);
   if (userGroupData) {
     groups = userGroupData.data;
   }
-  let members= [];
-  if(memberListData){
+  let members = [];
+  if (memberListData) {
     members = memberListData.data.Members;
   }
-  const filterSubmitHandler = (values)=>{
-    console.log("values from form",values)
-  }
-  let errorContent ='';
-  if(isError){
-    console.log(error)
-    errorContent = <ErrorBlock message="Something went wrong please try again later." />
+  const filterSubmitHandler = (values) => {
+    console.log('values from form', values);
+  };
+  let errorContent = '';
+  if (isError) {
+    console.log(error);
+    errorContent = <ErrorBlock message="Something went wrong please try again later." />;
   }
 
   return (
     <>
-      <PageHeadView name={`${groupName} Expenses`} labelForNewButton="New Expense" onNewClick={onNewClicked} />
+      <PageHeadView
+        name={`${groupName} Expenses`}
+        labelForNewButton="New Expense"
+        onNewClick={onNewClicked}
+      />
       <Container>
         <Dialog
           open={isOpen}
@@ -211,9 +220,9 @@ export default function GroupExpenseView() {
                     error={formik.touched.group && Boolean(formik.errors.group)}
                   >
                     <InputLabel id="group-select">Group</InputLabel>
-                   
+
                     <Select
-                     readOnly
+                      readOnly
                       labelId="group-select"
                       id="demo-simple-select-helper"
                       label="Group"
@@ -323,9 +332,14 @@ export default function GroupExpenseView() {
           </DialogActions>
         </Dialog>
 
-   {isError ? errorContent:     (<>
-    <GroupExpenseFilterView members={members} onFormSubmit={filterSubmitHandler} />
-        <GroupExpenseTableView /></>)}
+        {isError ? (
+          errorContent
+        ) : (
+          <>
+            <GroupExpenseFilterView members={members} onFormSubmit={filterSubmitHandler} />
+            <GroupExpenseTableView />
+          </>
+        )}
       </Container>
     </>
   );
