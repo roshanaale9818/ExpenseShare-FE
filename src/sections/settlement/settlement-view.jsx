@@ -48,7 +48,7 @@ export default function SettlementView() {
     onSubmit: (values) => {
       console.log('navigating to preview');
       console.log('values', navigate, values);
-      navigate(`/auth/settlement/${values.group}/preview?groupName`);
+      navigate(`/auth/settlement/${values.group}/preview?groupName=`);
     },
   });
   const [isOpen, setOpen] = useState(false);
@@ -69,28 +69,6 @@ export default function SettlementView() {
     const response = await settlementService.getGroupList({ page: _page, limit: _limit });
     return response;
   };
-  // const addExpenseHandler = async (values) => {
-  //   const response = await ExpenseService.editExpense(values);
-  //   return response;
-  // };
-
-  // const { mutate: expenseMutate } = useMutation({
-  //   mutationFn: addExpenseHandler,
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries(['expense']);
-  //     showSnackbar('Expense added successfull.', 'success');
-  //     handleClose();
-  //   },
-  //   onError: (error) => {
-  //     try {
-  //       console.log('Error', error);
-  //       const errMsg = error.response.data.errors[0] || 'Something went wrong.';
-  //       showSnackbar(errMsg, 'error');
-  //     } catch (err) {
-  //       showSnackbar(error.response.data.message, 'error');
-  //     }
-  //   },
-  // });
 
   const onExpenseEditHandler = async (data) => {
     setOpen(true);

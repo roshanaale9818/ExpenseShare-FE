@@ -23,7 +23,7 @@ import * as settlmentService from 'src/services/settlement.service';
 import ErrorBlock from 'src/components/error';
 import { useNavigate, useParams } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
-import Alert from '@mui/material/Alert';
+// import Alert from '@mui/material/Alert';
 import { getTwoDigitNumber } from 'src/utils/format-number';
 import ViewDialog from 'src/components/view-dialog/view.dialog';
 import { getFormatedDate } from 'src/utils/helper';
@@ -42,7 +42,7 @@ function Row(props) {
   const [popoverMenuIsOpen, setPopOverMenu] = useState(false);
 
   const onGroupViewHandler = (group) => {
-    navigate(`/auth/group/${group.groupId}/detail?groupName=${group.groupName}`, group);
+    navigate(`/auth/group/${group.groupId}/detail?groupName=${group.Group.groupName}`, group);
   };
 
   let actionContent = '';
@@ -82,7 +82,7 @@ function Row(props) {
               <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
                 Group Name:
               </Typography>
-              <Typography variant="body1">{row.groupName}</Typography>
+              <Typography variant="body1">{row.Group.groupName}</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
@@ -116,7 +116,7 @@ function Row(props) {
               onGroupViewHandler(row);
             }}
           >
-            {row.groupName}
+            {row.Group.groupName}
           </Link>
         </TableCell>
         <TableCell align="right">
@@ -126,10 +126,8 @@ function Row(props) {
           </Typography>
         </TableCell>
         <TableCell>{row.description}</TableCell>
-        <TableCell>{row.addedBy}</TableCell>
-
         <TableCell sx={{ display: 'flex' }}>
-          <Label>PENDING</Label>
+          <Label color="primary">{row.status}</Label>
         </TableCell>
 
         <TableCell align="right">
@@ -145,6 +143,7 @@ function Row(props) {
 
 Row.propTypes = {
   row: PropTypes.shape({
+    Group: PropTypes.object,
     groupName: PropTypes.string,
     createdAt: PropTypes.string,
     status: PropTypes.string,
@@ -155,8 +154,6 @@ Row.propTypes = {
     description: PropTypes.string,
   }).isRequired,
   serial: PropTypes.number,
-  // openDialog: PropTypes.func,
-  // onDelete: PropTypes.func,
 };
 
 export default function SettlementPreviewTable() {
@@ -211,7 +208,7 @@ export default function SettlementPreviewTable() {
         {rows.length === 0 && (
           <TableRow>
             <TableCell colSpan={6} align="center">
-              <Typography variant="body">No request found.</Typography>
+              <Typography variant="body">No data found.</Typography>
             </TableCell>
           </TableRow>
         )}
@@ -233,9 +230,9 @@ export default function SettlementPreviewTable() {
 
   return (
     <TableContainer component={Paper}>
-      <Alert variant="filled" severity="success" sx={{ mb: 2, p: 2 }}>
+      {/* <Alert variant="filled" severity="success" sx={{ mb: 2, p: 2 }}>
         If you are admin of any group, you can create new settlements.
-      </Alert>
+      </Alert> */}
       <Table aria-label="collapsible table">
         <TableHead>
           <TableRow>
@@ -244,9 +241,8 @@ export default function SettlementPreviewTable() {
             <TableCell>Associated Group</TableCell>
             <TableCell>Amount</TableCell>
             <TableCell>Description</TableCell>
-            <TableCell>Settled By </TableCell>
-            <TableCell align="right">Status</TableCell>
-            <TableCell align="right"> </TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell align="right">Action</TableCell>
           </TableRow>
         </TableHead>
         {content}

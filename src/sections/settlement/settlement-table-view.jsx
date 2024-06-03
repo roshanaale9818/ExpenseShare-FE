@@ -132,7 +132,6 @@ function Row(props) {
               </Typography>
               <Typography variant="body1">{getFormatedDate(row.createdAt)}</Typography>
             </Grid>
-            {/* Add more details here as needed */}
           </Grid>
         </ViewDialog>
       </MenuItem>
@@ -165,7 +164,7 @@ function Row(props) {
         <TableCell>{row.addedBy}</TableCell>
 
         <TableCell sx={{ display: 'flex' }}>
-          <Label>PENDING</Label>
+          <Label color={(row.status === 'PENDING' && 'secondary') || 'success'}>{row.status}</Label>
         </TableCell>
 
         <TableCell align="right">
@@ -191,8 +190,6 @@ Row.propTypes = {
     description: PropTypes.string,
   }).isRequired,
   serial: PropTypes.number,
-  // openDialog: PropTypes.func,
-  // onDelete: PropTypes.func,
 };
 
 export default function SettlementTableView() {

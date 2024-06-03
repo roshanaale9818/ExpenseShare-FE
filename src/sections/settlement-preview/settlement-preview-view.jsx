@@ -29,12 +29,9 @@ import SettlementTableView from './settlement-preview-table-view';
 // import ExpenseRequestSearchForm from './expense-request-search-form';
 
 export default function SettlementPreview() {
-  // const { showSnackbar } = useAppContext();
   const groups = [];
   const params = useParams();
   const { groupId } = params;
-
-  // loaded form data when edit is clicked
   // let formData = {};
   const schema = yup.object({
     group: yup.string('Enter Group').required('Group is required.'),
@@ -51,7 +48,7 @@ export default function SettlementPreview() {
     },
   });
   const [isOpen, setOpen] = useState(false);
-  // const [mode, setMode] = useState('new');
+  let group = '';
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClose = (event, reason = null) => {
@@ -82,15 +79,19 @@ export default function SettlementPreview() {
     queryKey: ['settlement', 'expense', groupId],
     queryFn: getExpenses,
   });
+
   if (data) {
-    console.log(data);
+    group = data.data[0];
   }
 
   const hideBtn = true;
   const fullWidth = true;
   return (
-    <>
-      <PageHeadView name={`Settlement Preview For ${hideBtn}`} hideNewButton={hideBtn} />
+    <section className="bg-white">
+      <PageHeadView
+        name={`Settlement Preview For ${group ? group.Group.groupName : 'Group'}`}
+        hideNewButton={hideBtn}
+      />
       <Container>
         <Box className="dialog__wrap">
           <Dialog
@@ -170,6 +171,6 @@ export default function SettlementPreview() {
 
         <SettlementTableView onEdit={onExpenseEditHandler} />
       </Container>
-    </>
+    </section>
   );
 }
