@@ -32,11 +32,11 @@ const navConfig = [
     path: '/auth/group',
     icon: icon('ic_user'),
   },
-  {
-    title: 'Reports',
-    path: '',
-    icon: icon('ic_blog'),
-  },
+  // {
+  //   title: 'Reports',
+  //   path: '',
+  //   icon: icon('ic_blog'),
+  // },
   {
     title: 'Settlements',
     path: '/auth/settlement',

@@ -27,6 +27,7 @@ import Pagination from '@mui/material/Pagination';
 import { getTwoDigitNumber } from 'src/utils/format-number';
 import ViewDialog from 'src/components/view-dialog/view.dialog';
 import { getFormatedDate } from 'src/utils/helper';
+import Button from '@mui/material/Button';
 
 function Row(props) {
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ function Row(props) {
               <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
                 Added By:
               </Typography>
-              <Typography variant="body1">{row.addedBy}</Typography>
+              <Typography variant="body1">{row.Member.memberName}</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
@@ -96,9 +97,18 @@ function Row(props) {
               </Typography>
               <Typography variant="body1">{getFormatedDate(row.createdAt)}</Typography>
             </Grid>
-            {/* Add more details here as needed */}
           </Grid>
         </ViewDialog>
+      </MenuItem>
+      <MenuItem>
+        <Button
+          onClick={() => {
+            console.log('edit');
+          }}
+        >
+          <Iconify icon="eva:eye-fill" sx={{ mr: 2 }} />
+          Edit
+        </Button>
       </MenuItem>
     </Popover>
   );
@@ -152,6 +162,7 @@ Row.propTypes = {
     title: PropTypes.string,
     amount: PropTypes.number,
     description: PropTypes.string,
+    Member: PropTypes.object,
   }).isRequired,
   serial: PropTypes.number,
 };
