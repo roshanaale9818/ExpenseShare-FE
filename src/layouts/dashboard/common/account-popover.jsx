@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -15,7 +15,6 @@ import { authActions } from 'src/store';
 
 import ConfirmDialog from 'src/components/confirm/confirm-dialog';
 
-
 // import ConfirmDialog from 'src/components/confirm/confirm-dialog';
 
 // ----------------------------------------------------------------------
@@ -29,6 +28,7 @@ const MENU_OPTIONS = [
     label: 'Profile',
     icon: 'eva:person-fill',
   },
+
   {
     label: 'Settings',
     icon: 'eva:settings-2-fill',
@@ -50,15 +50,14 @@ export default function AccountPopover() {
   };
   const onConfirmedHandler = () => {
     dispatch(authActions.logout());
-    navigate('/home')
+    navigate('/home');
   };
-  const onCancelHandler = ()=>{};
-  const account = useSelector((state)=>state.auth);
+  const onCancelHandler = () => {};
+  const account = useSelector((state) => state.auth);
   let displayName = `${account.currentUser?.firstName}  ${account.currentUser?.lastName}`;
-  if(!displayName){
-    displayName = 'User'
+  if (!displayName) {
+    displayName = 'User';
   }
-
 
   return (
     <>
@@ -75,7 +74,7 @@ export default function AccountPopover() {
         }}
       >
         <Avatar
-          src='/assets/images/avatars/avatar_25.jpg'
+          src="/assets/images/avatars/avatar_25.jpg"
           alt={`${account.currentUser?.firstName}  ${account.currentUser?.lastName}`}
           sx={{
             width: 36,
@@ -125,8 +124,8 @@ export default function AccountPopover() {
           description="You have to sign in again."
           onConfirmed={onConfirmedHandler}
           onCanceled={onCancelHandler}
-          variant='contained'
-          sx={{ typography: 'body2', color: 'error.main',margin:"3px",width:'95%'}}
+          variant="contained"
+          sx={{ typography: 'body2', color: 'error.main', margin: '3px', width: '95%' }}
         />
       </Popover>
     </>

@@ -288,7 +288,12 @@ export default function ExpenseRequestTableView() {
 
   return (
     <TableContainer component={Paper}>
-      <Alert variant="filled" severity="info" sx={{ mb: 2, p: 2 }}>
+      <Alert
+        variant="filled"
+        className="text-white"
+        severity="info"
+        sx={{ mb: 2, p: 2, color: '#fff' }}
+      >
         If you are admin of any group, All the pending expense request will appear here.
       </Alert>
       <Table aria-label="collapsible table">

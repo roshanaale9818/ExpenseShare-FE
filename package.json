@@ -24,6 +24,7 @@
     "@emotion/styled": "^11.11.0",
     "@faker-js/faker": "^8.1.0",
     "@iconify/react": "^4.1.1",
+    "@imgly/background-removal-data": "^1.4.5",
     "@mui/icons-material": "^5.15.11",
     "@mui/lab": "^5.0.0-alpha.147",
     "@mui/material": "^5.14.12",

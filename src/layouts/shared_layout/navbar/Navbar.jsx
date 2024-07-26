@@ -41,30 +41,16 @@ export default function Navbar() {
   const handleCloseNavMenu = (route) => {
     setAnchorElNav(null);
   };
- const  onCanceledHandler=()=>{}
- const onConfirmHandler = ()=>{
-  dispatch(authActions.logout());
-  navigate('/home')
- }
-
+  const onCanceledHandler = () => {};
+  const onConfirmHandler = () => {
+    dispatch(authActions.logout());
+    navigate('/home');
+  };
 
   const handleCloseUserMenu = (menu) => {
     setAnchorElUser(null);
-    console.log('CLOSING');
-    console.log("sadas",menu.title)
     try {
-      switch (menu.title) {
-        case 'Logout':
-            
-          // if (window.confirm('Are you sure you want to logout?')) {
-          //   // logoutHandler();
-          // }
-
-          break;
-
-        default:
-          break;
-      }
+      navigate(menu.url);
     } catch {
       console.error('errror has occured');
     }
@@ -87,7 +73,6 @@ export default function Navbar() {
     <AppBar position="static" style={{ backgroundColor: '#2E3B55', padding: '7px' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          {/* <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} /> */}
           <Typography
             variant="h6"
             noWrap
@@ -171,9 +156,9 @@ export default function Navbar() {
                   <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
                 </IconButton>
               </Tooltip>
-              {/* <Button variant="outlined">Outlined</Button> */}
+
               <Menu
-                sx={{ mt: '45px' }}
+                sx={{ mt: '45px', width: '200px' }}
                 id="menu-appbar"
                 anchorEl={anchorElUser}
                 anchorOrigin={{
@@ -188,24 +173,32 @@ export default function Navbar() {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                {SETTINGS_MENU.map((setting) => (
-                  <MenuItem
-                    key={setting.title}
-                    onClick={() => {
-                      handleCloseUserMenu(setting);
+                <div style={{ width: '200px' }}>
+                  {SETTINGS_MENU.map((setting) => (
+                    <MenuItem
+                      key={setting.title}
+                      onClick={() => {
+                        handleCloseUserMenu(setting);
+                      }}
+                    >
+                      <Typography textAlign="right">{setting.title}</Typography>
+                    </MenuItem>
+                  ))}
+                  <ConfirmDialog
+                    title="Are you sure you want to Logout ?"
+                    description="You have to sign in again."
+                    onConfirmed={onConfirmHandler}
+                    onCanceled={onCanceledHandler}
+                    label="Logout"
+                    sx={{
+                      typography: 'body2',
+                      textAlign: 'left',
+                      color: 'error.main',
+                      py: 1,
+                      width: '90%',
                     }}
-                  >
-                    <Typography textAlign="right">{setting.title}</Typography>
-                  </MenuItem>
-                ))}
-  <ConfirmDialog
-          title="Are you sure you want to Logout ?"
-          description="You have to sign in again."
-          onConfirmed={onConfirmHandler}
-          onCanceled={onCanceledHandler}
-          label="Logout"
-          sx={{ typography: 'body2',textAlign:'left', color: 'error.main', py: 1.5,width:'100%'}}
-        />
+                  />
+                </div>
               </Menu>
             </Box>
           )}

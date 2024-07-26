@@ -10,7 +10,7 @@ export default function CustomMain() {
     <div className="site-wrapper">
       <div className="top-wrap">
         <Navbar />
-        <div className="main-content" id="main">
+        <div className="main-content bg-secondary" id="main">
           {outlet}
         </div>
         <Footer />

@@ -1,4 +1,3 @@
-// AppReducer.js
 import { PropTypes } from 'prop-types';
 import React, { useMemo, useState, useReducer, useContext, createContext } from 'react';
 
@@ -59,9 +58,9 @@ export const AppProvider = ({ children }) => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
     setAlertType(type);
-    setTimeout(()=>{
+    setTimeout(() => {
       setSnackbarOpen(false);
-    },3000)
+    }, 3000);
   };
   // console.log(showSnackbar)
 
@@ -86,11 +85,9 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider value={contextValue}>
       {children}
-      <Box sx={{ width: '100%' }}>
-      {state.isLoading &&   <LinearProgress  color="success" />}
-      </Box>
+      <Box sx={{ width: '100%' }}>{state.isLoading && <LinearProgress color="success" />}</Box>
 
-      <Snackbar open={snackbarOpen} autoHideDuration={3000} onClick={()=>hideSnackbar}>
+      <Snackbar open={snackbarOpen} autoHideDuration={3000} onClick={() => hideSnackbar}>
         <Alert severity={alertType}>{snackbarMessage}</Alert>
       </Snackbar>
     </AppContext.Provider>
