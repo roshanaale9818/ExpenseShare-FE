@@ -20,7 +20,8 @@ import Label from 'src/components/label';
 
 // import { queryClient } from 'src/utils/http';
 // import { useAppContext } from 'src/providers/AppReducer';
-import * as ExpenseService from 'src/services/expense.service';
+// import * as ExpenseService from 'src/services/expense.service';
+import * as SettlementService from 'src/services/settlement.service';
 
 import ErrorBlock from 'src/components/error';
 import { useNavigate } from 'react-router-dom';
@@ -194,8 +195,8 @@ Row.propTypes = {
 
 export default function SettlementTableView() {
   let rows = [];
-  const getExpenseRequest = async (_data, _page = 1, _limit = 10) => {
-    const response = await ExpenseService.getExpenseRequest({ page: _page, limit: _limit });
+  const getSettlement = async (_data, _page = 1, _limit = 10) => {
+    const response = await SettlementService.getSettlement({ page: _page, limit: _limit });
     return response;
   };
 
@@ -212,13 +213,12 @@ export default function SettlementTableView() {
   };
 
   const { isError, data, error } = useQuery({
-    queryKey: ['expense'],
-    queryFn: getExpenseRequest,
+    queryKey: ['settlement'],
+    queryFn: getSettlement,
   });
   let content = '';
 
   if (data && data.status === 'ok') {
-    // hideLoading()
     rows = data.data;
     content = (
       <TableBody>
@@ -237,7 +237,7 @@ export default function SettlementTableView() {
         {rows.length === 0 && (
           <TableRow>
             <TableCell colSpan={6} align="center">
-              <Typography variant="body">No request found.</Typography>
+              <Typography variant="body">No data found.</Typography>
             </TableCell>
           </TableRow>
         )}
@@ -245,12 +245,17 @@ export default function SettlementTableView() {
     );
   }
   if (isError) {
-    console.log(error);
+    console.error(error);
     content = (
       <TableBody>
         <TableRow>
-          <TableCell>
-            <ErrorBlock message="An Error occured on pending Request" />
+          <TableCell
+            colSpan={8}
+            sx={{
+              textAlign: 'center',
+            }}
+          >
+            <ErrorBlock message="An Error has occured" />
           </TableCell>
         </TableRow>
       </TableBody>

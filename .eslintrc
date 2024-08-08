@@ -4,17 +4,8 @@
     "browser": true,
     "es2021": true
   },
-
-  "plugins": [
-    // "perfectionist",
-    "unused-imports",
-    "prettier"
-  ],
-  "extends": [
-    "airbnb",
-    "airbnb/hooks",
-    "prettier"
-  ],
+  "plugins": ["unused-imports", "prettier"],
+  "extends": ["airbnb", "airbnb/hooks", "prettier"],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module",
@@ -28,17 +19,11 @@
     },
     "import/resolver": {
       "alias": {
-        "map": [
-          [
-            "src",
-            "./src"
-          ]
-        ],
-        "extensions": [
-          ".js",
-          ".jsx",
-          ".json"
-        ]
+        "map": [["src", "./src"]],
+        "extensions": [".js", ".jsx", ".json", ".ts", ".tsx"]
+      },
+      "node": {
+        "extensions": [".js", ".jsx", ".json", ".ts", ".tsx"]
       }
     }
   },
@@ -83,12 +68,7 @@
         "allowAsProps": true
       }
     ],
-    "no-unused-vars": [
-      1,
-      {
-        "args": "none"
-      }
-    ],
+    "no-unused-vars": 0,
     "react/jsx-no-duplicate-props": [
       1,
       {
@@ -103,8 +83,6 @@
         "peerDependencies": false
       }
     ],
-    // unused-imports
-    // https://www.npmjs.com/package/eslint-plugin-unused-imports
     "unused-imports/no-unused-imports": 1,
     "unused-imports/no-unused-vars": [
       0,
@@ -115,72 +93,5 @@
         "argsIgnorePattern": "^_"
       }
     ]
-    // perfectionist
-    // https://eslint-plugin-perfectionist.azat.io/
-    // "perfectionist/sort-named-imports": [
-    //   1,
-    //   {
-    //     "order": "asc",
-    //     "type": "line-length"
-    //   }
-    // ]
-    // ,
-    // "perfectionist/sort-named-exports": [
-    //   1,
-    //   {
-    //     "order": "asc",
-    //     "type": "line-length"
-    //   }
-    // ],
-    // "perfectionist/sort-exports": [
-    //   1,
-    //   {
-    //     "order": "asc",
-    //     "type": "line-length"
-    //   }
-    // ],
-    // "perfectionist/sort-imports": [
-    //   1,
-    //   {
-    //     "order": "asc",
-    //     "type": "line-length",
-    //     "newlines-between": "always",
-    //     "groups": [
-    //       [
-    //         "builtin",
-    //         "external"
-    //       ],
-    //       "custom-mui",
-    //       "custom-routes",
-    //       "custom-hooks",
-    //       "custom-utils",
-    //       "internal",
-    //       "custom-components",
-    //       "custom-sections",
-    //       "custom-types",
-    //       [
-    //         "parent",
-    //         "sibling",
-    //         "index"
-    //       ],
-    //       "object",
-    //       "unknown"
-    //     ],
-    //     "custom-groups": {
-    //       "value": {
-    //         "custom-mui": "@mui/**",
-    //         "custom-routes": "src/routes/**",
-    //         "custom-hooks": "src/hooks/**",
-    //         "custom-utils": "src/utils/**",
-    //         "custom-components": "src/components/**",
-    //         "custom-sections": "src/sections/**",
-    //         "custom-types": "src/types/**"
-    //       }
-    //     },
-    //     "internal-pattern": [
-    //       "src/**"
-    //     ]
-    //   }
-    // ]
   }
 }

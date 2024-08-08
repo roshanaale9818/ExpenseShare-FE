@@ -27,3 +27,16 @@ export async function getAccepetedExpense({ page, limit, groupId }) {
   const resData = await response.data;
   return resData;
 }
+
+export async function getSettlement({ page, limit }) {
+  const response = await _http.get(`${APIURL}settlement?page=${page}&limit=${limit}`);
+  if (!response.status === 200) {
+    const error = new Error('An error occurred while trying to create');
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+
+  const resData = await response.data;
+  return resData;
+}

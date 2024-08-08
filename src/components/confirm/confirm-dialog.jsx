@@ -8,8 +8,6 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 
-
-
 export default function ConfirmDialog({
   title,
   description,
@@ -20,16 +18,15 @@ export default function ConfirmDialog({
   children,
   sx,
   label,
-  color="error",
+  color = 'error',
   variant,
-  buttonSize
+  buttonSize,
 }) {
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
     setOpen(true);
   };
-
 
   const handleClose = () => {
     setOpen(false);
@@ -57,8 +54,14 @@ export default function ConfirmDialog({
   };
   return (
     <>
-      <Button color={color} variant={variant?'outlined':'text'} size={buttonSize} onClick={handleClickOpen} sx={sx}>
-        {label && label} {!label &&'Logout'}
+      <Button
+        color={color}
+        variant={variant ? 'outlined' : 'text'}
+        size={buttonSize}
+        onClick={handleClickOpen}
+        sx={sx}
+      >
+        {label && label} {!label && 'Logout'}
       </Button>
 
       <Dialog
@@ -72,10 +75,10 @@ export default function ConfirmDialog({
           <DialogContentText id="alert-dialog-slide-description">{contentDesc}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button variant="outlined" onClick={onCancelHandler}>
+          <Button variant="outlined" onClick={onCancelHandler} color="error">
             Cancel
           </Button>
-          <Button onClick={onConfirmHandler} variant="outlined" color="error">
+          <Button onClick={onConfirmHandler} variant="outlined">
             Yes
           </Button>
         </DialogActions>
@@ -90,12 +93,10 @@ ConfirmDialog.propTypes = {
   data: PropTypes.object,
   onCanceled: PropTypes.func,
   onConfirmed: PropTypes.func,
-  children:PropTypes.node,
-  sx:PropTypes.object,
-  label:PropTypes.string,
-  color:PropTypes.string,
-  variant:PropTypes.string,
-  buttonSize:PropTypes.string
-
-
+  children: PropTypes.node,
+  sx: PropTypes.object,
+  label: PropTypes.string,
+  color: PropTypes.string,
+  variant: PropTypes.string,
+  buttonSize: PropTypes.string,
 };

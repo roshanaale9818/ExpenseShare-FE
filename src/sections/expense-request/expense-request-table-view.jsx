@@ -26,8 +26,10 @@ import Pagination from '@mui/material/Pagination';
 import Alert from '@mui/material/Alert';
 import { getTwoDigitNumber } from 'src/utils/format-number';
 import ConfirmDialog from 'src/components/confirm/confirm-dialog';
-import { getFormatedDate, SettlementStatus } from 'src/utils/helper';
+import { getFormatedDate, SettlementStatus, stringAvatar } from 'src/utils/helper';
 import ViewDialog from 'src/components/view-dialog/view.dialog';
+import Avatar from '@mui/material/Avatar';
+import Tooltip from '@mui/material/Tooltip';
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -159,8 +161,10 @@ function Row(props) {
           </Typography>
         </TableCell>
         <TableCell>{row.description}</TableCell>
-        <TableCell>
-          {row.addedBy}
+        <TableCell sx={{ cursor: 'pointer' }}>
+          <Tooltip title={`${row.addedBy}`}>
+            <Avatar {...stringAvatar(`${row.addedBy}`)} />
+          </Tooltip>
           {/* {row.status} */}
         </TableCell>
 
@@ -304,7 +308,7 @@ export default function ExpenseRequestTableView() {
             <TableCell>Associated Group</TableCell>
             <TableCell>Amount</TableCell>
             <TableCell>Description</TableCell>
-            <TableCell align="right">Added By </TableCell>
+            <TableCell>Added By </TableCell>
             <TableCell align="right">Action</TableCell>
             <TableCell align="right"> </TableCell>
           </TableRow>

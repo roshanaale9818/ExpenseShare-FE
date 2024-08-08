@@ -45,8 +45,6 @@ function Row(props) {
         showSnackbar('Expense cannot be changed.', 'error');
         return;
       }
-      // if this is still editable
-      // pass the data into the parent
       onEdit(data);
       handleCloseMenu();
     } catch (err) {

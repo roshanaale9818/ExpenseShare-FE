@@ -25,3 +25,18 @@
 .text-white {
   color: #fff;
 }
+.mb-10 {
+  margin-bottom: 10px;
+}
+.p-10 {
+  padding: 10px;
+}
+.bg-white2 {
+  background-color: #eee;
+}
+.pt-10 {
+  padding-top: 10px;
+}
+.pb-10 {
+  padding-bottom: 10px;
+}

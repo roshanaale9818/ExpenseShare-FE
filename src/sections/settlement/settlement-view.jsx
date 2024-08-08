@@ -46,8 +46,6 @@ export default function SettlementView() {
     initialValues,
     validationSchema: schema,
     onSubmit: (values) => {
-      console.log('navigating to preview');
-      console.log('values', navigate, values);
       navigate(`/auth/settlement/${values.group}/preview?groupName=`);
     },
   });

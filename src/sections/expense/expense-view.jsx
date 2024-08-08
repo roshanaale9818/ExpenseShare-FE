@@ -90,10 +90,6 @@ export default function ExpenseView() {
     }
     return response;
   };
-  // const editExpense = async (values) => {
-  //   const response = await ExpenseService.editExpense(values);
-  //   return response;
-  // };
   const { mutate: expenseMutate } = useMutation({
     mutationFn: addExpenseHandler,
     onSuccess: () => {
@@ -239,9 +235,6 @@ export default function ExpenseView() {
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      {/* <MenuItem value={10}>Sydney Ghar</MenuItem>
-                      <MenuItem value={20}>South Windsor</MenuItem>
-                      <MenuItem value={30}>Parramatta Campus Guys</MenuItem> */}
                       {groups &&
                         groups.map((row, index) => (
                           <MenuItem key={row.id} value={row.id}>
