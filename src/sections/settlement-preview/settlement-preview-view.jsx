@@ -386,7 +386,6 @@ const GroupMemberExpense = ({ memberList }) => {
     queryKey: ['settlementpreview'],
     queryFn: getAcceptedExpense,
   });
-  console.log(data);
   return (
     <TableContainer component={Paper}>
       <Table aria-label="collapsible table">
@@ -448,12 +447,15 @@ const GroupMemberExpense = ({ memberList }) => {
               </TableRow>
             ))}
 
-          {data.length === 0 && (
+          {data && data.data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={6} align="center">
                 <Typography variant="body">No data found.</Typography>
               </TableCell>
             </TableRow>
+          ) : (
+            // eslint-disable-next-line react/jsx-no-useless-fragment
+            <></>
           )}
         </TableBody>
       </Table>
