@@ -21,7 +21,7 @@ import { attachToken } from 'src/utils/http';
 
 import { authActions } from 'src/store';
 
-import CopyRight from 'src/components/copyright/CopyRight';
+import CopyRight, { ForgotPasswordSection } from 'src/components/copyright/CopyRight';
 
 import * as loginService from '../../services/auth.service';
 
@@ -184,6 +184,8 @@ export default function SignInView() {
                   </Link>
                 </Grid>
               </Grid>
+
+              <ForgotPasswordSection sx={{ mt: 1 }} />
               <CopyRight sx={{ mt: 5 }} />
             </Box>
           </Box>

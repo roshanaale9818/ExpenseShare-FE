@@ -21,6 +21,7 @@ export const GroupDetailPage = lazy(() => import('src/pages/group-detail'));
 export const GroupExpenseDetailPage = lazy(() => import('src/pages/group-expense'));
 export const SettlementPage = lazy(() => import('src/pages/settlement'));
 export const SettlemetPreviewPage = lazy(() => import('src/pages/settlement-preview'));
+export const RequestResetPasswordPage = lazy(() => import('src/pages/request-reset-password'));
 
 // ----------------------------------------------------------------------
 
@@ -76,6 +77,10 @@ export default function Router() {
         {
           path: 'signup',
           element: <SignUpPage />,
+        },
+        {
+          path: 'request-reset-password',
+          element: <RequestResetPasswordPage />,
         },
         {
           path: '404',
