@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppContext } from 'src/providers/AppReducer';
 
 import Box from '@mui/material/Box';
@@ -17,26 +17,30 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-// import { attachToken } from 'src/utils/http';
-
-// import { authActions } from 'src/store';
-
 import CopyRight from 'src/components/copyright/CopyRight';
 
 import * as loginService from '../../services/auth.service';
+import { NotFoundView } from '../error';
 
 const schema = yup.object({
-  email: yup.string('Enter your email').email('Enter a valid email').required('Email is required'),
+  password: yup.string('').required('Password is required'),
+  confirmPassword: yup
+    .string('')
+    .oneOf([yup.ref('password')], 'Passwords does not match')
+    .required('Confirm password is required'),
 });
 const initialValues = {
-  email: 'email@example.com',
+  password: '',
+  confirmPassword: '',
 };
 
 const defaultTheme = createTheme();
 
-export default function RequestResetPasswordView() {
+export default function ResetPasswordView() {
   const { showSnackbar } = useAppContext();
-
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('key');
+  console.log(token);
   const [isLoading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const formik = useFormik({
@@ -82,6 +86,10 @@ export default function RequestResetPasswordView() {
       setLoading(false);
     }
   };
+
+  if (!token) {
+    return <NotFoundView />;
+  }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -138,16 +146,33 @@ export default function RequestResetPasswordView() {
                   margin="normal"
                   required
                   fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
+                  id="password"
+                  label="Password"
+                  name="password"
+                  type="password"
+                  autoComplete="password"
                   autoFocus
-                  value={formik.values.email}
+                  value={formik.values.password}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
-                  error={formik.touched.email && Boolean(formik.errors.email)}
-                  helperText={formik.touched.email && formik.errors.email}
+                  error={formik.touched.password && Boolean(formik.errors.password)}
+                  helperText={formik.touched.password && formik.errors.password}
+                />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="confirmPassword"
+                  type="password"
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  autoComplete="confirmPassword"
+                  autoFocus
+                  value={formik.values.confirmPassword}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                  helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                 />
 
                 <Box>

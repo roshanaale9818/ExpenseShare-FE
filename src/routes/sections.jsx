@@ -4,6 +4,7 @@ import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 
 import DashboardLayout from 'src/layouts/dashboard';
 
+import { ResetPasswordPage } from 'src/pages/request-reset-password';
 import CustomMain from './custom.main';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
@@ -81,6 +82,10 @@ export default function Router() {
         {
           path: 'request-reset-password',
           element: <RequestResetPasswordPage />,
+        },
+        {
+          path: 'reset-password',
+          element: <ResetPasswordPage />,
         },
         {
           path: '404',

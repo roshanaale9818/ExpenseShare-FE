@@ -1,9 +1,10 @@
 import { Helmet } from 'react-helmet-async';
 import { RequestResetPasswordView } from 'src/sections/reset-password';
+import ResetPasswordView from 'src/sections/reset-password/reset-password';
 
 // ----------------------------------------------------------------------
 
-export default function ResetPasswordPage() {
+export default function RequestResetPasswordPage() {
   return (
     <>
       <Helmet>
@@ -11,6 +12,18 @@ export default function ResetPasswordPage() {
       </Helmet>
 
       <RequestResetPasswordView />
+    </>
+  );
+}
+
+export function ResetPasswordPage() {
+  return (
+    <>
+      <Helmet>
+        <title> Reset password | Expense Share </title>
+      </Helmet>
+
+      <ResetPasswordView />
     </>
   );
 }
