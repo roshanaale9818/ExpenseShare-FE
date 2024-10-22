@@ -47,3 +47,21 @@ export async function sendPasswordResetEmail(email) {
   const resData = await response.data;
   return resData;
 }
+export async function resetPassword(email, token, password) {
+  const data = {
+    email,
+    token,
+    password,
+  };
+  const response = await _http.post(`${APIURL}user/auth/reset-password`, data);
+
+  if (!response.status === 200) {
+    const error = new Error('An error occurred while trying to login');
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+
+  const resData = await response.data;
+  return resData;
+}

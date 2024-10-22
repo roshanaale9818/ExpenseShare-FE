@@ -21,9 +21,17 @@ import CopyRight from 'src/components/copyright/CopyRight';
 
 import * as loginService from '../../services/auth.service';
 import { NotFoundView } from '../error';
+import { getCharacterValidationError } from '../user/utils';
 
 const schema = yup.object({
-  password: yup.string('').required('Password is required'),
+  password: yup
+    .string('Enter your password')
+    .min(8, 'Password should be of minimum 8 characters length')
+    .required('Password is required')
+    // different error messages for different requirements
+    .matches(/[0-9]/, getCharacterValidationError('digit'))
+    .matches(/[a-z]/, getCharacterValidationError('lowercase'))
+    .matches(/[A-Z]/, getCharacterValidationError('uppercase')),
   confirmPassword: yup
     .string('')
     .oneOf([yup.ref('password')], 'Passwords does not match')
@@ -40,7 +48,7 @@ export default function ResetPasswordView() {
   const { showSnackbar } = useAppContext();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('key');
-  console.log(token);
+  const emailId = searchParams.get('email');
   const [isLoading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null);
   const formik = useFormik({
@@ -52,16 +60,15 @@ export default function ResetPasswordView() {
         return;
       }
       setLoading(true);
-      loginHandler(values);
+      formSubmitHandler(values);
     },
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const loginHandler = async (formData) => {
+  const formSubmitHandler = async (formData) => {
     try {
       setLoading(true);
-      const response = await loginService.sendPasswordResetEmail(formData.email);
-      // console.log('Received', response);
+      const response = await loginService.resetPassword(emailId, token, formData.password);
       // success login
       if (response.status === 'ok') {
         setErrorMessage(null);
@@ -191,7 +198,7 @@ export default function ResetPasswordView() {
                   sx={{ mt: 3, mb: 2 }}
                   // onClick={handleClick}
                 >
-                  Send Email
+                  Save
                 </LoadingButton>
                 <Grid container>
                   <Grid item xs>

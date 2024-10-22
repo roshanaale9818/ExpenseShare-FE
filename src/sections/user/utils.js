@@ -54,3 +54,11 @@ export function applyFilter({ inputData, comparator, filterName }) {
 
   return inputData;
 }
+
+export const getCharacterValidationError = (str) => {
+  if (!str) {
+    return '';
+  }
+  const msg = `Your password must have at least 1 ${str} character`;
+  return msg;
+};

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from 'src/providers/AppReducer';
 
-
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
@@ -90,7 +89,6 @@ export default function SignUpView() {
 
   const { showSnackbar } = useAppContext();
 
-
   const submitHandler = async (formData) => {
     try {
       setLoading(true);
@@ -102,10 +100,10 @@ export default function SignUpView() {
         setLoading(false);
         formik.resetForm();
         // show alert
-        showSnackbar(response.message)
+        showSnackbar(response.message);
       }
     } catch (err) {
-      console.error('An error has occured while signing up', err,err.response);
+      console.error('An error has occured while signing up', err, err.response);
       const { response } = err;
       setLoading(false);
       setResultType('error');
@@ -113,7 +111,7 @@ export default function SignUpView() {
         setResMessage(response.data.errors[0]); // show one error at a time
 
         // show alert
-        showSnackbar(response.data.errors[0],'error')
+        showSnackbar(response.data.errors[0], 'error');
       }
     }
   };
