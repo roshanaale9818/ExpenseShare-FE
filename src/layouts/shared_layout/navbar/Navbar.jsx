@@ -64,7 +64,6 @@ export default function Navbar() {
   };
   const navigate = useNavigate();
   const onNavitemClicked = (route) => {
-    console.log(route);
     setAnchorElNav(null);
     navigate(route.url);
   };

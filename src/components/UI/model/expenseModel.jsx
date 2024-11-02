@@ -31,7 +31,7 @@ export default function ExpenseModel(props) {
     group: yup.string('Enter Group').required('Group is required.'),
     id: yup.string(),
   });
-  console.log(data);
+
   const initialValues = {
     expenseTitle: data && data.title ? data.title : '',
     amount: data && data.amount ? data.amount : 0,

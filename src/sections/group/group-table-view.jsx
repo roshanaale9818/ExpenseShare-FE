@@ -236,7 +236,7 @@ export default function GroupTableView(props) {
     // hideLoading()
     content = (
       <TableBody>
-        (<ErrorBlock message={error} />)
+        <ErrorBlock message={error} />
       </TableBody>
     );
     // hideLoading();

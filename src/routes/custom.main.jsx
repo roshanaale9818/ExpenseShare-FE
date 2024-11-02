@@ -6,6 +6,7 @@ import Footer from 'src/layouts/shared_layout/footer/footer';
 
 export default function CustomMain() {
   const outlet = useOutlet();
+
   return (
     <div className="site-wrapper">
       <div className="top-wrap">

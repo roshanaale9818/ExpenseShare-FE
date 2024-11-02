@@ -61,10 +61,17 @@ export function stringToColor(string) {
 }
 
 export function stringAvatar(name) {
-  return {
-    sx: {
-      bgcolor: stringToColor(name),
-    },
-    children: `${name.split(' ')[0][0].toUpperCase()}${name.split(' ')[1][0]}`,
-  };
+  try {
+    if (!name) {
+      return '';
+    }
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+      children: `${name.split(' ')[0][0].toUpperCase()}${name.split(' ')[1][0]}`,
+    };
+  } catch (er) {
+    return '';
+  }
 }
