@@ -37,7 +37,7 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-export default function GroupMemberView({ groupMembers, isAdmin }) {
+export default function GroupMemberView({ groupMembers, isAdmin, onAddMember }) {
   const params = useParams();
   const { groupId } = params;
   const [isOpen, setOpen] = useState(false);
@@ -137,10 +137,11 @@ export default function GroupMemberView({ groupMembers, isAdmin }) {
         name="Group Members"
         sx={{ fontSize: '16px' }}
         // hideNewButton={}
-        labelForNewButton="Add Members"
+        labelForNewButton="Add Member"
         hideIcon={hideIcon}
         hideBtn={hideIcon}
         onNewClick={() => {
+          onAddMember();
           // addGroup();
           // navigate(`/auth/group/${groupId}/expense?groupName=${'s'}`);
         }}
@@ -202,4 +203,5 @@ export default function GroupMemberView({ groupMembers, isAdmin }) {
 GroupMemberView.propTypes = {
   groupMembers: PropTypes.array,
   isAdmin: PropTypes.string,
+  onAddMember: PropTypes.func,
 };

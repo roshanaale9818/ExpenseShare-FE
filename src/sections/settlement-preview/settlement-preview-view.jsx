@@ -217,7 +217,7 @@ export default function SettlementPreview() {
           }}
         />
         <GroupMemberExpense memberList={['roshan', 'sds']} />
-        <TotalExpenseSections totalExpense={2000} />
+        <TotalExpenseSections totalExpense={999} />
       </Container>
     </section>
   );
@@ -399,9 +399,6 @@ const GroupMemberExpense = ({ memberList }) => {
             <TableCell width={200} align="right">
               Total Owe
             </TableCell>
-            {/* <TableCell width={200} align="right">
-              Action
-            </TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -441,9 +438,6 @@ const GroupMemberExpense = ({ memberList }) => {
                     {getTwoDigitNumber(row.amount)}
                   </Typography>
                 </TableCell>
-                {/* <TableCell align="right">
-                  <Button variant="outlined"> View </Button>
-                </TableCell> */}
               </TableRow>
             ))}
 

@@ -61,6 +61,7 @@ export default function GroupDetailView() {
   const [validEmail, setValidEmail] = useState(true);
   const [isOpen, setOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [userExist, setUserExist] = useState(true);
 
   const [openConfirm, setOpenConfirm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -88,7 +89,9 @@ export default function GroupDetailView() {
     const { status, data } = response;
     if (status === 'ok' && data) {
       setRows(data);
+      setUserExist(data.length > 0);
     } else {
+      setUserExist(false);
       setRows([]);
     }
   };
@@ -113,6 +116,10 @@ export default function GroupDetailView() {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const onAddMember = () => {
+    onNewClicked();
+  };
   const handleConfirm = async (action, email) => {
     if (action === 'cancel') {
       setOpenConfirm(false);
@@ -135,7 +142,21 @@ export default function GroupDetailView() {
   const onNewClicked = () => {
     setOpen(true);
     setRows([]);
+    setUserExist(true);
     setSearchTerm('');
+  };
+
+  const inviteNewUserHandler = async () => {
+    try {
+      const response = await GroupService.inviteUserToGroup(searchTerm, groupId);
+      // console.log('response', response);
+      if (response.status === 'ok') {
+        showSnackbar('Your invitation has been successfully sent!');
+      }
+    } catch (err) {
+      showSnackbar('Something went wrong while inviting. please try again later.', 'error');
+      console.error(err);
+    }
   };
   const hideBtn = false;
   const params = useParams();
@@ -219,7 +240,7 @@ export default function GroupDetailView() {
                     required
                     id="outlined-required"
                     label="Email"
-                    defaultValue="youremail@something.com"
+                    defaultValue="email"
                     onChange={handleSearchChange}
                     helperText={!validEmail && 'Enter a valid email'}
                     error={!validEmail}
@@ -228,6 +249,18 @@ export default function GroupDetailView() {
               </Box>
             </DialogContent>
             <DialogActions>
+              {/* if user is not found invite the new member  */}
+              {!userExist && (
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => {
+                    inviteNewUserHandler();
+                  }}
+                >
+                  Invite
+                </Button>
+              )}
               <Button
                 variant="contained"
                 color="error"
@@ -445,7 +478,11 @@ export default function GroupDetailView() {
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <Card sx={{ padding: 2 }}>
-                <GroupMemberView groupMembers={data.data.Members} isAdmin={data.data.isAdmin} />
+                <GroupMemberView
+                  groupMembers={data.data.Members}
+                  isAdmin={data.data.isAdmin}
+                  onAddMember={onAddMember}
+                />
               </Card>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
