@@ -136,12 +136,13 @@ export default function GroupMemberView({ groupMembers, isAdmin }) {
       <PageHeadView
         name="Group Members"
         sx={{ fontSize: '16px' }}
-        hideNewButton={false}
-        labelForNewButton="View All"
+        // hideNewButton={}
+        labelForNewButton="Add Members"
         hideIcon={hideIcon}
         hideBtn={hideIcon}
         onNewClick={() => {
-          navigate(`/auth/group/${groupId}/expense?groupName=${'s'}`);
+          // addGroup();
+          // navigate(`/auth/group/${groupId}/expense?groupName=${'s'}`);
         }}
       />
 

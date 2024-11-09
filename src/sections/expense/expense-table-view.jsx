@@ -25,6 +25,7 @@ import { useNavigate } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
 import { getTwoDigitNumber } from 'src/utils/format-number';
 import { SettlementStatus } from 'src/utils/helper';
+import { formatDateString } from 'src/utils/format-time';
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -129,6 +130,8 @@ function Row(props) {
         <TableCell>
           <Label color={getStatusLabel(row.status)}>{row.status}</Label>
         </TableCell>
+
+        <TableCell>{formatDateString(row.createdAt)}</TableCell>
 
         <TableCell align="right">
           {row.status === SettlementStatus.PENDING && (
@@ -280,6 +283,7 @@ export default function ExpenseTableView({ onEdit }) {
             <TableCell>Associated Group</TableCell>
             <TableCell>Amount</TableCell>
             <TableCell> Status</TableCell>
+            <TableCell>Created At </TableCell>
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>

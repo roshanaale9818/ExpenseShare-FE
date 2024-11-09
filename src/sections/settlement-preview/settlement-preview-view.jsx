@@ -399,15 +399,15 @@ const GroupMemberExpense = ({ memberList }) => {
             <TableCell width={200} align="right">
               Total Owe
             </TableCell>
-            <TableCell width={200} align="right">
+            {/* <TableCell width={200} align="right">
               Action
-            </TableCell>
+            </TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
           {data &&
             data.data.map((row, index) => (
-              <TableRow>
+              <TableRow key={index + 2}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell
                   sx={{
@@ -441,9 +441,9 @@ const GroupMemberExpense = ({ memberList }) => {
                     {getTwoDigitNumber(row.amount)}
                   </Typography>
                 </TableCell>
-                <TableCell align="right">
+                {/* <TableCell align="right">
                   <Button variant="outlined"> View </Button>
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             ))}
 

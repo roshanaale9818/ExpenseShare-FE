@@ -69,7 +69,6 @@ export default function GroupDetailView() {
   // Function to handle the search input change
   const handleSearchChange = (event) => {
     const { value } = event.target;
-    // setSearchTerm(value);
     // Start a timer to execute search after 3000ms
     debounceSearch(value);
   };
@@ -92,8 +91,6 @@ export default function GroupDetailView() {
     } else {
       setRows([]);
     }
-
-    console.log('response', response);
   };
 
   // Function to perform search operation
@@ -102,7 +99,6 @@ export default function GroupDetailView() {
       return;
     }
     // Perform your search operation here
-    console.log('Searching for:', term);
     if (term.includes('@')) {
       setSearchTerm(term);
       setValidEmail(true);
@@ -163,7 +159,6 @@ export default function GroupDetailView() {
   const { mutate } = useMutation({
     mutationFn: addGroupMember,
     onSuccess: async () => {
-      // console.log("on success is called")
       queryClient.invalidateQueries({
         queryKey: ['group', groupId],
       });
@@ -186,10 +181,9 @@ export default function GroupDetailView() {
   };
 
   if (isError) {
-    console.log('Error', errorObject);
     content = (
       <Container>
-        <ErrorBlock message={errorObject.response.data.message} />
+        <ErrorBlock message={errorObject.response.data.message || 'An error has occured.'} />
       </Container>
     );
   }
@@ -298,6 +292,7 @@ export default function GroupDetailView() {
           </Dialog>
         </Container>
         {/* dialog content ends  */}
+
         {/* confirm dialog start here  */}
         <Container>
           <Dialog
