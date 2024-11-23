@@ -38,40 +38,42 @@ const _http = axios.create({
   },
 });
 
-_http.interceptors.response.use(
-  (response) => {
-    console.log('Response logging', response);
-    return response;
-  },
-  (error) => {
-    console.log(error);
-    console.log('this is an error', error.response.status);
-    // const { showSnackBar } = useAppContext();
-    const { status } = error.response;
-    let errorMessage = 'An unexpected error occurred.';
-    switch (status) {
-      case 400:
-        errorMessage = 'Bad Request. Please check your input.';
-        break;
-      case 401:
-        errorMessage = 'Unauthorized. Please log in again.';
-        break;
-      case 404:
-        errorMessage = 'Not Found. The requested resource could not be found.';
-        break;
-      case 500:
-        errorMessage = 'Internal Server Error. Please try again later.';
-        break;
-      default:
-        errorMessage = 'An error occurred. Please try again.';
-        break;
-    }
-    // showSnackBar(errorMessage, 'error');
-    // alert('Your session has timed out. Please sign in again to continue.');
-    // localStorage.clear();
-    return Promise.reject(error);
-  }
-);
+// _http.interceptors.response.use(
+//   (response) => {
+//     console.log('Response logging', response);
+//     return response;
+//   },
+//   (error) => {
+//     console.log(error);
+//     console.log('this is an error', error.response.status);
+
+//     // Accessing the context
+//     // const { setError } = useInterceptor(); // Get setError from context
+//     // const { status } = error.response;
+//     let errorMessage = 'An unexpected error occurred.';
+
+//     switch (error.response.status) {
+//       case 400:
+//         errorMessage = 'Bad Request. Please check your input.';
+//         // setError(true, errorMessage);
+//         console.log(' I HAVE AN ERROR', errorMessage);
+//         break;
+//       case 401:
+//         errorMessage = 'Unauthorized. Please log in again.';
+//         break;
+//       case 404:
+//         errorMessage = 'Not Found. The requested resource could not be found.';
+//         break;
+//       case 500:
+//         errorMessage = 'Internal Server Error. Please try again later.';
+//         break;
+//       default:
+//         errorMessage = 'An error occurred. Please try again.';
+//         break;
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 export function attachToken() {
   try {
@@ -90,6 +92,71 @@ export function attachToken() {
 export default _http;
 export { getUserId, getToken };
 
-// export const setShowSnackBar = (snackBarFunction) => {
-//   showSnackBar = snackBarFunction; // Set the function to the variable
-// };
+// Axios Interceptor
+export const setAxiosErrorHandler = (errorHandler) => {
+  const ignoredEndpoints = ['/signin', '/login']; // Endpoints to be ignored
+
+  // Request Interceptor
+  _http.interceptors.request.use(
+    (config) => {
+      // Check if the request URL matches any ignored endpoint
+      if (!ignoredEndpoints.some((endpoint) => config.url.includes(endpoint))) {
+        // Perform any operations for non-ignored endpoints
+        // Example: Show a loading indicator
+        console.log('Request made to:', config.url);
+      }
+      return config; // Always return the config
+    },
+    (error) => {
+      console.error('Request error:', error);
+      return Promise.reject(error);
+    }
+  );
+
+  // Response Interceptor
+  _http.interceptors.response.use(
+    (response) => {
+      // Check if the request URL matches any ignored endpoint
+      if (!ignoredEndpoints.some((endpoint) => response.config.url.includes(endpoint))) {
+        console.log('Response received from:', response.config.url);
+      }
+      return response; // Return the response as is
+    },
+    (error) => {
+      const requestUrl = error.response?.config?.url || '';
+      const { status } = error.response || {};
+      let errorMessage = 'An unexpected error occurred.';
+
+      // Skip error handling for ignored endpoints
+      if (ignoredEndpoints.some((endpoint) => requestUrl.includes(endpoint))) {
+        return Promise.reject(error); // Simply reject the error
+      }
+
+      // Handle errors for other endpoints
+      switch (status) {
+        case 400:
+          errorMessage = 'Bad Request. Please check your input.';
+          break;
+        case 401:
+          errorMessage = 'Unauthorized. Please log in again.';
+          break;
+        case 404:
+          errorMessage = 'Not Found. The requested resource could not be found.';
+          break;
+        case 500:
+          errorMessage = 'Internal Server Error. Please try again later.';
+          break;
+        default:
+          errorMessage = 'An error occurred. Please try again.';
+          break;
+      }
+
+      // Call the error handler passed as a parameter
+      if (errorHandler) {
+        errorHandler(true, errorMessage); // Set error state in component
+      }
+
+      return Promise.reject(error); // Reject the error
+    }
+  );
+};

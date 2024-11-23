@@ -210,7 +210,6 @@ export default function SettlementPreview() {
         <Heading title="Group Members" />
         <MembersBlock
           onSelection={(memberList) => {
-            console.log(memberList);
             if (!memberList || memberList.length === 0) {
               showSnackbar('Members cannot be empty.', 'error');
             }
@@ -394,11 +393,11 @@ const GroupMemberExpense = ({ memberList }) => {
             <TableCell width={10}>S.N</TableCell>
             <TableCell width={200}>Name</TableCell>
             <TableCell width={200} align="right">
-              Total Paid
+              Total Expense
             </TableCell>
-            <TableCell width={200} align="right">
+            {/* <TableCell width={200} align="right">
               Total Owe
-            </TableCell>
+            </TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -410,20 +409,22 @@ const GroupMemberExpense = ({ memberList }) => {
                   sx={{
                     cursor: 'pointer',
                     display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    justifyContent: 'left',
+                    alignItems: 'left',
                     gap: 2,
                   }}
                 >
                   <Tooltip
                     sx={{ marginRight: '10px' }}
-                    title={`${row.Member.user.firstName} ${row.Member.user.lastName}`}
+                    title={`${row.Member.userDetails.firstName} ${row.Member.userDetails.lastName}`}
                   >
                     <Avatar
-                      {...stringAvatar(`${row.Member.user.firstName} ${row.Member.user.lastName}`)}
+                      {...stringAvatar(
+                        `${row.Member.userDetails.firstName} ${row.Member.userDetails.lastName}`
+                      )}
                     />
                   </Tooltip>
-                  <span>{`${row.Member.user.firstName} ${row.Member.user.lastName}`}</span>
+                  <span className="mt-1">{`${row.Member.userDetails.firstName} ${row.Member.userDetails.lastName}`}</span>
                 </TableCell>
                 <TableCell align="right">
                   {' '}
@@ -432,12 +433,12 @@ const GroupMemberExpense = ({ memberList }) => {
                     {getTwoDigitNumber(row.amount)}
                   </Typography>
                 </TableCell>
-                <TableCell align="right">
+                {/* <TableCell align="right">
                   $AUD{' '}
                   <Typography sx={{ fontWeight: 'bold', typography: 'body' }}>
                     {getTwoDigitNumber(row.amount)}
                   </Typography>
-                </TableCell>
+                </TableCell> */}
               </TableRow>
             ))}
 

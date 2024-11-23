@@ -88,8 +88,12 @@ function Row(props) {
         </TableCell>
         <TableCell>{row.description}</TableCell>
         <TableCell sx={{ cursor: 'pointer', padding: '0px' }}>
-          <Tooltip title={`${row.Member.user.firstName} ${row.Member.user.lastName}`}>
-            <Avatar {...stringAvatar(`${row.Member.user.firstName} ${row.Member.user.lastName}`)} />
+          <Tooltip title={`${row.Member.userDetails.firstName} ${row.Member.userDetails.lastName}`}>
+            <Avatar
+              {...stringAvatar(
+                `${row.Member.userDetails.firstName} ${row.Member.userDetails.lastName}`
+              )}
+            />
           </Tooltip>
         </TableCell>
         <TableCell>
