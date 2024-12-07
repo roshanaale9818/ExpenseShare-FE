@@ -1,6 +1,6 @@
 import Container from '@mui/material/Container';
 import { PageHeadView } from 'src/components/page-head';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -10,6 +10,8 @@ import * as GroupService from 'src/services/group.service';
 import LoadingButton from '@mui/lab/LoadingButton';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 import MenuItem from '@mui/material/MenuItem';
 import Grid from '@mui/material/Grid';
 import FormControl from '@mui/material/FormControl';
@@ -17,7 +19,6 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
-import DialogContent from '@mui/material/DialogContent';
 import Alert from '@mui/material/Alert';
 import Chip from '@mui/material/Chip';
 import { useTheme } from '@mui/material/styles';
@@ -32,11 +33,12 @@ import { getTwoDigitNumber } from 'src/utils/format-number';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import { stringAvatar } from 'src/utils/helper';
+// import Badge from '@mui/material/Badge';
 
 import { useAppContext } from 'src/providers/AppReducer';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import * as settlementService from 'src/services/settlement.service';
@@ -44,6 +46,12 @@ import SettlementTableView from './settlement-preview-table-view';
 
 export default function SettlementPreview() {
   const { showSnackbar } = useAppContext();
+  const [totalExpense, setTotalExpense] = useState(0); // Manage total expense in parent
+
+  const handleTotalExpenseUpdate = (newTotalExpense) => {
+    setTotalExpense(newTotalExpense); // Update total expense from child
+  };
+  const [expenseData, setExpenseData] = useState([]);
   const groups = [];
   const params = useParams();
   const { groupId } = params;
@@ -61,6 +69,7 @@ export default function SettlementPreview() {
     onSubmit: (values) => {},
   });
   const [isOpen, setOpen] = useState(false);
+  const [open, setOpenDialog] = useState(false);
   let group = '';
   const [isLoading, setIsLoading] = useState(false);
 
@@ -68,6 +77,7 @@ export default function SettlementPreview() {
     if (reason && reason === 'backdropClick') return;
     setOpen(false);
   };
+  const navigate = useNavigate();
 
   const getExpenses = async (_data, _page = 1, _limit = 10) => {
     setIsLoading(true);
@@ -125,6 +135,7 @@ export default function SettlementPreview() {
       <PageHeadView
         name={`Settlement Preview For ${group ? group.Group.groupName : 'Group'}`}
         hideNewButton={hideBtn}
+        className="h1"
       />
       <Container>
         <Typography variant="h5" sx={{ marginBottom: '10px', textAlign: 'right' }}>
@@ -207,16 +218,78 @@ export default function SettlementPreview() {
         </Box>
         <Heading title="Expenses" />
         <SettlementTableView onEdit={onExpenseEditHandler} />
-        <Heading title="Group Members" />
-        <MembersBlock
-          onSelection={(memberList) => {
-            if (!memberList || memberList.length === 0) {
-              showSnackbar('Members cannot be empty.', 'error');
-            }
+        <Heading title="Group Members Expense" />
+        <GroupMemberExpense
+          memberList={[]}
+          onUpdateTotalExpense={handleTotalExpenseUpdate}
+          onData={(_data) => {
+            console.log(_data);
+            setExpenseData(_data.expenses);
           }}
         />
-        <GroupMemberExpense memberList={['roshan', 'sds']} />
-        <TotalExpenseSections totalExpense={999} />
+        <TotalExpenseSections totalExpense={totalExpense} />
+        <Heading title="Settlement" />
+        <Settlement totalExpense={totalExpense} data={expenseData} />
+        <Container
+          sx={{
+            display: 'flex',
+            gap: '3',
+            marginTop: '10px',
+            alignItems: 'right',
+            justifyContent: 'right',
+          }}
+        >
+          <Button
+            variant="contained"
+            sx={{ marginRight: '5px' }}
+            onClick={() => {
+              setOpenDialog(true);
+            }}
+            color="error"
+          >
+            Cancel
+          </Button>
+          <Button variant="contained">Settle</Button>
+        </Container>
+
+        <Dialog
+          open={open}
+          onClose={() => {
+            setOpenDialog(false);
+          }}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            Are you sure you want to exit without saving?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Your work may not be recovered.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setOpenDialog(false);
+                navigate('/auth/');
+              }}
+              variant="contained"
+              color="primary"
+            >
+              Yes
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setOpenDialog(false);
+              }}
+              autoFocus
+            >
+              Back
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </section>
   );
@@ -346,14 +419,14 @@ const TotalExpenseSections = ({ totalExpense }) => {
         <Typography
           variant="h6"
           sx={{
-            fontWeight: 'bold',
+            fontWeight: 'body',
             color: theme.palette.text.primary,
           }}
         >
           Total Expense:
         </Typography>
         <Typography
-          variant="h4"
+          variant="h6"
           sx={{
             fontWeight: 'bold',
             color: '#000',
@@ -369,9 +442,10 @@ TotalExpenseSections.propTypes = {
   totalExpense: PropTypes.number,
 };
 
-const GroupMemberExpense = ({ memberList }) => {
+const GroupMemberExpense = ({ memberList, onUpdateTotalExpense, onData }) => {
   const params = useParams();
   const { groupId } = params;
+
   const getAcceptedExpense = async (_data, _page = 1, _limit = 10) => {
     const response = await settlementService.getAccepetedExpense({
       page: _page,
@@ -385,6 +459,17 @@ const GroupMemberExpense = ({ memberList }) => {
     queryKey: ['settlementpreview'],
     queryFn: getAcceptedExpense,
   });
+
+  // Memoize expensesByMembers
+  const expensesByMembers = useMemo(() => data?.expenses || [], [data]);
+
+  useEffect(() => {
+    if (!expensesByMembers || expensesByMembers.length === 0) return;
+    const total = expensesByMembers.reduce((sum, member) => sum + member.totalExpense, 0);
+    onUpdateTotalExpense(total);
+    onData(data);
+  }, [expensesByMembers, onUpdateTotalExpense, onData, data]);
+
   return (
     <TableContainer component={Paper}>
       <Table aria-label="collapsible table">
@@ -393,16 +478,13 @@ const GroupMemberExpense = ({ memberList }) => {
             <TableCell width={10}>S.N</TableCell>
             <TableCell width={200}>Name</TableCell>
             <TableCell width={200} align="right">
-              Total Expense
+              Total Amount
             </TableCell>
-            {/* <TableCell width={200} align="right">
-              Total Owe
-            </TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
-          {data &&
-            data.data.map((row, index) => (
+          {expensesByMembers &&
+            expensesByMembers.map((row, index) => (
               <TableRow key={index + 2}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell
@@ -414,35 +496,21 @@ const GroupMemberExpense = ({ memberList }) => {
                     gap: 2,
                   }}
                 >
-                  <Tooltip
-                    sx={{ marginRight: '10px' }}
-                    title={`${row.Member.userDetails.firstName} ${row.Member.userDetails.lastName}`}
-                  >
-                    <Avatar
-                      {...stringAvatar(
-                        `${row.Member.userDetails.firstName} ${row.Member.userDetails.lastName}`
-                      )}
-                    />
+                  <Tooltip sx={{ marginRight: '10px' }} title={`${row.userName}`}>
+                    <Avatar {...stringAvatar(`${row.userName}`)} />
                   </Tooltip>
-                  <span className="mt-1">{`${row.Member.userDetails.firstName} ${row.Member.userDetails.lastName}`}</span>
+                  <span className="mt-1">{`${row.userName}`}</span>
                 </TableCell>
                 <TableCell align="right">
-                  {' '}
-                  $AUD{' '}
+                  $AUD
                   <Typography sx={{ fontWeight: 'bold', typography: 'body' }}>
-                    {getTwoDigitNumber(row.amount)}
+                    {getTwoDigitNumber(row.totalExpense)}
                   </Typography>
                 </TableCell>
-                {/* <TableCell align="right">
-                  $AUD{' '}
-                  <Typography sx={{ fontWeight: 'bold', typography: 'body' }}>
-                    {getTwoDigitNumber(row.amount)}
-                  </Typography>
-                </TableCell> */}
               </TableRow>
             ))}
 
-          {data && data.data.length === 0 ? (
+          {expensesByMembers && expensesByMembers.length === 0 ? (
             <TableRow>
               <TableCell colSpan={6} align="center">
                 <Typography variant="body">No data found.</Typography>
@@ -460,4 +528,105 @@ const GroupMemberExpense = ({ memberList }) => {
 
 GroupMemberExpense.propTypes = {
   memberList: PropTypes.arrayOf(string),
+  onUpdateTotalExpense: PropTypes.func.isRequired,
+  onData: PropTypes.func.isRequired,
+};
+
+const Settlement = ({ data, totalExpense }) => {
+  const calculateSettlement = (memberExpense) => {
+    if (!data) {
+      return '';
+    }
+    const individualShare = totalExpense / data.length; // Assuming equal share for simplicity
+    return memberExpense - individualShare;
+  };
+
+  return (
+    <TableContainer component={Paper}>
+      <Table aria-label="collapsible table">
+        <TableHead>
+          <TableRow>
+            <TableCell width={10}>S.N</TableCell>
+            <TableCell width={200}>Name</TableCell>
+            <TableCell width={200} align="right">
+              Amount Owed/Receive
+            </TableCell>
+            <TableCell width={200} align="right">
+              Settlement Type
+            </TableCell>
+
+            {/* <TableCell width={200} align="right">
+              Action
+            </TableCell> */}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data &&
+            data.map((row, index) => {
+              const settlementAmount = calculateSettlement(row.totalExpense);
+              const status = settlementAmount > 0 ? 'Receive' : 'Pay';
+              // const color = settlementAmount > 0 ? 'green' : 'red';
+
+              return (
+                <TableRow key={index + 2}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell
+                    sx={{
+                      cursor: 'pointer',
+                      display: 'flex',
+                      justifyContent: 'left',
+                      alignItems: 'left',
+                      gap: 2,
+                    }}
+                  >
+                    <Tooltip sx={{ marginRight: '10px' }} title={`${row.userName}`}>
+                      <Avatar {...stringAvatar(`${row.userName}`)} />
+                    </Tooltip>
+                    <span className="mt-1">{`${row.userName}`}</span>
+                  </TableCell>
+
+                  <TableCell align="right">
+                    $AUD
+                    <Typography sx={{ fontWeight: 'bold', typography: 'body' }}>
+                      {getTwoDigitNumber(Math.abs(settlementAmount))}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color={status === 'Pay' ? 'error' : 'success'}
+                    >
+                      {status === 'Pay' ? 'Need to Pay' : 'Need to Receive'}
+                    </Button>
+                  </TableCell>
+                  {/* <TableCell align="right">
+                    $AUD
+                    <Typography sx={{ fontWeight: 'bold', typography: 'body' }}>
+                      {getTwoDigitNumber(Math.abs(settlementAmount))}
+                    </Typography>
+                  </TableCell> */}
+                </TableRow>
+              );
+            })}
+
+          {data && data.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} align="center">
+                <Typography variant="body">No data found.</Typography>
+              </TableCell>
+            </TableRow>
+          ) : (
+            // eslint-disable-next-line react/jsx-no-useless-fragment
+            <></>
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
+
+Settlement.propTypes = {
+  data: PropTypes.shape().isRequired,
+  totalExpense: PropTypes.number,
 };

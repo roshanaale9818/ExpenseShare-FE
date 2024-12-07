@@ -142,8 +142,6 @@ export default function GroupMemberView({ groupMembers, isAdmin, onAddMember }) 
         hideBtn={hideIcon}
         onNewClick={() => {
           onAddMember();
-          // addGroup();
-          // navigate(`/auth/group/${groupId}/expense?groupName=${'s'}`);
         }}
       />
 
