@@ -124,7 +124,7 @@ export default function AccountPopover() {
           description="You have to sign in again."
           onConfirmed={onConfirmedHandler}
           onCanceled={onCancelHandler}
-          variant="contained"
+          variant="outlined"
           sx={{ typography: 'body2', color: 'error.main', margin: '3px', width: '95%' }}
         />
       </Popover>

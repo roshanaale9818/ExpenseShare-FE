@@ -183,7 +183,7 @@ export default function GroupDetailView() {
       queryClient.invalidateQueries({
         queryKey: ['group', groupId],
       });
-      showSnackbar('Member added successfull');
+      // showSnackbar('Member added successfull');
       setOpenConfirm(false);
       setOpen(false);
       hideLoading();

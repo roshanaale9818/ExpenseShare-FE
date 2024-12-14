@@ -193,11 +193,16 @@ Row.propTypes = {
   serial: PropTypes.number,
 };
 
-export default function SettlementTableView() {
+export default function SettlementGridView() {
+  console.log('INIT');
   let rows = [];
   const getSettlement = async (_data, _page = 1, _limit = 10) => {
-    const response = await SettlementService.getSettlement({ page: _page, limit: _limit });
-    return response;
+    try {
+      const response = await SettlementService.GetSettlement({ page: _page, limit: _limit });
+      return response; // Ensure this is a promise
+    } catch (error) {
+      throw new Error('Failed to fetch settlement data'); // This will be caught by useQuery
+    }
   };
 
   const onDeleteHandler = (group) => {
@@ -213,10 +218,14 @@ export default function SettlementTableView() {
   };
 
   const { isError, data, error } = useQuery({
-    queryKey: ['settlement'],
-    queryFn: getSettlement,
+    queryKey: ['settle', 'expenseSettlement'],
+    staleTime: 0,
+    cacheTime: 5 * 60 * 1000,
+    enabled: true,
+    queryFn: () => getSettlement({}, 1, 10),
   });
   let content = '';
+  console.log('content', data);
 
   if (data && data.status === 'ok') {
     rows = data.data;
@@ -272,7 +281,7 @@ export default function SettlementTableView() {
           <TableRow>
             <TableCell>S.N</TableCell>
             <TableCell>Title</TableCell>
-            <TableCell>Associated Group</TableCell>
+            <TableCell>Associated Groups</TableCell>
             <TableCell>Amount</TableCell>
             <TableCell>Description</TableCell>
             <TableCell>Settled By </TableCell>

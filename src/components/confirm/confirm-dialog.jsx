@@ -56,7 +56,7 @@ export default function ConfirmDialog({
     <>
       <Button
         color={color}
-        variant={variant ? 'outlined' : 'text'}
+        variant={variant || 'outlined'}
         size={buttonSize}
         onClick={handleClickOpen}
         sx={sx}

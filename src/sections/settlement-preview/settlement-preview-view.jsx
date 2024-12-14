@@ -37,10 +37,12 @@ import { stringAvatar } from 'src/utils/helper';
 
 import { useAppContext } from 'src/providers/AppReducer';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useFormik } from 'formik';
+import { queryClient } from 'src/utils/http';
 import * as yup from 'yup';
+import ConfirmDialog from 'src/components/confirm/confirm-dialog';
 import * as settlementService from 'src/services/settlement.service';
 import SettlementTableView from './settlement-preview-table-view';
 
@@ -52,6 +54,8 @@ export default function SettlementPreview() {
     setTotalExpense(newTotalExpense); // Update total expense from child
   };
   const [expenseData, setExpenseData] = useState([]);
+  const [members, setMembers] = useState([]);
+
   const groups = [];
   const params = useParams();
   const { groupId } = params;
@@ -130,6 +134,30 @@ export default function SettlementPreview() {
 
   const hideBtn = true;
   const fullWidth = true;
+  const createSettlement = async (body) => {
+    const response = await settlementService.createSettlement(body);
+    return response;
+  };
+  const { mutate: settle } = useMutation({
+    mutationFn: createSettlement,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['expense']);
+      showSnackbar('Settlement successfull.', 'success');
+    },
+    onError: (error) => {
+      console.log('Error', error);
+      showSnackbar(error.response.data.message, 'error');
+    },
+  });
+  // const deleteExpense = async ({ id }) => {
+  //   const response = await ExpenseService.deleteExpense(id);
+  //   return response;
+  // };
+
+  const settlementHandler = () => {
+    console.log('settle');
+  };
+
   return (
     <section className="bg-white" style={{ boxShadow: 3, padding: '10px 0px 10px 0px' }}>
       <PageHeadView
@@ -218,18 +246,18 @@ export default function SettlementPreview() {
         </Box>
         <Heading title="Expenses" />
         <SettlementTableView onEdit={onExpenseEditHandler} />
-        <Heading title="Group Members Expense" />
+        <Heading title="Members Expense" />
         <GroupMemberExpense
           memberList={[]}
           onUpdateTotalExpense={handleTotalExpenseUpdate}
           onData={(_data) => {
-            console.log(_data);
             setExpenseData(_data.expenses);
+            setMembers(_data.members);
           }}
         />
         <TotalExpenseSections totalExpense={totalExpense} />
         <Heading title="Settlement" />
-        <Settlement totalExpense={totalExpense} data={expenseData} />
+        <Settlement totalExpense={totalExpense} data={expenseData} members={members} />
         <Container
           sx={{
             display: 'flex',
@@ -249,7 +277,28 @@ export default function SettlementPreview() {
           >
             Cancel
           </Button>
-          <Button variant="contained">Settle</Button>
+          {/* <Button variant="contained" onClick={settlementHandler}>
+            Settle
+          </Button> */}
+
+          <ConfirmDialog
+            title="Are you sure you want to settle ?"
+            description="You are about to settle the expense."
+            onConfirmed={() => {
+              settle({
+                title: '',
+                settledBy: '',
+                remarks: '',
+                expenseIds: data.data.map((x) => x.id),
+                groupId,
+              });
+            }}
+            onCanceled={() => {}}
+            variant="contained"
+            color="primary"
+            sx={{ width: '10%' }}
+            label="Settle"
+          />
         </Container>
 
         <Dialog
@@ -330,6 +379,7 @@ function getStyles(name, personName, theme) {
         : theme.typography.fontWeightMedium,
   };
 }
+
 const MembersBlock = (props) => {
   const { onSelection } = props;
   const params = useParams();
@@ -464,7 +514,10 @@ const GroupMemberExpense = ({ memberList, onUpdateTotalExpense, onData }) => {
   const expensesByMembers = useMemo(() => data?.expenses || [], [data]);
 
   useEffect(() => {
-    if (!expensesByMembers || expensesByMembers.length === 0) return;
+    if (!expensesByMembers || expensesByMembers.length === 0) {
+      onData([]);
+      return;
+    }
     const total = expensesByMembers.reduce((sum, member) => sum + member.totalExpense, 0);
     onUpdateTotalExpense(total);
     onData(data);
@@ -532,15 +585,55 @@ GroupMemberExpense.propTypes = {
   onData: PropTypes.func.isRequired,
 };
 
-const Settlement = ({ data, totalExpense }) => {
-  const calculateSettlement = (memberExpense) => {
-    if (!data) {
-      return '';
-    }
-    const individualShare = totalExpense / data.length; // Assuming equal share for simplicity
-    return memberExpense - individualShare;
-  };
+const Settlement = ({ data, totalExpense, members }) => {
+  const calculateSettlement = (userId) => {
+    try {
+      if (!data || !Array.isArray(data)) {
+        console.error('Invalid or missing data array.');
+        return 0; // Default to 0 if data is unavailable
+      }
 
+      // Fetch the user's total expense safely
+      const userExpense = data.find((x) => x.userId === userId)?.totalExpense || 0;
+      if (!members || members.length === 0) {
+        console.error('Members list is empty or undefined.');
+        return 0; // Avoid division by zero
+      }
+
+      // Calculate individual share of the total expenses
+      const individualShare = totalExpense / members.length;
+
+      // Settlement calculation
+      const settlement = userExpense - individualShare;
+
+      // Round the result to 2 decimal places for accuracy
+      const roundedSettlement = Math.round(settlement * 100) / 100;
+
+      return roundedSettlement;
+    } catch (error) {
+      console.error('Error in calculateSettlement:', error.message);
+      return 0; // Return a safe fallback value in case of errors
+    }
+  };
+  const calculateExpense = (userId) => {
+    try {
+      if (!data || !Array.isArray(data)) {
+        console.error('Invalid or missing data array.');
+        return 0; // Default to 0 if data is unavailable
+      }
+
+      // Fetch the user's total expense safely
+      const userExpense = data.find((x) => x.userId === userId)?.totalExpense || 0;
+      if (!members || members.length === 0) {
+        console.error('Members list is empty or undefined.');
+        return 0; // Avoid division by zero
+      }
+      return userExpense;
+    } catch (error) {
+      console.error('Error in calculateSettlement:', error.message);
+      return 0; // Return a safe fallback value in case of errors
+    }
+  };
   return (
     <TableContainer component={Paper}>
       <Table aria-label="collapsible table">
@@ -549,22 +642,25 @@ const Settlement = ({ data, totalExpense }) => {
             <TableCell width={10}>S.N</TableCell>
             <TableCell width={200}>Name</TableCell>
             <TableCell width={200} align="right">
+              Individual Expense
+            </TableCell>
+            <TableCell width={200} align="right">
+              Group Expense
+            </TableCell>
+            <TableCell width={200} align="right">
               Amount Owed/Receive
             </TableCell>
             <TableCell width={200} align="right">
               Settlement Type
             </TableCell>
-
-            {/* <TableCell width={200} align="right">
-              Action
-            </TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
-          {data &&
-            data.map((row, index) => {
-              const settlementAmount = calculateSettlement(row.totalExpense);
+          {members &&
+            members.map((row, index) => {
+              const settlementAmount = calculateSettlement(row.user.id);
               const status = settlementAmount > 0 ? 'Receive' : 'Pay';
+              const expense = calculateExpense(row.user.id);
               // const color = settlementAmount > 0 ? 'green' : 'red';
 
               return (
@@ -580,11 +676,22 @@ const Settlement = ({ data, totalExpense }) => {
                     }}
                   >
                     <Tooltip sx={{ marginRight: '10px' }} title={`${row.userName}`}>
-                      <Avatar {...stringAvatar(`${row.userName}`)} />
+                      <Avatar {...stringAvatar(`${row.memberName}`)} />
                     </Tooltip>
-                    <span className="mt-1">{`${row.userName}`}</span>
+                    <span className="mt-1">{`${row.memberName}`}</span>
                   </TableCell>
-
+                  <TableCell align="right">
+                    $AUD
+                    <Typography sx={{ fontWeight: 'bold', typography: 'body' }}>
+                      {getTwoDigitNumber(Math.abs(expense))}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    $AUD
+                    <Typography sx={{ fontWeight: 'bold', typography: 'body' }}>
+                      {getTwoDigitNumber(totalExpense)}
+                    </Typography>
+                  </TableCell>
                   <TableCell align="right">
                     $AUD
                     <Typography sx={{ fontWeight: 'bold', typography: 'body' }}>
@@ -629,4 +736,5 @@ const Settlement = ({ data, totalExpense }) => {
 Settlement.propTypes = {
   data: PropTypes.shape().isRequired,
   totalExpense: PropTypes.number,
+  members: PropTypes.array,
 };

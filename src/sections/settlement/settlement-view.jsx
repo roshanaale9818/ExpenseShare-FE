@@ -24,7 +24,7 @@ import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import * as settlementService from 'src/services/settlement.service';
-import SettlementTableView from './settlement-table-view';
+import SettlementGridView from './settlement-grid-view';
 
 // import ExpenseRequestSearchForm from './expense-request-search-form';
 
@@ -65,6 +65,7 @@ export default function SettlementView() {
 
   const getUserGroups = async (_data, _page = 1, _limit = 10) => {
     const response = await settlementService.getGroupList({ page: _page, limit: _limit });
+    console.log('res', response);
     return response;
   };
 
@@ -77,7 +78,7 @@ export default function SettlementView() {
   };
 
   const { data: userGroupData } = useQuery({
-    queryKey: ['settlement', 'expense'],
+    queryKey: ['settlementUserGroups', 'expense'],
     queryFn: getUserGroups,
   });
   if (userGroupData) {
@@ -173,7 +174,7 @@ export default function SettlementView() {
           </Dialog>
         </Box>
 
-        <SettlementTableView onEdit={onExpenseEditHandler} />
+        <SettlementGridView onEdit={onExpenseEditHandler} />
       </Container>
     </>
   );
