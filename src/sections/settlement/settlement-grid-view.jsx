@@ -194,15 +194,10 @@ Row.propTypes = {
 };
 
 export default function SettlementGridView() {
-  console.log('INIT');
   let rows = [];
-  const getSettlement = async (_data, _page = 1, _limit = 10) => {
-    try {
-      const response = await SettlementService.GetSettlement({ page: _page, limit: _limit });
-      return response; // Ensure this is a promise
-    } catch (error) {
-      throw new Error('Failed to fetch settlement data'); // This will be caught by useQuery
-    }
+  const getSettlement = async () => {
+    const response = await SettlementService.GetSettlement({ page: 1, limit: 10 });
+    return response;
   };
 
   const onDeleteHandler = (group) => {
@@ -219,15 +214,11 @@ export default function SettlementGridView() {
 
   const { isError, data, error } = useQuery({
     queryKey: ['settle', 'expenseSettlement'],
-    staleTime: 0,
-    cacheTime: 5 * 60 * 1000,
-    enabled: true,
-    queryFn: () => getSettlement({}, 1, 10),
+    queryFn: getSettlement,
   });
   let content = '';
-  console.log('content', data);
 
-  if (data && data.status === 'ok') {
+  if (data && data.status === 'ok' && data.data.length) {
     rows = data.data;
     content = (
       <TableBody>
@@ -254,7 +245,7 @@ export default function SettlementGridView() {
     );
   }
   if (isError) {
-    console.error(error);
+    // console.error(error);
     content = (
       <TableBody>
         <TableRow>

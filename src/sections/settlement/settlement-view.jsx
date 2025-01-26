@@ -59,7 +59,6 @@ export default function SettlementView() {
   };
   const onNewClicked = () => {
     setOpen(true);
-    console.log(setIsLoading);
     formik.resetForm();
   };
 
