@@ -103,7 +103,7 @@ export const setAxiosErrorHandler = (errorHandler) => {
       if (!ignoredEndpoints.some((endpoint) => config.url.includes(endpoint))) {
         // Perform any operations for non-ignored endpoints
         // Example: Show a loading indicator
-        console.log('Request made to:', config.url);
+        // console.log('Request made to:', config.url);
       }
       return config; // Always return the config
     },
@@ -118,7 +118,7 @@ export const setAxiosErrorHandler = (errorHandler) => {
     (response) => {
       // Check if the request URL matches any ignored endpoint
       if (!ignoredEndpoints.some((endpoint) => response.config.url.includes(endpoint))) {
-        console.log('Response received from:', response.config.url);
+        // console.log('Response received from:', response.config.url);
       }
       return response; // Return the response as is
     },

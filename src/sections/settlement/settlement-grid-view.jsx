@@ -16,11 +16,8 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import Iconify from 'src/components/iconify';
-import Label from 'src/components/label';
+// import Label from 'src/components/label';
 
-// import { queryClient } from 'src/utils/http';
-// import { useAppContext } from 'src/providers/AppReducer';
-// import * as ExpenseService from 'src/services/expense.service';
 import * as SettlementService from 'src/services/settlement.service';
 
 import ErrorBlock from 'src/components/error';
@@ -113,7 +110,7 @@ function Row(props) {
               <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
                 Added By:
               </Typography>
-              <Typography variant="body1">{row.addedBy}</Typography>
+              <Typography variant="body1">{row.settledBy}</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
@@ -125,7 +122,7 @@ function Row(props) {
               <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
                 Description:
               </Typography>
-              <Typography variant="body1">{row.description}</Typography>
+              <Typography variant="body1">-</Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1" sx={{ fontWeight: 600 }} className="label">
@@ -161,12 +158,9 @@ function Row(props) {
             {getTwoDigitNumber(row.amount)}
           </Typography>
         </TableCell>
-        <TableCell>{row.description}</TableCell>
-        <TableCell>{row.addedBy}</TableCell>
+        <TableCell align="right">{row.settledBy}</TableCell>
 
-        <TableCell sx={{ display: 'flex' }}>
-          <Label color={(row.status === 'PENDING' && 'secondary') || 'success'}>{row.status}</Label>
-        </TableCell>
+        <TableCell align="right">{getFormatedDate(row.createdAt)}</TableCell>
 
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -184,8 +178,8 @@ Row.propTypes = {
     groupName: PropTypes.string,
     createdAt: PropTypes.string,
     status: PropTypes.string,
-    addedBy: PropTypes.string,
-    isAdmin: PropTypes.string,
+    settledBy: PropTypes.string,
+    isAdmin: PropTypes.bool,
     title: PropTypes.string,
     amount: PropTypes.number,
     description: PropTypes.string,
@@ -209,7 +203,7 @@ export default function SettlementGridView() {
   };
 
   const paginationChangeHandler = (event, page) => {
-    console.log('EVENT', event, page);
+    console.log('NOT IMPLEMENTED YET', event, page);
   };
 
   const { isError, data, error } = useQuery({
@@ -217,7 +211,22 @@ export default function SettlementGridView() {
     queryFn: getSettlement,
   });
   let content = '';
-
+  if (isError) {
+    content = (
+      <TableBody>
+        <TableRow>
+          <TableCell
+            colSpan={8}
+            sx={{
+              textAlign: 'center',
+            }}
+          >
+            <ErrorBlock message="An Error has occured" />
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    );
+  }
   if (data && data.status === 'ok' && data.data.length) {
     rows = data.data;
     content = (
@@ -244,18 +253,13 @@ export default function SettlementGridView() {
       </TableBody>
     );
   }
-  if (isError) {
-    // console.error(error);
+
+  if (data && data.data.length === 0) {
     content = (
       <TableBody>
         <TableRow>
-          <TableCell
-            colSpan={8}
-            sx={{
-              textAlign: 'center',
-            }}
-          >
-            <ErrorBlock message="An Error has occured" />
+          <TableCell colSpan={6} align="center">
+            <Typography variant="body">No data found.</Typography>
           </TableCell>
         </TableRow>
       </TableBody>
@@ -274,9 +278,8 @@ export default function SettlementGridView() {
             <TableCell>Title</TableCell>
             <TableCell>Associated Groups</TableCell>
             <TableCell>Amount</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Settled By </TableCell>
-            <TableCell align="right">Status</TableCell>
+            <TableCell align="right">Settled By </TableCell>
+            <TableCell align="right">Created At</TableCell>
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>

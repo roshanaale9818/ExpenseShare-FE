@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import Link from '@mui/material/Link';
@@ -14,7 +14,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import Iconify from 'src/components/iconify';
-import { getUserId, queryClient } from 'src/utils/http';
+import { queryClient } from 'src/utils/http';
 import { useAppContext } from 'src/providers/AppReducer';
 import * as ExpenseService from 'src/services/expense.service';
 
@@ -30,7 +30,7 @@ import { formatDateString } from 'src/utils/format-time';
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
   const navigate = useNavigate();
-  const { row, onEdit, serial } = props;
+  const { row, onEdit, serial, filters } = props;
   const handleCloseMenu = () => {
     setPopOverMenu(false);
   };
@@ -97,7 +97,6 @@ function Row(props) {
     },
   });
   const onConfirmedHandler = (data) => {
-    // console.log("friy",data)
     showLoading();
     mutate(data);
     handleCloseMenu();
@@ -195,12 +194,19 @@ Row.propTypes = {
   serial: PropTypes.number,
   onEdit: PropTypes.func,
   // onDelete: PropTypes.func,
+  filters: PropTypes.object,
 };
 
-export default function ExpenseTableView({ onEdit }) {
+export default function ExpenseTableView({ onEdit, filters }) {
   let rows = [];
-  const getExpenseList = async (_data, _page = 1, _limit = 10) => {
-    const response = await ExpenseService.getExpenseList({ page: _page, limit: _limit });
+
+  const getExpenseList = async (_page = 1, _limit = 10, _groupId, _status) => {
+    const response = await ExpenseService.getExpenseList({
+      page: _page,
+      limit: _limit,
+      groupId: _groupId,
+      status: _status,
+    });
     return response;
   };
 
@@ -211,41 +217,42 @@ export default function ExpenseTableView({ onEdit }) {
       console.error(err);
     }
   };
+
   const paginationChangeHandler = () => {};
+
   const onDeleteHandler = (data) => {
     try {
       console.log('deleting the expense', data);
-      // onDelete(group);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const { isError, data, error } = useQuery({
-    queryKey: ['expense', getUserId()],
-    queryFn: getExpenseList,
+  const { isError, data, error, refetch } = useQuery({
+    queryKey: ['expense', filters],
+    queryFn: () => getExpenseList(1, 10, filters?.groupId, filters?.status),
+    keepPreviousData: true,
   });
+
+  useEffect(() => {
+    refetch();
+  }, [filters, refetch]);
+
   let content = '';
 
   if (data && data.status === 'ok') {
     rows = data.data;
     content = (
       <TableBody>
-        {rows &&
-          rows.map((row, index) => (
-            <Row
-              key={row.id}
-              onEdit={() => {
-                onEditClickHandler(row);
-              }}
-              row={row}
-              serial={index}
-              onDelete={() => {
-                onDeleteHandler(row);
-              }}
-            />
-          ))}
-
+        {rows.map((row, index) => (
+          <Row
+            key={row.id}
+            onEdit={() => onEditClickHandler(row)}
+            row={row}
+            serial={index}
+            onDelete={() => onDeleteHandler(row)}
+          />
+        ))}
         {rows.length === 0 && (
           <TableRow>
             <TableCell colSpan={5} align="center">
@@ -258,6 +265,7 @@ export default function ExpenseTableView({ onEdit }) {
       </TableBody>
     );
   }
+
   if (isError) {
     content = (
       <TableBody>
@@ -265,7 +273,7 @@ export default function ExpenseTableView({ onEdit }) {
           <TableCell>
             <ErrorBlock
               sx={{ width: 100 }}
-              message={error ? error.message : 'An error has occured'}
+              message={error ? error.message : 'An error has occurred'}
             />
           </TableCell>
         </TableRow>
@@ -282,18 +290,18 @@ export default function ExpenseTableView({ onEdit }) {
             <TableCell>Title</TableCell>
             <TableCell>Associated Group</TableCell>
             <TableCell>Amount</TableCell>
-            <TableCell> Status</TableCell>
-            <TableCell>Created At </TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Created At</TableCell>
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
         {content}
       </Table>
 
-      {data && data.totalPages > 1 && (
+      {data?.totalPages > 1 && (
         <Pagination
           sx={{ textAlign: 'center', justifyContent: 'center', display: 'flex', p: 3 }}
-          count={data ? Number(data.totalPages) : 100}
+          count={Number(data.totalPages)}
           variant="outlined"
           shape="rounded"
           onChange={paginationChangeHandler}
@@ -305,4 +313,5 @@ export default function ExpenseTableView({ onEdit }) {
 
 ExpenseTableView.propTypes = {
   onEdit: PropTypes.func,
+  filters: PropTypes.object,
 };

@@ -64,6 +64,7 @@ export default function ExpenseView() {
   const [isOpen, setOpen] = useState(false);
   // const [mode, setMode] = useState('new');
   const [isLoading, setIsLoading] = useState(false);
+  const [filters, onSetFilters] = useState({ groupId: '', status: '' });
 
   const handleClose = (event, reason = null) => {
     if (reason && reason === 'backdropClick') return;
@@ -155,6 +156,11 @@ export default function ExpenseView() {
     // finally{
     //   setMemberList([]);
     // }
+  };
+  const onfilterChangeHandler = (formValues) => {
+    console.log(formValues);
+    onSetFilters(formValues);
+    console.log(formValues);
   };
   return (
     <>
@@ -267,9 +273,6 @@ export default function ExpenseView() {
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      {/* <MenuItem value={10}>Samir Tamang</MenuItem>
-                      <MenuItem value={20}>Roshan Aale Magar</MenuItem>
-                      <MenuItem value={30}>Rojina Ale</MenuItem> */}
 
                       {memberList &&
                         memberList.map((row, index) => (
@@ -337,8 +340,8 @@ export default function ExpenseView() {
           </DialogActions>
         </Dialog>
 
-        <ExpenseFilterView data={groups} />
-        <ExpenseTableView onEdit={onExpenseEditHandler} />
+        <ExpenseFilterView data={groups} onFilterDataChange={onfilterChangeHandler} />
+        <ExpenseTableView onEdit={onExpenseEditHandler} filters={filters} />
       </Container>
     </>
   );

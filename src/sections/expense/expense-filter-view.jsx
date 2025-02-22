@@ -14,8 +14,7 @@ import { useFormik } from 'formik';
 import { PropTypes } from 'prop-types';
 import { StatusOptions } from 'src/utils/helper';
 
-
-export default function ExpenseFilterView({data}) {
+export default function ExpenseFilterView({ data, onFilterDataChange }) {
   const [open, setOpen] = useState(false);
   const schema = yup.object({
     group: yup.string('Enter Group').required('Group is required'),
@@ -31,24 +30,25 @@ export default function ExpenseFilterView({data}) {
     validationSchema: schema,
     onSubmit: (values) => {
       console.log('values', values);
-      // submitHandler(values);
-      //   mutate(values);
+      onFilterDataChange(values);
     },
   });
 
-  // reset form handler get initial form 
-  const onResetHandler = ()=>{
-      console.log("calling reset")
-  }
+  // reset form handler get initial form
+  const onResetHandler = () => {
+    console.log('calling reset');
+    formik.resetForm();
+    onFilterDataChange({ group: '', status: '' });
+  };
 
   const handleGroupChange = (event) => {
     const newGroupValue = event.target.value;
     // Reset expenseTitle field when group is changed
     if (newGroupValue !== formik.values.group) {
-        formik.setFieldValue('status', ''); // Reset expenseTitle
+      formik.setFieldValue('status', ''); // Reset expenseTitle
     }
     formik.handleChange(event); // Call handleChange to update formik's state
-};
+  };
 
   return (
     <Card>
@@ -83,39 +83,19 @@ export default function ExpenseFilterView({data}) {
                     error={formik.touched.group && Boolean(formik.errors.group)}
                     helperText={formik.touched.group && formik.errors.group}
                   >
-                <MenuItem value="">
-                        <em>None</em>
-                      </MenuItem>
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
 
-                      {/* // dynamic group list  */}
-                      {data &&
-                        data.map((row, index) => (
-                          <MenuItem key={row.id} value={row.id}>
-                            {row.groupName}
-                          </MenuItem>
-                        ))}
+                    {data &&
+                      data.map((row, index) => (
+                        <MenuItem key={row.id} value={row.id}>
+                          {row.groupName}
+                        </MenuItem>
+                      ))}
                   </TextField>
                 </Grid>
 
-                {/* <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    select
-                    label="Paid By"
-                    name="paidBy"
-                    variant="outlined"
-                    type="text"
-                    id="paidBy"
-                    autoComplete="Paid By"
-                    value={formik.values.paidBy}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                  >
-                    <MenuItem value="pending">Pending</MenuItem>
-                    <MenuItem value="approved">Approved</MenuItem>
-                    <MenuItem value="rejected">Rejected</MenuItem>
-                  </TextField>
-                </Grid> */}
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
@@ -130,21 +110,25 @@ export default function ExpenseFilterView({data}) {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   >
-                     {StatusOptions &&
-                        StatusOptions.map((status, index) => (
-                          <MenuItem key={index} value={status.value}>
-                            {status.label}
-                          </MenuItem>
-                        ))}
-            
-          
+                    {StatusOptions &&
+                      StatusOptions.map((status, index) => (
+                        <MenuItem key={index} value={status.value}>
+                          {status.label}
+                        </MenuItem>
+                      ))}
                   </TextField>
                 </Grid>
               </Grid>
               <Button sx={{ mt: 2 }} type="submit" variant="contained" color="primary">
                 Search
               </Button>
-              <Button sx={{ mt: 2,ml:2 }} type="button" onClick={onResetHandler} variant="contained" color="error">
+              <Button
+                sx={{ mt: 2, ml: 2 }}
+                type="button"
+                onClick={onResetHandler}
+                variant="contained"
+                color="error"
+              >
                 Reset
               </Button>
             </form>
@@ -156,5 +140,6 @@ export default function ExpenseFilterView({data}) {
 }
 
 ExpenseFilterView.propTypes = {
-  data:PropTypes.array
-}
+  data: PropTypes.array,
+  onFilterDataChange: PropTypes.func,
+};

@@ -68,3 +68,16 @@ export async function createSettlement(body) {
   const resData = await response.data;
   return resData;
 }
+
+export async function checkIfGroupHasUnSettledExpense(body) {
+  const response = await _http.post(`${APIURL}settlement/create?groupId=${body.groupId}`, body);
+  if (!response.status === 200) {
+    const error = new Error('An error occurred while trying to create');
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+
+  const resData = await response.data;
+  return resData;
+}

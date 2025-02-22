@@ -328,7 +328,7 @@ export default function SettlementPreviewTable(props) {
       <TableBody>
         <TableRow>
           <TableCell colSpan={7} sx={{ textAlign: 'center' }}>
-            No Expense found. Check if their status are accepted.
+            No data found. Check if their status are accepted.
           </TableCell>
         </TableRow>
       </TableBody>

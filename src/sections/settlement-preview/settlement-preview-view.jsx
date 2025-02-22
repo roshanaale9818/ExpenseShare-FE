@@ -143,6 +143,7 @@ export default function SettlementPreview() {
     onSuccess: () => {
       queryClient.invalidateQueries(['expense']);
       showSnackbar('Settlement successfull.', 'success');
+      navigate('/auth/settlement');
     },
     onError: (error) => {
       console.log('Error', error);
@@ -531,7 +532,7 @@ const GroupMemberExpense = ({ memberList, onUpdateTotalExpense, onData }) => {
             <TableCell width={10}>S.N</TableCell>
             <TableCell width={200}>Name</TableCell>
             <TableCell width={200} align="right">
-              Total Amount
+              Amount
             </TableCell>
           </TableRow>
         </TableHead>

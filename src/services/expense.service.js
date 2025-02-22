@@ -34,10 +34,10 @@ export async function editExpense(expense) {
   return resData;
 }
 
-export async function getExpenseList({ page, limit }) {
+export async function getExpenseList({ page, limit, status, groupId }) {
   try {
     const response = await _http.get(`${APIURL}expense/list`, {
-      params: { page, limit }, // Using params to clean up the URL
+      params: { page, limit, status, groupId }, // Using params to clean up the URL
     });
 
     // Directly return the response data
@@ -55,11 +55,20 @@ export async function getExpenseList({ page, limit }) {
   }
 }
 
-export async function getGroupExpense({ page, limit, groupId }) {
-  const response = await _http.get(
-    `${APIURL}group/expense?groupId=${groupId}&page=${page}&limit=${limit}`
-  );
-  if (!response.status === 200) {
+export async function getGroupExpense({ page, limit, groupId, status }) {
+  // Initialize the base URL
+  let url = `${APIURL}group/expense?groupId=${groupId}&page=${page}&limit=${limit}`;
+
+  // Append the status parameter if it's provided
+  if (status) {
+    url += `&status=${status}`;
+  }
+
+  // Make the HTTP GET request
+  const response = await _http.get(url);
+
+  // Check if the response status is not 200
+  if (response.status !== 200) {
     const error = new Error('An error occurred');
     error.code = response.status;
     error.info = await response.json();
@@ -69,6 +78,7 @@ export async function getGroupExpense({ page, limit, groupId }) {
   const resData = await response.data;
   return resData;
 }
+
 export async function deleteExpense(id) {
   const data = {
     expenseId: id,

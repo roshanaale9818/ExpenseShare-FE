@@ -19,17 +19,19 @@ import Alert from '@mui/material/Alert';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 // import { queryClient } from 'src/utils/http';
-// import { useAppContext } from 'src/providers/AppReducer';
+import { useAppContext } from 'src/providers/AppReducer';
 import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import * as settlementService from 'src/services/settlement.service';
+// import * as expenseService from 'src/services/expense.service';
+
 import SettlementGridView from './settlement-grid-view';
 
 // import ExpenseRequestSearchForm from './expense-request-search-form';
 
 export default function SettlementView() {
-  // const { showSnackbar } = useAppContext();
+  const { showSnackbar } = useAppContext();
   let groups = [];
   const navigate = useNavigate();
 
@@ -45,7 +47,17 @@ export default function SettlementView() {
   const formik = useFormik({
     initialValues,
     validationSchema: schema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
+      // check if user has the un settled  expenses in that group
+      const data = await settlementService.getAccepetedExpense({
+        page: 1,
+        limit: 10,
+        groupId: values.group,
+      });
+      if (data && data.data.length === 0) {
+        showSnackbar('There is no any expense to settle for this group.', 'error');
+        return;
+      }
       navigate(`/auth/settlement/${values.group}/preview?groupName=`);
     },
   });
@@ -64,7 +76,6 @@ export default function SettlementView() {
 
   const getUserGroups = async (_data, _page = 1, _limit = 10) => {
     const response = await settlementService.getGroupList({ page: _page, limit: _limit });
-    console.log('res', response);
     return response;
   };
 
