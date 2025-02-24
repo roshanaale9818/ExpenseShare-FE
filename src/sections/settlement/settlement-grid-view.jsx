@@ -29,6 +29,7 @@ import { getTwoDigitNumber } from 'src/utils/format-number';
 // import { SettlementStatus } from 'src/utils/helper';
 import ViewDialog from 'src/components/view-dialog/view.dialog';
 import { getFormatedDate } from 'src/utils/helper';
+import LoadingSpinner from 'src/components/loading-spinner/loading-spinner';
 
 function Row(props) {
   // const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -206,7 +207,7 @@ export default function SettlementGridView() {
     console.log('NOT IMPLEMENTED YET', event, page);
   };
 
-  const { isError, data, error } = useQuery({
+  const { isError, data, error, isLoading } = useQuery({
     queryKey: ['settle', 'expenseSettlement'],
     queryFn: getSettlement,
   });
@@ -275,7 +276,7 @@ export default function SettlementGridView() {
         <TableHead>
           <TableRow>
             <TableCell>S.N</TableCell>
-            <TableCell>Title</TableCell>
+            <TableCell>Id</TableCell>
             <TableCell>Associated Groups</TableCell>
             <TableCell>Amount</TableCell>
             <TableCell align="right">Settled By </TableCell>
@@ -283,6 +284,17 @@ export default function SettlementGridView() {
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
+        {isLoading && (
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={7}>
+                {' '}
+                {/* Set colSpan to cover all columns */}
+                <LoadingSpinner fullHeight />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        )}
         {content}
       </Table>
 

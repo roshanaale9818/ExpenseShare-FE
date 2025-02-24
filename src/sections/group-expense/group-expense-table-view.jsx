@@ -22,6 +22,7 @@ import Pagination from '@mui/material/Pagination';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import { getTwoDigitNumber } from 'src/utils/format-number';
+import LoadingSpinner from 'src/components/loading-spinner/loading-spinner';
 
 function Row(props) {
   const { showSnackbar, hideLoading } = useAppContext();
@@ -104,7 +105,7 @@ export default function GroupExpenseTableView() {
     return response;
   };
 
-  const { mutate } = useMutation({
+  const { mutate, isLoading } = useMutation({
     mutationFn: getExpenseList,
     onSuccess: () => {
       queryClient.invalidateQueries(['groups', groupId, 'expense']);
@@ -202,6 +203,17 @@ export default function GroupExpenseTableView() {
             <TableCell align="right">Created By </TableCell>
           </TableRow>
         </TableHead>
+        {isLoading && (
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={7}>
+                {' '}
+                {/* Set colSpan to cover all columns */}
+                <LoadingSpinner fullHeight />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        )}
         {content}
       </Table>
 

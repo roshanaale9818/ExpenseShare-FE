@@ -49,3 +49,7 @@
 .mr-1 {
   margin-right: 10px;
 }
+.spinner-wrap {
+  width: 100%;
+  display: block;
+}

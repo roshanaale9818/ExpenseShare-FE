@@ -28,6 +28,7 @@ import ErrorBlock from 'src/components/error';
 import ConfirmDelete from 'src/components/delete-confirm/confirm-delete';
 import Label from 'src/components/label';
 import { useNavigate } from 'react-router-dom';
+import LoadingSpinner from 'src/components/loading-spinner/loading-spinner';
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -194,7 +195,7 @@ export default function GroupTableView(props) {
     }
   };
 
-  const { isError, data, error } = useQuery({
+  const { isError, data, error, isLoading } = useQuery({
     queryKey: ['groups', getUserId()],
     queryFn: getGroupList,
   });
@@ -267,6 +268,17 @@ export default function GroupTableView(props) {
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
+        {isLoading && (
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={7}>
+                {' '}
+                {/* Set colSpan to cover all columns */}
+                <LoadingSpinner fullHeight />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        )}
         {content}
       </Table>
       {data && data.totalPages > 1 && (

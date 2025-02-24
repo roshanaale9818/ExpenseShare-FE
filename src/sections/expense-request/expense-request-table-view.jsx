@@ -30,6 +30,7 @@ import { getFormatedDate, SettlementStatus, stringAvatar } from 'src/utils/helpe
 import ViewDialog from 'src/components/view-dialog/view.dialog';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
+import LoadingSpinner from 'src/components/loading-spinner/loading-spinner';
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -244,8 +245,8 @@ export default function ExpenseRequestTableView() {
     console.log('EVENT', event, page);
   };
 
-  const { isError, data, error } = useQuery({
-    queryKey: ['expense'],
+  const { isError, data, error, isLoading } = useQuery({
+    queryKey: ['expenseReq'],
     queryFn: getExpenseRequest,
   });
   let content = '';
@@ -313,6 +314,17 @@ export default function ExpenseRequestTableView() {
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
+        {isLoading && (
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={7}>
+                {' '}
+                {/* Set colSpan to cover all columns */}
+                <LoadingSpinner fullHeight />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        )}
         {content}
       </Table>
 

@@ -26,6 +26,7 @@ import Pagination from '@mui/material/Pagination';
 import { getTwoDigitNumber } from 'src/utils/format-number';
 import { SettlementStatus } from 'src/utils/helper';
 import { formatDateString } from 'src/utils/format-time';
+import LoadingSpinner from 'src/components/loading-spinner/loading-spinner';
 
 function Row(props) {
   const { showSnackbar, showLoading, hideLoading } = useAppContext();
@@ -228,7 +229,7 @@ export default function ExpenseTableView({ onEdit, filters }) {
     }
   };
 
-  const { isError, data, error, refetch } = useQuery({
+  const { isError, data, error, refetch, isLoading } = useQuery({
     queryKey: ['expense', filters],
     queryFn: () => getExpenseList(1, 10, filters?.groupId, filters?.status),
     keepPreviousData: true,
@@ -295,6 +296,17 @@ export default function ExpenseTableView({ onEdit, filters }) {
             <TableCell align="right"> </TableCell>
           </TableRow>
         </TableHead>
+        {isLoading && (
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={7}>
+                {' '}
+                {/* Set colSpan to cover all columns */}
+                <LoadingSpinner fullHeight />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        )}
         {content}
       </Table>
 

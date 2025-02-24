@@ -60,7 +60,7 @@ export default function Nav({ openNav, onCloseNav }) {
         <Typography variant="subtitle2">{displayName}</Typography>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {account.roles[0]}
+          {/* {account.roles[0]} */} Personal Account
         </Typography>
       </Box>
     </Box>
